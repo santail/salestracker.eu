@@ -1,0 +1,144 @@
+web-admin:
+  container_name: web-admin
+  build: ./salestracker.eu-admin/
+  dockerfile: Dockerfile
+  ports:
+    - "8000:8000"
+  volumes:
+    - ./salestracker.eu-admin/:/usr/src/app/
+    - ./shared/uploads/:/usr/src/app/uploads/
+    - /usr/src/app/node_modules # will statically map node_modules folder to container. Should clean-up on each package.json change with docker rm -v containerId
+  environment:
+    REDIS_ADDR: redis:6379
+    MONGODB_URI: mongodb://mongo:27017/salestracker
+    NODE_ENV: development 
+    PORT: 8000
+  links:
+    - server-mongodb
+    - server-redis
+
+web-public:
+  container_name: web-public
+  build: ./salestracker.eu-public/
+  dockerfile: Dockerfile
+  links:
+    - server-mongodb
+  ports:
+    - "9000:9000"
+  volumes:
+    - ./salestracker.eu-public/:/usr/src/app/
+    - ./shared/uploads/:/usr/src/app/uploads/
+    - /usr/src/app/node_modules
+  environment:
+   NODE_ENV: development 
+   MONGODB_URI: mongodb://mongo:27017/salestracker
+   PORT: 9000
+
+backend-harvester:
+  container_name: backend-harvester
+  build: ./salestracker.eu-harvester/
+  dockerfile: Dockerfile
+  volumes:
+    - ./salestracker.eu-harvester/:/usr/src/app/
+    - ./shared/uploads/:/usr/src/app/uploads/
+    - /usr/src/app/node_modules
+  environment:
+    REDIS_ADDR: redis:6379
+    MONGODB_URI: mongodb://mongo:27017/salestracker
+  links:
+    - server-mongodb
+    - server-redis
+
+backend-notifier:
+  container_name: backend-notifier
+  build: ./salestracker.eu-notifier/
+  dockerfile: Dockerfile
+  volumes:
+    - ./salestracker.eu-notifier/:/usr/src/app/
+    - /usr/src/app/node_modules
+  environment:
+    REDIS_ADDR: redis:6379
+    MONGODB_URI: mongodb://mongo:27017/salestracker
+  links:
+    - server-mongodb
+    - server-redis
+
+server-mongodb:
+  container_name: server-mongodb
+  image: mongo:latest
+  hostname: mongo
+  volumes:
+    - dbdata:/data/db
+  ports:
+   - "27017:27017"
+
+server-redis:
+  container_name: server-redis
+  image: redis
+  hostname: redis
+  ports:
+    - "6379:6379"
+
+server-elasticsearch:
+  image: elasticsearch:latest
+  container_name: server-elasticsearch
+  command: elasticsearch -Ecluster.name=salestracker -Ebootstrap.memory_lock=true -Ehttp.port=9200 -Ehttp.cors.allow-origin="http://localhost:1358" -Ehttp.cors.enabled=true -Ehttp.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization -Ehttp.cors.allow-credentials=true
+  environment:
+    - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+  ports:
+    - "9200:9200"
+    - "9300:9300"
+
+tools-elasticsearch-dejavu:
+  image: appbaseio/dejavu:latest
+  container_name: tools-elasticsearch-dejavu
+  ports:
+    - "1358:1358"
+  links:
+    - server-elasticsearch
+
+tools-elasticsearch-kibana:
+     image: kibana:latest
+     container_name: tools-elasticsearch-kibana
+     ports:
+        - "5601:5601"
+     links:
+       - server-elasticsearch:elasticsearch
+
+tools-mongodb-commander:
+  image: mongo-express
+  container_name: tools-mongodb-commander
+  environment:
+    ME_CONFIG_MONGODB_URI: mongodb://mongo:27017/salestracker
+    VCAP_APP_PORT: 8082
+  links:
+    - server-mongodb
+  ports:
+   - "8082:8082"
+
+tools-mongodb-mongoclient:
+  image: mongoclient/mongoclient:latest
+  container_name: tools-mongodb-mongoclient
+  hostname: mongoclient
+  links:
+    - server-mongodb
+  ports:
+    - "3300:3000"
+      
+tools-redis-commander:
+  image: rediscommander/redis-commander:latest
+  hostname: redis-commander
+  container_name: tools-redis-commander
+  restart: always
+  environment:
+    REDIS_HOSTS: redis:6379
+  ports:
+    - "8081:8081"
+
+tools-mailcatcher:
+  image: schickling/mailcatcher:latest
+  container_name: tools-mailcatcher
+  hostname: mailcatcher
+  ports:
+    - "1080:1080"
+    - "1025:1025"

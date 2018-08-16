@@ -1,0 +1,31 @@
+
+backend-harvester:
+  container_name: backend-harvester
+  build: ./salestracker.eu-harvester/
+  dockerfile: Dockerfile.production
+  volumes:
+    - ./salestracker.eu-harvester/:/usr/src/app/
+    - ./shared/uploads/:/usr/src/app/uploads/
+    - /usr/src/app/node_modules
+  environment:
+    REDIS_ADDR: redis:6379
+    MONGODB_URI: mongodb://mongo:27017/salestracker
+  links:
+    - server-mongodb
+    - server-redis
+
+server-mongodb:
+  container_name: server-mongodb
+  image: mongo:latest
+  hostname: mongo
+  volumes:
+    - dbdata:/data/db
+  ports:
+   - "27017:27017"
+
+server-redis:
+  container_name: server-redis
+  image: redis
+  hostname: redis
+  ports:
+    - "6379:6379"
