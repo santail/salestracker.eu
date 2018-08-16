@@ -1,0 +1,24 @@
+{
+  "name": "salestracker.eu-harvester",
+  "version": "0.0.1",
+  "description": "Crawls list of sites and gathers products",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "start:prod": "pm2 start index.js"
+  },
+  "author": "Nikolai Muhhin",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^2.6.0",
+    "cheerio": "^1.0.0-rc.2",
+    "htmltidy": "0.0.6",
+    "kue": "^0.11.6",
+    "kue-scheduler": "^0.7.4",
+    "lodash": "^4.17.5",
+    "mongojs": "^2.5.0",
+    "promise": "^8.0.1",
+    "request": "^2.85.0",
+    "winston": "^2.4.2"
+  }
+}

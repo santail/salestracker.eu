@@ -1,0 +1,20 @@
+FROM keymetrics/pm2:8-alpine
+
+LABEL maintainer="nikolai muhhin <nikolai.muhhin@gmail.com>"
+
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+
+COPY package.json /usr/src/app
+
+RUN apk --no-cache add libc6-compat
+RUN apk --no-cache add ncurses-libs
+RUN apk --no-cache add libstdc++
+RUN apk --no-cache add tidyhtml
+
+RUN npm install
+COPY . /usr/src/app
+
+ENV NODE_ENV development
+
+CMD ["npm", "start"]
