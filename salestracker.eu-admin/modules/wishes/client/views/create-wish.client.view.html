@@ -1,0 +1,27 @@
+<section ng-controller="WishesController" ng-init="setFormFields(false)">
+    <div class="page-header">
+        <h1>New Wish</h1>
+    </div>
+    <div class="col-md-12">
+        <form class="form-horizontal" data-ng-submit="create(wishForm.$valid)" novalidate>
+
+          <formly-form model="wish" fields="formFields">
+    	  </formly-form>
+
+          <hr/>
+          <div class="form-group">
+              <button type="submit" class="btn btn-success">
+                <i class="glyphicon glyphicon-ok"></i> Save
+              </button>
+              <a class="btn btn-danger" href="/#!/wishes">
+                <i class="glyphicon glyphicon-remove"></i> Cancel
+              </a>
+          </div>
+
+          <div ng-show="error" class="alert alert-danger form-group">
+            <strong ng-bind="error"></strong>
+          </div>
+
+        </form>
+    </div>
+</section>

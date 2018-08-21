@@ -10,7 +10,7 @@ web-admin:
     - /usr/src/app/node_modules # will statically map node_modules folder to container. Should clean-up on each package.json change with docker rm -v containerId
   environment:
     REDIS_ADDR: redis:6379
-    MONGODB_URI: mongodb://mongo:27017/salestracker
+    MONGODB_URI: mongodb://mongo:27017/salestracker-dev
     NODE_ENV: development 
     PORT: 8000
   links:
@@ -31,7 +31,7 @@ web-public:
     - /usr/src/app/node_modules
   environment:
    NODE_ENV: development 
-   MONGODB_URI: mongodb://mongo:27017/salestracker
+   MONGODB_URI: mongodb://mongo:27017/salestracker-dev
    PORT: 9000
 
 backend-harvester:
@@ -44,7 +44,7 @@ backend-harvester:
     - /usr/src/app/node_modules
   environment:
     REDIS_ADDR: redis:6379
-    MONGODB_URI: mongodb://mongo:27017/salestracker
+    MONGODB_URI: mongodb://mongo:27017/salestracker-dev
   links:
     - server-mongodb
     - server-redis
@@ -58,7 +58,7 @@ backend-notifier:
     - /usr/src/app/node_modules
   environment:
     REDIS_ADDR: redis:6379
-    MONGODB_URI: mongodb://mongo:27017/salestracker
+    MONGODB_URI: mongodb://mongo:27017/salestracker-dev
   links:
     - server-mongodb
     - server-redis
@@ -109,7 +109,7 @@ tools-mongodb-commander:
   image: mongo-express
   container_name: tools-mongodb-commander
   environment:
-    ME_CONFIG_MONGODB_URI: mongodb://mongo:27017/salestracker
+    ME_CONFIG_MONGODB_URI: mongodb://mongo:27017/salestracker-dev
     VCAP_APP_PORT: 8082
   links:
     - server-mongodb

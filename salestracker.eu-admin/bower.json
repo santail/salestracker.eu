@@ -1,0 +1,26 @@
+{
+  "name": "salestrackeradmin",
+  "version": "0.0.0",
+  "description": "SalesTracker.eu administration portal",
+  "dependencies": {
+    "bootstrap": "~3",
+    "angular": "1.4.2",
+    "angular-resource": "~1.4.2",
+    "angular-animate": "1.4.2",
+    "angular-mocks": "~1.4.2",
+    "angular-bootstrap": "~0.13",
+    "angular-ui-utils": "bower",
+    "angular-ui-router": "~0.2",
+    "angular-file-upload": "1.1.5",
+    "angular-messages": "~1.4.2",
+    "angular-ui-select": "~0.19.6",
+    "api-check": "~6.0.10",
+    "angular-formly": "~4.0.11",
+    "angular-formly-templates-bootstrap": "~4.0.3",
+    "ng-table-bundle": "^4.0.0"
+  },
+  "resolutions": {
+    "angular": "1.4.2",
+    "api-check": "~6.0.10"
+  }
+}

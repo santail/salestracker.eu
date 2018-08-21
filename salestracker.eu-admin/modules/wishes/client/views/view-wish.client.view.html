@@ -1,0 +1,26 @@
+<section ng-controller="WishesController" ng-init="toViewWish()">
+	<div class="page-header">
+		<h1 ng-bind="wish.contains"></h1>
+	</div>
+	<div class="col-md-12">
+
+		<form novalidate>
+			<formly-form model="wish" fields="formFields">
+			</formly-form>
+		</form>
+
+		<hr/>
+		<div data-ng-show="((authentication.user) && (authentication.user._id == wish.user._id))">
+			<a class="btn btn-success" href="/#!/wishes/{{wish._id}}/edit">
+				<i class="glyphicon glyphicon-edit"></i> Edit
+			</a>
+			<a class="btn btn-danger" title="Remove" ng-really-message="Are you sure ?" ng-really-click="remove()" item="wish">
+				<i class="glyphicon glyphicon-remove-circle"></i> Delete
+			</a>
+			<a class="btn btn-primary" href="/#!/wishes">
+				<i class="glyphicon glyphicon-list"></i> List Wishes
+			</a>
+		</div>
+	</div>
+
+</section>

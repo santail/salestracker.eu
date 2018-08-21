@@ -1,0 +1,26 @@
+<section data-ng-controller="JobsController">
+    <div class="page-header">
+        <h1>Jobs</h1>
+    </div>
+
+    <div>
+        <table ng-table="tableParams" show-filter="true">
+            <tr ng-repeat="job in $data">
+                <td data-title="'Name'" sortable="'name'" filter="{ 'name': 'text' }">{{job.name}}</td>
+                <td data-title="'Params'">{{job.params}}</td>
+                <td>
+                    <div class="table-actions">
+                <td>
+                   <div class="table-actions">
+                        <a class="btn btn-default" title="View" href="/#!/jobs/{{job._id}}">
+                            <span class="glyphicon glyphicon-eye-open"></span>
+                        </a>
+                        <a class="btn btn-danger" title="Remove" ng-really-message="Are you sure ?" ng-really-click="remove(job)" item="job">
+                  				<span class="glyphicon glyphicon-remove-circle"></span>
+                  			</a>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</section>

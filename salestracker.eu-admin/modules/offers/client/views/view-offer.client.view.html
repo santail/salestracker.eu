@@ -1,0 +1,30 @@
+<section ng-controller="OffersController" ng-init="toViewOffer()">
+	<div class="page-header">
+		<h1 data-ng-bind="offer.name"></h1>
+	</div>
+
+	<div class="col-md-12">
+
+		<img ng-src="{{offer.pictures[0]}}" alt="Main picture" />
+
+		<form novalidate>
+			<formly-form model="offer" fields="formFields">
+			</formly-form>
+		</form>
+
+		<hr/>
+		<div data-ng-show="((authentication.user) && (authentication.user._id == offer.user._id))">
+			<a class="btn btn-success" href="/#!/offers/{{offer._id}}/edit">
+				<i class="glyphicon glyphicon-edit"></i> Edit
+			</a>
+			<a class="btn btn-danger" title="Remove" ng-really-message="Are you sure ?" ng-really-click="remove()" item="offer">
+				<i class="glyphicon glyphicon-remove-circle"></i> Delete
+			</a>
+			<a class="btn btn-primary" href="/#!/offers">
+				<i class="glyphicon glyphicon-list"></i> List Offers
+			</a>
+		</div>
+
+	</div>
+
+</section>

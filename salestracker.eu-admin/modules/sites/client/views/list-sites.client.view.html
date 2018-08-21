@@ -1,0 +1,45 @@
+<style>
+.table-actions {
+  width: 170px;
+}
+
+</style>
+<section data-ng-controller="SitesController">
+    <div class="page-header">
+        <h1>Sites</h1>
+    </div>
+
+    <div class="pull-right">
+      <a type="button" class="btn btn-success" href="/#!/sites/create">
+        <i class="glyphicon glyphicon-open"></i> New Site
+      </a>
+    </div>
+
+    <div>
+        <table ng-table="tableParams" show-filter="true">
+            <tr ng-repeat="site in $data">
+                <td data-title="'Name'" sortable="'name'" filter="{ 'name': 'text' }">{{site.name}}</td>
+                <td data-title="'Url'" sortable="'url'" filter="{ 'url': 'text' }">{{site.url}}</td>
+                <td data-title="'Active'" sortable="'is_active'" filter="{ 'is_active': 'text' }">{{site.is_active}}</td>
+                <td data-title="'Last harvesting'" sortable="'last_run'">{{site.last_run | date:'yyyy.MM.dd HH:mm:ss'}}</td>
+                <td class="table-actions">
+                    <a class="btn-sm btn-default" title="Edit" href="/#!/sites/{{site._id}}/edit">
+                        <span class="glyphicon glyphicon-edit"></span>
+                    </a>
+                    <a class="btn-sm btn-danger" title="Remove" ng-really-message="Are you sure ?" ng-really-click="remove(site)" item="site">
+          				<span class="glyphicon glyphicon-remove-circle"></span>
+          			</a>
+          			<a class="btn-sm btn-warning" title="Cleanup" ng-really-message="Are you sure ?" ng-really-click="callCleanup(site)" item="site">
+          				<span class="glyphicon glyphicon-refresh"></span>
+          			</a>
+          			<a class="btn-sm btn-warning" title="Reactivate" ng-really-message="Are you sure ?" ng-really-click="callReactivate(site)" item="site">
+          				<span class="glyphicon glyphicon-repeat"></span>
+          			</a>
+          			<a class="btn-sm btn-warning" title="Process" ng-really-message="Are you sure ?" ng-really-click="callProcess(site)" item="site">
+          				<span class="glyphicon glyphicon-play"></span>
+          			</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+</section>

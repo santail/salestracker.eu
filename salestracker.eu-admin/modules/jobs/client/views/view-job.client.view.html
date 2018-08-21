@@ -1,0 +1,24 @@
+<section ng-controller="JobsController" ng-init="toViewJob()">
+	<div class="page-header">
+		<h1 data-ng-bind="job.name"></h1>
+	</div>
+
+	<div class="col-md-12">
+
+		<p>{{job.name}}</p>
+        <p><pre>{{job.params}}</pre></p>
+
+
+		<hr/>
+		<div data-ng-show="((authentication.user))">
+			<a class="btn btn-danger" title="Remove" ng-really-message="Are you sure ?" ng-really-click="remove()" item="job">
+				<i class="glyphicon glyphicon-remove-circle"></i> Delete
+			</a>
+			<a class="btn btn-primary" href="/#!/jobs">
+				<i class="glyphicon glyphicon-list"></i> List Jobs
+			</a>
+		</div>
+
+	</div>
+
+</section>

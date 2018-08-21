@@ -1,0 +1,117 @@
+<section data-ng-controller="OffersController">
+    <div class="page-header">
+        <h1>Offers</h1>
+    </div>
+
+    <div class="pull-right">
+        <a type="button" class="btn-sm btn-success" href="/#!/offers/create">
+            <i class="glyphicon glyphicon-open"></i> New Offer
+        </a>
+        <a type="button" class="btn-sm btn-danger" ng-really-message="Are you sure ?" ng-really-click="remove()">
+            <i class="glyphicon glyphicon-remove-circle"></i> Remove
+        </a>
+        <a type="button" class="btn-sm btn-warning" ng-really-message="Are you sure ?" ng-really-click="callReprocessing()">
+            <i class="glyphicon glyphicon-refresh"></i> Refresh
+        </a>
+    </div>
+
+    <div>
+        <label class="checkbox-inline" ng-repeat="column in columns">
+            <input type="checkbox" ng-model="column.visible" /> {{column.title}}
+        </label>
+    </div>
+
+    <div loading-container="tableParams.settings().$loading">
+
+        <table ng-table="tableParams" template-header="table_header" show-filter="true" class="table table-condensed table-bordered">
+            <tbody>
+                <tr ng-repeat="offer in $data">
+                    <td><input type="checkbox" ng-model="checkboxes.items[offer._id]" /></td>
+
+                    <td ng-repeat="column in columns" ng-show="column.visible" sortable="column.field" filter="{column.field: 'select'}" filter-data="trueFalse($column)">
+                        <a title="View" ng-href="{{offer.original_url ? offer.original_url : offer.url}}" ng-if="column.url">
+                            {{ offer[column.field] }}
+                        </a>
+                        <span ng-if="!column.url">{{ offer[column.field] }}</span>
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            <a class="btn-sm btn-default" title="View" href="/#!/offers/{{offer._id}}">
+                                <span class="glyphicon glyphicon-eye-open"></span>
+                            </a>
+                            <a class="btn-sm btn-default" title="Edit" href="/#!/offers/{{offer._id}}/edit">
+                                <span class="glyphicon glyphicon-edit"></span>
+                            </a>
+                            <a class="btn-sm btn-danger" title="Remove" ng-really-message="Are you sure ?" ng-really-click="remove(offer)" item="offer">
+                                <span class="glyphicon glyphicon-remove-circle"></span>
+                            </a>
+                            <a class="btn-sm btn-warning" title="Refresh" ng-really-message="Are you sure ?" ng-really-click="callReprocessing(offer)" item="offer">
+                                <span class="glyphicon glyphicon-refresh"></span>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+	<pre>{{tableParams.filter()['name']}}</pre>
+
+<script type="text/ng-template" id="ng-table/filters/name.html">
+  <select ng-options="name.id as name.title for name in nameOptions"
+          ng-model="params.filter()['name']"
+          ng-change="ages(column, params.filter()['name'])">
+  </select>
+</script>
+
+<script type="text/ng-template" id="ng-table/filters/age.html">
+  <select ng-options="age.id as age.title for age in ageOptions"
+          ng-model="params.filter()['age']"></select>
+</script>
+
+        <script type="text/ng-template" id="ng-table/filters/boolean.html">
+            <label>Active:
+                <input type="checkbox" ng-model="params.filter()[name]" value="1">
+            </label>
+            <label>Off:
+                <input type="checkbox" ng-model="params.filter()[name]" value="0">
+            </label>
+        </script>
+
+        <script type="text/ng-template" id="ng-table/filters/select-plus.html">
+            <span ng-repeat="data in column.data">
+            {{data}}
+            </span>
+
+            <select ng-options="data.id as data.title for data in column.data" ng-disabled="$filterRow.disabled" ng-model="params.filter()[name]" class="filter filter-select form-control" name="{{name}}">
+                <option style="display:none" value=""></option>
+            </select>
+        </script>
+
+        <script id="table_header" type="text/ng-template">
+            <tr>
+                <th>
+                    <input type="checkbox" ng-model="checkboxes.checked" class="select-all" value="" />
+                </th>
+                <th ng-repeat="column in columns" ng-show="column.visible" class="text-center sortable" ng-class="{
+                      'sort-asc': tableParams.isSortBy(column.field, 'asc'),
+                      'sort-desc': tableParams.isSortBy(column.field, 'desc')
+                    }" ng-click="tableParams.sorting(column.field, tableParams.isSortBy(column.field, 'asc') ? 'desc' : 'asc')">
+                    {{column.title}}
+                </th>
+                <th>&nbsp;</th>
+            </tr>
+
+            <tr ng-show="show_filter" class="ng-table-filters">
+                <th>&nbsp;</th>
+                <th ng-repeat="column in columns" data-title-text="column.title" ng-show="column.visible" class="filter">
+                    <div ng-repeat="(name, filter) in column.filter track by $index">
+                        <div ng-if="filter.indexOf('/') !== -1" ng-include="filter"></div>
+                        <div ng-if="filter.indexOf('/') === -1" ng-include="'ng-table/filters/' + filter + '.html'"></div>
+                    </div>
+                </th>
+                <th>&nbsp;</th>
+            </tr>
+        </script>
+
+    </div>
+</section>
