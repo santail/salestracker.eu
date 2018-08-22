@@ -59,10 +59,10 @@ if (process.env.NODE_ENV === 'production') {
     });
   });
 
-
   //Add Local Admin
   User.find({username: 'admin'}).remove(function () {
     var password = crypto.randomBytes(64).toString('hex').slice(1, 20);
+    
     var user = new User({
       username: 'admin',
       password: password,
