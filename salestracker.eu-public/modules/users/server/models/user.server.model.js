@@ -132,7 +132,7 @@ UserSchema.pre('validate', function (next) {
  */
 UserSchema.methods.hashPassword = function (password) {
   if (this.salt && password) {
-    return crypto.pbkdf2Sync(password, new Buffer(this.salt, 'base64'), 10000, 64).toString('base64');
+    return crypto.pbkdf2Sync(password, new Buffer(this.salt, 'base64'), 10000, 64, 'sha512').toString('base64');
   } else {
     return password;
   }
@@ -173,7 +173,6 @@ UserSchema.statics.findUniqueUsername = function (username, suffix, callback) {
 * NOTE: Passphrases are only tested against the required owasp strength tests, and not the optional tests.
 */
 UserSchema.statics.generateRandomPassphrase = function () {
-  return new Promise(function (resolve, reject) {
     var password = '';
     var repeatingCharacters = new RegExp('(.)\\1{2,}', 'g');
 
@@ -195,12 +194,11 @@ UserSchema.statics.generateRandomPassphrase = function () {
 
     // Send the rejection back if the passphrase fails to pass the strength test
     if (owasp.test(password).errors.length) {
-      reject(new Error('An unexpected problem occured while generating the random passphrase'));
+      return new Error('An unexpected problem occured while generating the random passphrase');
     } else {
       // resolve with the validated passphrase
-      resolve(password);
+      return password;
     }
-  });
 };
 
 mongoose.model('User', UserSchema);
