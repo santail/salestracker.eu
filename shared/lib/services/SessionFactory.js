@@ -5,7 +5,7 @@ var mongojs = require('mongojs');
 
 var LOG = require("./Logger");
 
-let MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/salestracker';
+let MONGODB_URI = process.env.MONGODB_URI || 'mongodb://mongo:27017/salestracker-dev';
 let REDIS_ADDR = process.env.REDIS_ADDR || '127.0.0.1:6379';
 
 function Sessionfactory() {

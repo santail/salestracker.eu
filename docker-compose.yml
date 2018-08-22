@@ -40,6 +40,8 @@ backend-harvester:
   dockerfile: Dockerfile
   volumes:
     - ./salestracker.eu-harvester/:/usr/src/app/
+    - ./shared/config/:/usr/src/app/config/
+    - ./shared/lib/:/usr/src/app/lib/
     - ./shared/uploads/:/usr/src/app/uploads/
     - /usr/src/app/node_modules
   environment:
@@ -55,6 +57,8 @@ backend-notifier:
   dockerfile: Dockerfile
   volumes:
     - ./salestracker.eu-notifier/:/usr/src/app/
+    - ./shared/config/:/usr/src/app/config/
+    - ./shared/lib/:/usr/src/app/lib/
     - /usr/src/app/node_modules
   environment:
     REDIS_ADDR: redis:6379
