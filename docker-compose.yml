@@ -40,8 +40,8 @@ backend-harvester:
   dockerfile: Dockerfile
   volumes:
     - ./salestracker.eu-harvester/:/usr/src/app/
-    - ./shared/config/:/usr/src/app/config/
-    - ./shared/lib/:/usr/src/app/lib/
+    #- ./shared/config/:/usr/src/app/config/
+    #- ./shared/lib/:/usr/src/app/lib/
     - ./shared/uploads/:/usr/src/app/uploads/
     - /usr/src/app/node_modules
   environment:
