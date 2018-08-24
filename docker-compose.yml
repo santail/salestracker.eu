@@ -182,3 +182,12 @@ tools-mailcatcher:
   ports:
     - "1080:1080"
     - "1025:1025"
+
+tools-seeds:
+  container_name: tools-seeds
+  build: ./salestracker.eu-seeds/
+  dockerfile: Dockerfile
+  environment:
+    DB_CONNECTION_URI: mongodb://mongo:27017/salestracker-dev
+  links:
+    - server-mongodb
