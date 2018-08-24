@@ -13,13 +13,14 @@
       "noImplicitReturns": true,
       "noFallthroughCasesInSwitch": true,
       "baseUrl": "./",
-      "paths": {
-        "@models/*": ["models/*"],
-        "@helpers/*": ["helpers/*"]
-      },
       "experimentalDecorators": true,
-      "emitDecoratorMetadata": true
+      "emitDecoratorMetadata": true,
+      "allowJs": true
     },
+    "include": [
+        "lib/**/*.ts",
+        "src/**/*.ts"
+    ],
     "exclude": [
       "node_modules"
     ]
