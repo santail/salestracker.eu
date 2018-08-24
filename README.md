@@ -1,12 +1,12 @@
-# RUN
+### RUN
 
-# rebuild and run container 
+# rebuild and run container for specific service
 docker-compose -f <docker-compose-config-file> up -d --build <service-name>
 
 # tail service logs
 docker-compose logs -f <service-name>
 
-# CONTAINERS
+### CONTAINERS
 
 # list all
 docker ps -a
@@ -14,7 +14,7 @@ docker ps -a
 # remove all not running caontainers 
 docker container prune -f
 
-# IMAGES
+### IMAGES
 
 # list all
 docker images -a 
@@ -22,10 +22,18 @@ docker images -a
 # remove all images without assocoated containers 
 docker image prune -a
 
-# VOLUMES
+### VOLUMES
 
 # list all
 docker volume ls
 
 # remove not used
 docker volume prune
+
+### GLOBAL
+
+# remove 
+docker system prune
+
+# remove all
+docker system prune -a
