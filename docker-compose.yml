@@ -35,6 +35,22 @@ web-public:
    MONGODB_URI: mongodb://mongo:27017/salestracker-dev
    PORT: 9000
 
+backend-finder:
+  container_name: backend-finder
+  build: ./salestracker.eu-finder/
+  dockerfile: Dockerfile
+  volumes:
+    - ./salestracker.eu-finder/:/usr/src/app/
+    - ./shared/config/:/usr/src/app/config/
+    - ./shared/lib/:/usr/src/app/lib/
+    - /usr/src/app/node_modules
+  environment:
+    REDIS_ADDR: redis:6379
+    MONGODB_URI: mongodb://mongo:27017/salestracker-dev
+  links:
+    - server-mongodb
+    - server-redis
+
 backend-harvester:
   container_name: backend-harvester
   build: ./salestracker.eu-harvester/
