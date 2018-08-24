@@ -9,15 +9,14 @@ RUN apt-get update -qq && apt-get install -y build-essential ruby ruby-dev && \
 
 WORKDIR /usr/src/app
 
-COPY package.json /usr/src/app
+COPY package.json package-lock.json /usr/src/app/
 
 RUN npm install -g grunt-cli && \
     npm install -g bower
 
 RUN npm install
 
-COPY .bowerrc /usr/src/app/.bowerrc
-COPY bower.json /usr/src/app/bower.json
+COPY .bowerrc bower.json /usr/src/app/
 
 RUN bower install --config.interactive=false --allow-root
 
