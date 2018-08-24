@@ -167,8 +167,10 @@ tools-redis-commander:
   hostname: redis-commander
   container_name: tools-redis-commander
   restart: always
+  links:
+    - server-redis
   environment:
-    REDIS_HOSTS: redis:6379
+    - REDIS_HOSTS=local:redis:6379
   ports:
     - "8081:8081"
 
