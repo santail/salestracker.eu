@@ -11,7 +11,7 @@ docker-compose logs -f <service-name>
 # list all
 docker ps -a
 
-# remove all not running caontainers 
+# remove all not running containers 
 docker container prune -f
 
 ### IMAGES
