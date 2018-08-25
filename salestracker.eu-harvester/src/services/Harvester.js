@@ -7,9 +7,10 @@ var request = require('request')
 var util = require("util");
 
 var Crawler = require("./Crawler");
-var LOG = require("./Logger");
 var parserFactory = require("./ParserFactory");
-var SessionFactory = require("./SessionFactory");
+
+var LOG = require("../../lib/services/Logger");
+var SessionFactory = require("../../lib/services/SessionFactory");
 
 
 var Harvester = function () {

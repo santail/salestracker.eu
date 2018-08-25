@@ -3,7 +3,7 @@ var cheerio = require("cheerio");
 var request = require("request");
 var util = require("util");
 
-var LOG = require("./Logger");
+var LOG = require("../../lib/services/Logger");
 
 
 function Crawler() {

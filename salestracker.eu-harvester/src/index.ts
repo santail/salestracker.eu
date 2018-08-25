@@ -5,9 +5,10 @@ var fs = require('fs');
 var path = require('path');
 var util = require('util');
 
-var Harvester = require('./lib/services/Harvester');
-var LOG = require('./lib/services/Logger');
-var SessionFactory = require('./lib/services/SessionFactory');
+var Harvester = require('./services/Harvester');
+
+var LOG = require('../lib/services/Logger');
+var SessionFactory = require('../lib/services/SessionFactory');
 
 var numParallel = 2;
 
@@ -57,7 +58,7 @@ scheduler.process('every', function (job, done) {
 worker.process('processSite', numParallel, function (job, done) {
     var config = job.data;
 
-    var processingSites = [];
+    let processingSites: any = [];
 
     if (config.site) {
         processingSites = [{
@@ -78,7 +79,7 @@ worker.process('processSite', numParallel, function (job, done) {
                     LOG.error(util.format('[STATUS] [FAILED] [%s] Site processing failed', config.site, err));
                 }
 
-                harvester.processSite(config, function (err, result) {
+                harvester.processSite(config, function (err) {
                     if (err) {
                         LOG.error(util.format('[STATUS] [FAILED] [%s] Site processing failed', config.site, err));
                         return siteProcessingFinished(err);
