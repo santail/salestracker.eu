@@ -2,9 +2,9 @@
   "name": "salestracker.eu-notifier",
   "version": "0.0.1",
   "description": "Sends found offer to user",
-  "main": "index.js",
+  "main": "./src/index.ts",
   "scripts": {
-    "start": "node index.js",
+    "start": "ts-node -r tsconfig-paths/register src/index.ts",
     "start:prod": "pm2 start index.js"
   },
   "author": "Nikolai Muhhin",
@@ -15,9 +15,22 @@
     "kue-scheduler": "^0.7.4",
     "lodash": "^4.17.5",
     "mailgun-js": "^0.7.13",
-    "mongojs": "^2.5.0",
     "promise": "^8.0.1",
     "twilio": "^2.11.0",
+    "mongojs": "^2.6.0",
+    "ts-node": "^7.0.1",
+    "tsconfig-paths": "^3.5.0",
+    "typescript": "^3.0.0",
     "winston": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/async": "^2.0.45",
+    "@types/bluebird": "^3.5.20",
+    "@types/connect-mongo": "^0.0.35",
+    "@types/lodash": "^4.14.91",
+    "@types/mongodb": "^3.1.4",
+    "@types/mongoose": "^5.2.6",
+    "@types/node": "^9.4.6",
+    "@types/winston": "^2.3.7"
   }
 }
