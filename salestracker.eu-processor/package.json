@@ -1,8 +1,8 @@
 {
   "name": "salestracker.eu-notifier",
   "version": "0.0.1",
-  "description": "Sends found offer to user",
-  "main": "index.js",
+  "description": "Offers post-harvesting processor",
+  "main": "./src/index.ts",
   "scripts": {
     "start": "ts-node -r tsconfig-paths/register src/index.ts",
     "start:prod": "pm2 start index.js"
