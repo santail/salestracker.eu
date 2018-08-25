@@ -44,7 +44,7 @@ backend-finder:
     - ./salestracker.eu-finder/:/usr/src/app/
     - ./shared/config/:/usr/src/app/config/
     - ./shared/lib/:/usr/src/app/lib/
-    - /usr/src/app/node_modules
+    - backend-finder-modules:/usr/src/app/node_modules
   environment:
     REDIS_ADDR: redis://redis:6379
     MONGODB_URI: mongodb://mongo:27017/salestracker-dev
@@ -58,10 +58,10 @@ backend-harvester:
   dockerfile: Dockerfile
   volumes:
     - ./salestracker.eu-harvester/:/usr/src/app/
-    #- ./shared/config/:/usr/src/app/config/
-    #- ./shared/lib/:/usr/src/app/lib/
+    - ./shared/config/:/usr/src/app/config/
+    - ./shared/lib/:/usr/src/app/lib/
     - ./shared/uploads/:/usr/src/app/uploads/
-    - /usr/src/app/node_modules
+    - backend-harvester-modules:/usr/src/app/node_modules
   environment:
     REDIS_ADDR: redis://redis:6379
     MONGODB_URI: mongodb://mongo:27017/salestracker-dev
@@ -77,7 +77,7 @@ backend-notifier:
     - ./salestracker.eu-notifier/:/usr/src/app/
     - ./shared/config/:/usr/src/app/config/
     - ./shared/lib/:/usr/src/app/lib/
-    - /usr/src/app/node_modules
+    - backend-notifier-modules:/usr/src/app/node_modules
   environment:
     REDIS_ADDR: redis://redis:6379
     MONGODB_URI: mongodb://mongo:27017/salestracker-dev
@@ -93,7 +93,7 @@ backend-processor:
     - ./salestracker.eu-processor/:/usr/src/app/
     - ./shared/config/:/usr/src/app/config/
     - ./shared/lib/:/usr/src/app/lib/
-    - /usr/src/app/node_modules
+    - backend-processor-modules:/usr/src/app/node_modules
   environment:
     REDIS_ADDR: redis://redis:6379
     MONGODB_URI: mongodb://mongo:27017/salestracker-dev
