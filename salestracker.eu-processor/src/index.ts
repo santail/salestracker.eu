@@ -1,7 +1,6 @@
 var util = require('util');
 
-var LOG = require('./lib/services/Logger');
-var SessionFactory = require('./lib/services/SessionFactory');
+var SessionFactory = require("../lib/services/SessionFactory");
 
 var worker = SessionFactory.getQueueConnection();
 var scheduler = SessionFactory.getSchedulerConnection();
@@ -20,7 +19,7 @@ scheduler.every('30 seconds', scheduledJob);
 
 //somewhere process your scheduled jobs
 scheduler.process('every', function (job, done) {
-    LOG.info(util.format('[STATUS] [OK] Next iteration'));
+    console.log(util.format('[STATUS] [OK] Next iteration'), job.data);
 
     return done();
 });
