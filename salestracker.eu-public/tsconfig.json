@@ -9,17 +9,18 @@
       "strictNullChecks": true,
       "noImplicitThis": true,
       "alwaysStrict": true,
-      "noUnusedParameters": true,
+      "noUnusedParameters": false,
       "noImplicitReturns": true,
       "noFallthroughCasesInSwitch": true,
-      "baseUrl": "./",
+      "baseUrl": "./src/",
+      "jsx": "react",
+      "rootDir": "./src/",
       "experimentalDecorators": true,
       "emitDecoratorMetadata": true,
       "allowJs": true
     },
     "include": [
-        "lib/**/*.ts",
-        "src/**/*.ts"
+        "./src//**/*.ts"
     ],
     "exclude": [
       "node_modules"

@@ -11,14 +11,7 @@ WORKDIR /usr/src/app
 
 COPY package.json package-lock.json /usr/src/app/
 
-RUN npm install -g grunt-cli && \
-    npm install -g bower
-
 RUN npm install
-
-COPY .bowerrc bower.json /usr/src/app/
-
-RUN bower install --config.interactive=false --allow-root
 
 # Make everything available for start
 COPY . /usr/src/app
@@ -31,4 +24,4 @@ ENV MONGO_SEED true
 # Port 35729 for livereload
 EXPOSE 9000 35729
 
-CMD ["grunt"]
+CMD [ "npm", "run", "dev" ]
