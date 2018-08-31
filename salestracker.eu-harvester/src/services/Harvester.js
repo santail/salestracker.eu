@@ -115,8 +115,7 @@ Harvester.prototype.processIndexPage = function (options, processIndexPageFinish
 
       if (parser.config.paging) {
         that.processPaginatedIndexes(options, content, processIndexPageFinished);
-      }
-      else {
+      } else {
         that.processSimpleIndexes(options, content, processIndexPageFinished);
       }
     }
@@ -139,42 +138,53 @@ Harvester.prototype.processPaginatedIndexes = function (options, content, proces
         content = null;
 
         SessionFactory.getQueueConnection().create('processPage', {
-          'site': options.site,
-          'url': pageUrl,
-          'pageIndex': index + 1,
-          'totalPages': pagingParams.pages.length
-        }).attempts(3).backoff({ delay: 60 * 1000, type: 'exponential' }).removeOnComplete(true).save(function (err) {
-          if (err) {
-            LOG.error(util.format('[STATUS] [FAILED] [%s] %s Page processing schedule failed', options.site, pageUrl, err));
-            return paginatedIndexHandlerFinished(err);
-          }
+            'site': options.site,
+            'url': pageUrl,
+            'pageIndex': index + 1,
+            'totalPages': pagingParams.pages.length
+          })
+          .attempts(3).backoff({
+            delay: 60 * 1000,
+            type: 'exponential'
+          })
+          .removeOnComplete(true)
+          .save(function (err) {
+            if (err) {
+              LOG.error(util.format('[STATUS] [FAILED] [%s] %s Page processing schedule failed', options.site, pageUrl, err));
+              return paginatedIndexHandlerFinished(err);
+            }
 
-          LOG.debug(util.format('[STATUS] [OK] [%s] %s Page processing scheduled', options.site, pageUrl));
-          return paginatedIndexHandlerFinished(null);
-        });
+            LOG.debug(util.format('[STATUS] [OK] [%s] %s Page processing scheduled', options.site, pageUrl));
+            return paginatedIndexHandlerFinished(null);
+          });
       };
     });
-  }
-  else {
+  } else {
     paginatedIndexesHandlers = _.map(pagingParams.payloads, function (payload, index) {
       return function (paginatedIndexHandlerFinished) {
         content = null;
 
         SessionFactory.getQueueConnection().create('processPage', {
-          'site': options.site,
-          'url': payload.url,
-          'payload': payload.payload,
-          'pageIndex': index + 1,
-          'totalPages': pagingParams.payloads.length
-        }).attempts(3).backoff({ delay: 60 * 1000, type: 'exponential' }).removeOnComplete(true).save(function (err) {
-          if (err) {
-            LOG.error(util.format('[STATUS] [FAILED] [%s] %s Page processing schedule failed', options.site, payload.url, err));
-            return paginatedIndexHandlerFinished(err);
-          }
+            'site': options.site,
+            'url': payload.url,
+            'payload': payload.payload,
+            'pageIndex': index + 1,
+            'totalPages': pagingParams.payloads.length
+          })
+          .attempts(3).backoff({
+            delay: 60 * 1000,
+            type: 'exponential'
+          })
+          .removeOnComplete(true)
+          .save(function (err) {
+            if (err) {
+              LOG.error(util.format('[STATUS] [FAILED] [%s] %s Page processing schedule failed', options.site, payload.url, err));
+              return paginatedIndexHandlerFinished(err);
+            }
 
-          LOG.debug(util.format('[STATUS] [OK] [%s] %s Page processing scheduled', options.site, payload.url));
-          return paginatedIndexHandlerFinished(null);
-        });
+            LOG.debug(util.format('[STATUS] [OK] [%s] %s Page processing scheduled', options.site, payload.url));
+            return paginatedIndexHandlerFinished(null);
+          });
       };
     });
   }
@@ -234,7 +244,11 @@ Harvester.prototype.processPage = function (options, processPageFinished) {
             }, offer);
 
             SessionFactory.getQueueConnection().create('processOffer', jobConfig)
-              .attempts(3).backoff({ delay: 60 * 1000, type: 'exponential' }).removeOnComplete(true)
+              .attempts(3).backoff({
+                delay: 60 * 1000,
+                type: 'exponential'
+              })
+              .removeOnComplete(true)
               .save(function (err) {
                 if (err) {
                   LOG.error(util.format('[STATUS] [FAILED] [%s] %s Offer processing schedule failed', options.site, offer.url, err));
@@ -256,8 +270,7 @@ Harvester.prototype.processPage = function (options, processPageFinished) {
           LOG.info(util.format('[STATUS] [OK] [%s] Offers processing scheduled', options.site));
           return processPageFinished(null, results);
         });
-      }
-      catch (ex) {
+      } catch (ex) {
         content = null;
 
         LOG.error(util.format('[STATUS] [Failure] [%s] Offers processing not scheduled', options.site, err));
@@ -292,43 +305,50 @@ Harvester.prototype.processOffer = function (options, processOfferFinished) {
         'parsed': runningTime.getDate() + "/" + runningTime.getMonth() + "/" + runningTime.getFullYear()
       });
 
-      SessionFactory.getDbConnection().offers.save(offer, function (err, saved) {
-        if (err) {
-          LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Saving offer failed', options.site, offer.id, err));
-          return processOfferFinished(err);
-        }
+      SessionFactory.getQueueConnection().create('processData', offer)
+        .attempts(3).backoff({
+          delay: 60 * 1000,
+          type: 'exponential'
+        })
+        .removeOnComplete(true)
+        .save(function (err) {
+          if (err) {
+            LOG.error(util.format('[STATUS] [FAILED] [%s] %s Offer data processing schedule failed', options.site, offer.url, err));
+            return processOfferFinished(err);
+          }
 
-        if (!saved) {
-          LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Saving offer failed', options.site, offer.id, err));
-          return processOfferFinished(new Error('DB save query failed'));
-        }
+          if (offer.pictures && offer.pictures.length > 0) {
+            SessionFactory.getQueueConnection().create('processImage', {
+                'site': options.site,
+                'url': offer.pictures[0]
+              })
+              .attempts(3).backoff({
+                delay: 60 * 1000,
+                type: 'exponential'
+              })
+              .removeOnComplete(true)
+              .save(function (err) {
+                if (err) {
+                  LOG.error(util.format('[STATUS] [FAILED] [%s] %s Image processing schedule failed', options.site, offer.url, err));
+                  return processOfferFinished(err);
+                }
 
-        if (offer.pictures && offer.pictures.length > 0) {
-          SessionFactory.getQueueConnection().create('processImage', {
-            'site': options.site,
-            'url': offer.pictures[0]
-          }).attempts(3).backoff({ delay: 60 * 1000, type: 'exponential' }).removeOnComplete(true).save(function (err) {
-            if (err) {
-              LOG.error(util.format('[STATUS] [FAILED] [%s] %s Image processing schedule failed', options.site, offer.url, err));
-              return processOfferFinished(err);
-            }
-
-            LOG.debug(util.format('[STATUS] [OK] [%s] %s Image processing scheduled', options.site, offer.url));
+                LOG.debug(util.format('[STATUS] [OK] [%s] %s Image processing scheduled', options.site, offer.url));
+                return processOfferFinished(null);
+              });
+          } else {
+            LOG.debug(util.format('[STATUS] [OK] [%s] %s Offer data processing scheduled', options.site, offer.url));
             return processOfferFinished(null);
-          });
-        }
+          }
+        });
 
-        LOG.debug(util.format('[STATUS] [OK] [%s] [%s] Saving offer finished', options.site, offer.id));
-        LOG.debug(util.format('[STATUS] [OK] [%s] Offer processing finished %s', options.site, options.url));
-        return processOfferFinished(null, saved);
-      });
+      LOG.debug(util.format('[STATUS] [OK] [%s] Offer parsing finished %s', options.site, options.url));
     });
   };
 
   if (parser.config.json) {
     offerDataHandler(null, options);
-  }
-  else {
+  } else {
     var crawler = new Crawler();
     crawler.request({
       url: options.url,
@@ -346,7 +366,7 @@ Harvester.prototype.processOffer = function (options, processOfferFinished) {
   }
 };
 
-Harvester.prototype.processImage = function (options, callback) {
+Harvester.prototype.processImage = function (options, processImageFinished) {
   var that = this;
 
   LOG.debug(util.format('[STATUS] [OK] [%s] Image processing started %s', options.site, options.url));
@@ -357,7 +377,7 @@ Harvester.prototype.processImage = function (options, callback) {
   }, (err, res, body) => {
     if (err) {
       LOG.error(util.format('[STATUS] [Failure] [%s] Image processing failed %s', options.site, options.url, err));
-      return callback(err);
+      return processImageFinished(err);
     }
 
     if (body && res.statusCode === 200) {
@@ -368,18 +388,18 @@ Harvester.prototype.processImage = function (options, callback) {
       fs.writeFile(options.dest, body, 'binary', (err) => {
         if (err) {
           LOG.error(util.format('[STATUS] [Failure] [%s] Image storing failed %s', options.site, options.url, err));
-          return callback(err);
+          return processImageFinished(err);
         }
 
-        return callback(null);
+        return processImageFinished(null);
       })
     } else {
       if (!body) {
         LOG.error(util.format('[STATUS] [Failure] [%s] Image retrieving failed %s', options.site, options.url, err));
-        return callback(new Error(`Image loading error - empty body. URL: ${options.url}`));
+        return processImageFinished(new Error(`Image loading error - empty body. URL: ${options.url}`));
       }
 
-      return callback(new Error(`Image loading error - server responded ${res.statusCode}`));
+      return processImageFinished(new Error(`Image loading error - server responded ${res.statusCode}`));
     }
   });
 };
