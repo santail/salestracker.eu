@@ -89,3 +89,4 @@ uploads
 **/*modules/users/client/img/profile/uploads
 **/*config/env/local.js
 *.pem
+

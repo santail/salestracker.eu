@@ -11,13 +11,13 @@ module.exports = {
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".jsx", ".json"]
   },
-  watch:true,
+  watch: true,
   module: {
     rules: [
-        { 
-            test: /\.tsx?$/, 
-            loader: "awesome-typescript-loader" 
-          },
+      {
+        test: /\.tsx?$/,
+        loader: "awesome-typescript-loader"
+      },
       {
         test: /\.js$/,
         exclude: /node_modules/,
@@ -39,7 +39,7 @@ module.exports = {
     port: 9000,
     open: true,
     proxy: {
-      "/api": "http://localhost:9090"
+      "/api": "http://localhost:9000"
     }
   },
   plugins: [
