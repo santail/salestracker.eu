@@ -1,25 +1,25 @@
 var util = require('util');
 
-var SessionFactory = require("../lib/services/SessionFactory");
+var LOG = require("../lib/services/Logger");
+var SessionFactory = require('../lib/services/SessionFactory');
 
 var worker = SessionFactory.getQueueConnection();
-var scheduler = SessionFactory.getSchedulerConnection();
 
-var scheduledJob = scheduler.createJob('every', {})
-    .attempts(1)
-    .removeOnComplete(true)
-    .backoff({
-        delay: 60 * 1000,
-        type: 'exponential'
-    })
-    .priority('high');
+worker.process('processData', 10, function (job, done) {
+    var offer = job.data;
 
-//schedule it to run every 2 seconds
-scheduler.every('30 seconds', scheduledJob);
+    SessionFactory.getDbConnection().offers.save(offer, function (err, saved) {
+        if (err) {
+            LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Saving offer failed', offer.site, offer.id, err));
+            return done(err);
+        }
 
-//somewhere process your scheduled jobs
-scheduler.process('every', function (job, done) {
-    console.log(util.format('[STATUS] [OK] Next iteration'), job.data);
+        if (!saved) {
+            LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Saving offer failed', offer.site, offer.id, err));
+            return done(new Error('DB save query failed'));
+        }
 
-    return done();
+        LOG.debug(util.format('[STATUS] [OK] [%s] Offer saved %s', offer.site, offer.url));
+        return done(null, saved);
+    });
 });

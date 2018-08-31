@@ -17,43 +17,23 @@ var sites = [{
 }];
 
 var worker = SessionFactory.getQueueConnection();
-var scheduler = SessionFactory.getSchedulerConnection();
 
-var scheduledJob = scheduler.createJob('every', {
+worker.createJob('processSite', {
         'site': 'www.minuvalik.ee'
     })
-    .attempts(1)
-    .removeOnComplete(true)
+    .attempts(3)
     .backoff({
         delay: 60 * 1000,
         type: 'exponential'
     })
-    .priority('high');
+    .removeOnComplete(true)
+    .save(function (err) {
+        if (err) {
+            LOG.error(util.format('[STATUS] [FAILED] [%s] Job not scheduled', err));
+        }
 
-//schedule it to run every 2 seconds
-scheduler.every('30 seconds', scheduledJob);
-
-//somewhere process your scheduled jobs
-scheduler.process('every', function (job, done) {
-    LOG.info(util.format('[STATUS] [OK] Next iteration'));
-
-    worker.create('processSite', job.data)
-        .attempts(3)
-        .backoff({
-            delay: 60 * 1000,
-            type: 'exponential'
-        })
-        .removeOnComplete(true)
-        .save(function (err) {
-            if (err) {
-                LOG.error(util.format('[STATUS] [FAILED] [%s] Job not scheduled', JSON.stringify(job), err));
-                return done(err);
-            }
-
-            LOG.info(util.format('[STATUS] [OK] Job scheduled'));
-            return done();
-        });
-});
+        LOG.info(util.format('[STATUS] [OK] Job scheduled'));
+    });
 
 worker.process('processSite', numParallel, function (job, done) {
     var config = job.data;

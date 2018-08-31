@@ -1,8 +1,8 @@
 var util = require('util');
 
+var LOG = require('../lib/services/Logger');
 var SessionFactory = require("../lib/services/SessionFactory");
 
-var worker = SessionFactory.getQueueConnection();
 var scheduler = SessionFactory.getSchedulerConnection();
 
 var scheduledJob = scheduler.createJob('every', {})
@@ -12,12 +12,18 @@ var scheduledJob = scheduler.createJob('every', {})
         delay: 60 * 1000,
         type: 'exponential'
     })
-    .priority('high');
+    .priority('high')
+    .removeOnComplete(true)
+    .save(function (err) {
+        if (err) {
+            LOG.error(util.format('[STATUS] [FAILED] [%s] Job not scheduled', err));
+        }
 
-//schedule it to run every 2 seconds
+        LOG.info(util.format('[STATUS] [OK] Job scheduled'));
+    });
+
 scheduler.every('30 seconds', scheduledJob);
 
-//somewhere process your scheduled jobs
 scheduler.process('every', function (job, done) {
     console.log(util.format('[STATUS] [OK] Next iteration'), job.data);
 
