@@ -175,6 +175,18 @@ tools-redis-commander:
   ports:
     - "8081:8081"
 
+tools-kue-ui:
+  image: christophwitzko/kue-ui
+  hostname: kui-ui
+  container_name: tools-kui-ui
+  restart: always
+  links:
+    - server-redis
+  environment:
+    - KUE_PREFIX=q
+  ports:
+    - "5000:5000"
+
 tools-mailcatcher:
   image: schickling/mailcatcher:latest
   container_name: tools-mailcatcher
