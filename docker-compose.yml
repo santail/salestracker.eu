@@ -96,9 +96,11 @@ backend-processor:
   environment:
     REDIS_ADDR: redis://redis:6379
     MONGODB_URI: mongodb://mongo:27017/salestracker-dev
+    ELASTICSEARCH_URL: http://elasticsearch:9200
   links:
     - server-mongodb
     - server-redis
+    - server-elasticsearch
 
 server-mongodb:
   container_name: server-mongodb
@@ -118,6 +120,7 @@ server-redis:
 
 server-elasticsearch:
   image: elasticsearch:latest
+  hostname: elasticsearch
   container_name: server-elasticsearch
   command: elasticsearch -Ecluster.name=salestracker -Ebootstrap.memory_lock=true -Ehttp.port=9200 -Ehttp.cors.allow-origin="http://localhost:1358" -Ehttp.cors.enabled=true -Ehttp.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization -Ehttp.cors.allow-credentials=true
   environment:
@@ -126,21 +129,21 @@ server-elasticsearch:
     - "9200:9200"
     - "9300:9300"
 
-tools-elasticsearch-dejavu:
-  image: appbaseio/dejavu:latest
-  container_name: tools-elasticsearch-dejavu
-  ports:
-    - "1358:1358"
-  links:
-    - server-elasticsearch
+# tools-elasticsearch-dejavu:
+#   image: appbaseio/dejavu:latest
+#   container_name: tools-elasticsearch-dejavu
+#   ports:
+#     - "1358:1358"
+#   links:
+#     - server-elasticsearch
 
-tools-elasticsearch-kibana:
-     image: kibana:latest
-     container_name: tools-elasticsearch-kibana
-     ports:
-        - "5601:5601"
-     links:
-       - server-elasticsearch:elasticsearch
+# tools-elasticsearch-kibana:
+#      image: kibana:latest
+#      container_name: tools-elasticsearch-kibana
+#      ports:
+#         - "5601:5601"
+#      links:
+#        - server-elasticsearch:elasticsearch
 
 tools-mongodb-commander:
   image: mongo-express
@@ -153,14 +156,14 @@ tools-mongodb-commander:
   ports:
    - "8082:8082"
 
-tools-mongodb-mongoclient:
-  image: mongoclient/mongoclient:latest
-  container_name: tools-mongodb-mongoclient
-  hostname: mongoclient
-  links:
-    - server-mongodb
-  ports:
-    - "3300:3000"
+# tools-mongodb-mongoclient:
+#   image: mongoclient/mongoclient:latest
+#   container_name: tools-mongodb-mongoclient
+#   hostname: mongoclient
+#   links:
+#     - server-mongodb
+#   ports:
+#     - "3300:3000"
       
 tools-redis-commander:
   image: rediscommander/redis-commander:latest
