@@ -116,8 +116,6 @@ worker.process('processOffer', numParallel, function (job, done) {
 worker.process('processImage', numParallel, function (job, done) {
     var config = job.data;
 
-    config.dest = path.join(process.cwd(), './uploads/');
-
     var harvester = new Harvester();
     harvester.processImage(config, function (err, offers) {
         if (err) {
@@ -132,7 +130,7 @@ worker.process('processImage', numParallel, function (job, done) {
 
 
 var cleanUploads = function () {
-    var uploadsPath = path.join(process.cwd(), './uploads/');
+    var uploadsPath = path.join(process.cwd(), './uploads/offers/');
 
     fs.readdir(uploadsPath, function (err, files) {
         if (err) {

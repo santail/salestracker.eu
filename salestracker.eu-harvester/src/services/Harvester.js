@@ -1,9 +1,11 @@
 var _ = require('lodash');
 var async = require('async');
-var fs = require('fs');
+var fs = require('fs-extra');
 var path = require('path');
 var Promise = require('promise');
-var request = require('request')
+var request = require('request');
+var slugify = require('slugify');
+var url = require('url');
 var util = require("util");
 
 var Crawler = require("./Crawler");
@@ -320,6 +322,7 @@ Harvester.prototype.processOffer = function (options, processOfferFinished) {
           if (offer.pictures && offer.pictures.length > 0) {
             SessionFactory.getQueueConnection().create('processImage', {
                 'site': options.site,
+                'offerUrl': offer.url,
                 'url': offer.pictures[0]
               })
               .attempts(3).backoff({
@@ -381,18 +384,28 @@ Harvester.prototype.processImage = function (options, processImageFinished) {
     }
 
     if (body && res.statusCode === 200) {
-      if (!path.extname(options.dest)) {
-        options.dest = path.join(options.dest, path.basename(options.url))
-      }
+      const offerUrl = new URL(options.offerUrl);
+      options.dest = path.join(process.cwd(), './uploads/offers/' + options.site + '/' + slugify(offerUrl.pathname));
 
-      fs.writeFile(options.dest, body, 'binary', (err) => {
+      fs.ensureDir(options.dest, '0777', (err) => {
         if (err) {
-          LOG.error(util.format('[STATUS] [Failure] [%s] Image storing failed %s', options.site, options.url, err));
-          return processImageFinished(err);
+          if (err.code == 'EEXIST') {
+            // do nothing 
+          }
         }
 
-        return processImageFinished(null);
-      })
+        options.dest = path.join(options.dest, path.basename(options.url))
+
+        fs.writeFile(options.dest, body, 'binary', (err) => {
+          if (err) {
+            LOG.error(util.format('[STATUS] [Failure] [%s] Image storing failed %s', options.site, options.url, err));
+            return processImageFinished(err);
+          }
+
+          return processImageFinished(null);
+        })
+      });
+
     } else {
       if (!body) {
         LOG.error(util.format('[STATUS] [Failure] [%s] Image retrieving failed %s', options.site, options.url, err));
