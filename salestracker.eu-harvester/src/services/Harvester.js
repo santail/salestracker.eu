@@ -2,10 +2,8 @@ var _ = require('lodash');
 var async = require('async');
 var fs = require('fs-extra');
 var path = require('path');
-var Promise = require('promise');
 var request = require('request');
 var slugify = require('slugify');
-var url = require('url');
 var util = require("util");
 
 var Crawler = require("./Crawler");
@@ -54,35 +52,22 @@ Harvester.prototype.gatherOffers = function (options, gatherOffersFinished) {
   var that = this;
 
   var parser = parserFactory.getParser(options.site),
-    indexPages = parser.config.indexPages;
+    indexPage = parser.config.indexPage,
+    language = parser.getMainLanguage();
 
-  // TODO extract to separate SiteProcessor -> process method
-  var indexPagesHandlers = _.map(indexPages, function (indexPageUrl) {
-    return function (indexPageHandlerFinished) {
-      options = _.extend(options, {
-        'url': indexPageUrl.replace(/{search_criteria}/g, options.search) // TODO add default paging parameters 
-      });
-
-      that.processIndexPage(options, function (err, offers) {
-        if (err) {
-          LOG.error(util.format('[STATUS] [Failure] [%s] Gathering offers index page failed', options.site, err));
-          return indexPageHandlerFinished(err);
-        }
-
-        LOG.info(util.format('[STATUS] [OK] [%s] Gathering offers index page finished', options.site));
-        return indexPageHandlerFinished(null, offers);
-      });
-    };
+  options = _.extend(options, {
+    'url': indexPage.replace(/{search_criteria}/g, options.search), // TODO add default paging parameters
+    'language': language
   });
 
-  async.series(indexPagesHandlers, function (err, results) {
+  that.processIndexPage(options, function (err, offers) {
     if (err) {
       LOG.error(util.format('[STATUS] [Failure] [%s] Gathering offers failed', options.site, err));
       return gatherOffersFinished(err);
     }
 
     LOG.info(util.format('[STATUS] [OK] [%s] Gathering offers finished', options.site));
-    return gatherOffersFinished(null, results);
+    return gatherOffersFinished(null, offers);
   });
 };
 
@@ -103,18 +88,11 @@ Harvester.prototype.processIndexPage = function (options, processIndexPageFinish
     json: parser.config.json,
     headers: parser.config.headers,
     payload: options.payload,
-    onError: function (err, result) {
-      if (err) {
-        LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Fetching index page failed', options.site, options.url, err));
-        return processIndexPageFinished(err);
-      }
+    onError: function (err) {
+      LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Fetching index page failed', options.site, options.url, err));
+      return processIndexPageFinished(err);
     },
-    onSuccess: function (err, content) {
-      if (err) {
-        LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Fetching index page failed', options.site, options.url, err));
-        return processIndexPageFinished(err);
-      }
-
+    onSuccess: function (content) {
       if (parser.config.paging) {
         that.processPaginatedIndexes(options, content, processIndexPageFinished);
       } else {
@@ -224,60 +202,58 @@ Harvester.prototype.processPage = function (options, processPageFinished) {
     json: parser.config.json,
     headers: parser.config.headers,
     payload: options.payload,
-    onError: function (err, result) {
-      if (err) {
-        LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Fetching page failed', options.site, options.url, err));
-        return processPageFinished(err);
-      }
-
-      LOG.debug(util.format('[STATUS] [OK] [%s] [%s] Fetching page finished', options.site, options.url));
-      return processPageFinished(null, result);
+    onError: function (err) {
+      LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Fetching page failed', options.site, options.url, err));
+      return processPageFinished(err);
     },
-    onSuccess: function (err, content) {
+    onSuccess: function (content) {
+      var offers = [];
+
       try {
-        var offers = parser.getOffers(content);
-
-        var offersHandlers = _.map(offers, function (offer, index) {
-          return function (offerHandlerFinished) {
-            content = null;
-
-            var jobConfig = _.extend({
-              'site': options.site
-            }, offer);
-
-            SessionFactory.getQueueConnection().create('processOffer', jobConfig)
-              .attempts(3).backoff({
-                delay: 60 * 1000,
-                type: 'exponential'
-              })
-              .removeOnComplete(true)
-              .save(function (err) {
-                if (err) {
-                  LOG.error(util.format('[STATUS] [FAILED] [%s] %s Offer processing schedule failed', options.site, offer.url, err));
-                  return offerHandlerFinished(err);
-                }
-
-                LOG.debug(util.format('[STATUS] [OK] [%s] %s Offer processing scheduled', options.site, offer.url));
-                return offerHandlerFinished(null);
-              });
-          };
-        });
-
-        async.series(offersHandlers, function (err, results) {
-          if (err) {
-            LOG.error(util.format('[STATUS] [Failure] [%s] Offers processing not scheduled', options.site, err));
-            return processPageFinished(err);
-          }
-
-          LOG.info(util.format('[STATUS] [OK] [%s] Offers processing scheduled', options.site));
-          return processPageFinished(null, results);
-        });
+        offers = parser.getOffers(content);
       } catch (ex) {
         content = null;
 
         LOG.error(util.format('[STATUS] [Failure] [%s] Offers processing not scheduled', options.site, err));
-        return processPageFinished(err);
+        return processPageFinished(new Error('Offers processing not scheduled', ex));
       }
+
+      var offersHandlers = _.map(offers, function (offer) {
+        return function (offerHandlerFinished) {
+          content = null;
+
+          var jobConfig = _.extend({
+            'site': options.site,
+            'language': parser.getMainLanguage()
+          }, offer);
+
+          SessionFactory.getQueueConnection().create('processOffer', jobConfig)
+            .attempts(3).backoff({
+              delay: 60 * 1000,
+              type: 'exponential'
+            })
+            .removeOnComplete(true)
+            .save(function (err) {
+              if (err) {
+                LOG.error(util.format('[STATUS] [FAILED] [%s] %s Offer processing schedule failed', options.site, offer.url, err));
+                return offerHandlerFinished(err);
+              }
+
+              LOG.debug(util.format('[STATUS] [OK] [%s] %s Offer processing scheduled', options.site, offer.url));
+              return offerHandlerFinished(null);
+            });
+        };
+      });
+
+      async.series(offersHandlers, function (err, results) {
+        if (err) {
+          LOG.error(util.format('[STATUS] [Failure] [%s] Offers processing not scheduled', options.site, err));
+          return processPageFinished(err);
+        }
+
+        LOG.info(util.format('[STATUS] [OK] [%s] Offers processing scheduled', options.site));
+        return processPageFinished(null, results);
+      });
     }
   });
 };
@@ -289,7 +265,7 @@ Harvester.prototype.processOffer = function (options, processOfferFinished) {
 
   var parser = parserFactory.getParser(options.site);
 
-  var offerDataHandler = function (err, body) {
+  var offerDataHandler = function (body) {
     parser.parse(body, function (err, offer) {
       body = null;
 
@@ -303,6 +279,7 @@ Harvester.prototype.processOffer = function (options, processOfferFinished) {
       offer = _.extend(offer, {
         'url': options.url,
         'site': options.site,
+        'language': options.language,
         'active': true,
         'parsed': runningTime.getDate() + "/" + runningTime.getMonth() + "/" + runningTime.getFullYear()
       });
@@ -319,30 +296,8 @@ Harvester.prototype.processOffer = function (options, processOfferFinished) {
             return processOfferFinished(err);
           }
 
-          if (offer.pictures && offer.pictures.length > 0) {
-            SessionFactory.getQueueConnection().create('processImage', {
-                'site': options.site,
-                'offerUrl': offer.url,
-                'url': offer.pictures[0]
-              })
-              .attempts(3).backoff({
-                delay: 60 * 1000,
-                type: 'exponential'
-              })
-              .removeOnComplete(true)
-              .save(function (err) {
-                if (err) {
-                  LOG.error(util.format('[STATUS] [FAILED] [%s] %s Image processing schedule failed', options.site, offer.url, err));
-                  return processOfferFinished(err);
-                }
-
-                LOG.debug(util.format('[STATUS] [OK] [%s] %s Image processing scheduled', options.site, offer.url));
-                return processOfferFinished(null);
-              });
-          } else {
-            LOG.debug(util.format('[STATUS] [OK] [%s] %s Offer data processing scheduled', options.site, offer.url));
-            return processOfferFinished(null);
-          }
+          LOG.debug(util.format('[STATUS] [OK] [%s] %s Offer data processing scheduled', options.site, offer.url));
+          return processOfferFinished(null);
         });
 
       LOG.debug(util.format('[STATUS] [OK] [%s] Offer parsing finished %s', options.site, options.url));
@@ -350,7 +305,7 @@ Harvester.prototype.processOffer = function (options, processOfferFinished) {
   };
 
   if (parser.config.json) {
-    offerDataHandler(null, options);
+    offerDataHandler(options);
   } else {
     var crawler = new Crawler();
     crawler.request({
@@ -394,7 +349,7 @@ Harvester.prototype.processImage = function (options, processImageFinished) {
           }
         }
 
-        options.dest = path.join(options.dest, path.basename(options.url))
+        options.dest = path.join(options.dest, path.basename(options.url));
 
         fs.writeFile(options.dest, body, 'binary', (err) => {
           if (err) {
@@ -403,9 +358,8 @@ Harvester.prototype.processImage = function (options, processImageFinished) {
           }
 
           return processImageFinished(null);
-        })
+        });
       });
-
     } else {
       if (!body) {
         LOG.error(util.format('[STATUS] [Failure] [%s] Image retrieving failed %s', options.site, options.url, err));

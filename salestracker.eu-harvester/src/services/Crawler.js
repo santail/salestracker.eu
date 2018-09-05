@@ -129,7 +129,7 @@ Crawler.prototype.request = function (options) {
                     return options.onError(err);
                 }
 
-                return options.onSuccess(null, result);
+                return options.onSuccess(result);
             };
 
             if (options.json) {

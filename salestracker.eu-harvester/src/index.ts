@@ -56,16 +56,16 @@ worker.process('processSite', numParallel, function (job, done) {
             var harvester = new Harvester();
             harvester.cleanupSite(config, function (err) {
                 if (err) {
-                    LOG.error(util.format('[STATUS] [FAILED] [%s] Site processing failed', config.site, err));
+                    LOG.error(util.format('[STATUS] [FAILED] [%s] Site harvesting failed', config.site, err));
                 }
 
                 harvester.processSite(config, function (err) {
                     if (err) {
-                        LOG.error(util.format('[STATUS] [FAILED] [%s] Site processing failed', config.site, err));
+                        LOG.error(util.format('[STATUS] [FAILED] [%s] Site harvesting failed', config.site, err));
                         return siteProcessingFinished(err);
                     }
 
-                    LOG.info(util.format('[STATUS] [OK] [%s] Site processing finished', config.site));
+                    LOG.info(util.format('[STATUS] [OK] [%s] Site harvesting finished', config.site));
                     return siteProcessingFinished();
                 });
             });
@@ -74,11 +74,11 @@ worker.process('processSite', numParallel, function (job, done) {
 
     async.series(siteHandlers, function (err, results) {
         if (err) {
-            LOG.error(util.format('[STATUS] [Failure] Sites processing failed', err));
+            LOG.error(util.format('[STATUS] [Failure] Sites harvesting failed', err));
             return done(err);
         }
 
-        LOG.info(util.format('[STATUS] [OK] Sites processing finished'));
+        LOG.info(util.format('[STATUS] [OK] Sites harvesting finished'));
         return done(null, results);
     });
 });
@@ -89,11 +89,11 @@ worker.process('processPage', numParallel, function (job, done) {
     var harvester = new Harvester();
     harvester.processPage(config, function (err, offers) {
         if (err) {
-            LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Page processing failed', config.site, config.url, err));
+            LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Page harvesting failed', config.site, config.url, err));
             return done(err);
         }
 
-        LOG.info(util.format('[STATUS] [OK] [%s] [%s] Page processing finished', config.site, config.url));
+        LOG.info(util.format('[STATUS] [OK] [%s] [%s] Page harvesting finished', config.site, config.url));
         return done(null, offers);
     });
 });
@@ -104,11 +104,11 @@ worker.process('processOffer', numParallel, function (job, done) {
     var harvester = new Harvester();
     harvester.processOffer(config, function (err, offers) {
         if (err) {
-            LOG.error(util.format('[STATUS] [Failure] [%s] Offer processing failed %s', config.site, config.url, err));
+            LOG.error(util.format('[STATUS] [Failure] [%s] Offer harvesting failed %s', config.site, config.url, err));
             return done(err);
         }
 
-        LOG.info(util.format('[STATUS] [OK] [%s] Offer processing finished %s', config.site, config.url));
+        LOG.info(util.format('[STATUS] [OK] [%s] Offer harvesting finished %s', config.site, config.url));
         return done(null, offers);
     });
 });
@@ -119,11 +119,11 @@ worker.process('processImage', numParallel, function (job, done) {
     var harvester = new Harvester();
     harvester.processImage(config, function (err, offers) {
         if (err) {
-            LOG.error(util.format('[STATUS] [Failure] [%s] Image processing failed %s', config.site, config.url, err));
+            LOG.error(util.format('[STATUS] [Failure] [%s] Image harvesting failed %s', config.site, config.url, err));
             return done(err);
         }
 
-        LOG.info(util.format('[STATUS] [OK] [%s] Image processing finished %s', config.site, config.url));
+        LOG.info(util.format('[STATUS] [OK] [%s] Image harvesting finished %s', config.site, config.url));
         return done(null, offers);
     });
 });

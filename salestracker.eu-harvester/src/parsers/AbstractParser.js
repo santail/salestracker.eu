@@ -17,8 +17,8 @@ AbstractParser.prototype.getOffers = function (content) {
 
   var metadata = _.map(dataItems, function (item) {
     var metadata = {
-      'id': that.compileOfferUrl('est', item),
-      'url': that.compileOfferUrl('est', item)
+      'id': that.compileOfferUrl(item),
+      'url': that.compileOfferUrl(item)
     }
 
     if (that.config.json) {
@@ -77,22 +77,22 @@ AbstractParser.prototype.parse = function (body, parseFinished) {
   return parseFinished(null, offer);
 };
 
-AbstractParser.prototype.compilePageUrl = function (language, link) {
+AbstractParser.prototype.compilePageUrl = function (link) {
   var that = this;
 
-  return that.config.indexPages[language] + link;
+  return that.config.indexPage + link;
 };
 
-AbstractParser.prototype.compileOfferUrl = function (language, link) {
+AbstractParser.prototype.compileOfferUrl = function (link) {
   var that = this;
 
-  return that.config.indexPages[language] + link.replace(/&amp;/g, '&');
+  return that.config.indexPage + link.replace(/&amp;/g, '&');
 };
 
-AbstractParser.prototype.compileImageUrl = function (language, link) {
+AbstractParser.prototype.compileImageUrl = function (link) {
   var that = this;
 
-  return that.config.indexPages[language] + link.replace(/&amp;/g, '&');
+  return that.config.indexPage + link.replace(/&amp;/g, '&');
 };
 
 AbstractParser.prototype.compilePagingParameters = function (content, options) {
@@ -110,7 +110,7 @@ AbstractParser.prototype.compilePagingParameters = function (content, options) {
   }
 
   for (var pageNumber = firstPage; pageNumber <= lastPage; pageNumber++) {
-    pages.push(that.compilePagingPattern('est')
+    pages.push(that.compilePagingPattern()
       .replace(/{paging_pagenumber}/g, pageNumber)
       .replace(/{search_criteria}/g, options.search)
     );
@@ -121,11 +121,11 @@ AbstractParser.prototype.compilePagingParameters = function (content, options) {
   };
 };
 
-AbstractParser.prototype.compilePagingPattern = function (content, options) {
+AbstractParser.prototype.compilePagingPattern = function () {
   var that = this;
 
-  var pattern = that.config.paging.pattern ? that.config.paging.pattern : that.config.indexPages['est'];
-  return that.compilePageUrl('est', pattern)
+  var pattern = that.config.paging.pattern ? that.config.paging.pattern : that.config.indexPage;
+  return that.compilePageUrl(pattern)
 }
 
 module.exports = AbstractParser;

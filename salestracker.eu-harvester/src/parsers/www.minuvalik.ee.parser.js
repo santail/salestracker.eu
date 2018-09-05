@@ -1,10 +1,10 @@
 'use strict';
 
-var util = require('util'),
-  _ = require("lodash"),
-  urlParser = require("url"),
+var _ = require("lodash");
+var url = require("url");
+var util = require('util');
 
-  AbstractParser = require("./AbstractParser");
+var AbstractParser = require("./AbstractParser");
 
 function MinuvalikParser() {
   AbstractParser.call(this);
@@ -24,9 +24,18 @@ function MinuvalikParser() {
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36 Vivaldi/1.2.490.43',
     },
     'site': 'http://www.minuvalik.ee',
-    'indexPages': {
-      'rus': 'https://www.minuvalik.ee/ru/?c=all',
-      'est': 'https://www.minuvalik.ee/?c=all'
+    'indexPage': 'https://www.minuvalik.ee/?c=all',
+    'languages': {
+      'est': {
+        'exists': true,
+        'main': true
+      },
+      'eng': {
+        'exists': false
+      },
+      'rus': {
+        'exists': true
+      }
     },
     'paging': {
       'finit': true,
@@ -50,9 +59,9 @@ function MinuvalikParser() {
       'title': function ($) {
         return $('.deal_rules_td > h1.title_deal').text();
       },
-      'pictures': function ($, language) {
+      'pictures': function ($) {
         return $('.deal_rules_td .dd_video_photo > a').map(function (i, el) {
-          return that.compileImageUrl(language, $(this).attr('href'));
+          return that.compileImageUrl($(this).attr('href'));
         }).get();
       },
       'additional': function ($) {
@@ -84,31 +93,35 @@ function MinuvalikParser() {
 
 util.inherits(MinuvalikParser, AbstractParser);
 
-MinuvalikParser.prototype.compilePagingPattern = function (language) {
+MinuvalikParser.prototype.compilePagingPattern = function () {
   var that = this;
   
-  return that.config.indexPages['est'] + that.config.paging.pattern;
+  return that.config.indexPage + that.config.paging.pattern;
 }
 
-MinuvalikParser.prototype.compileImageUrl = function (language, link) {
+MinuvalikParser.prototype.compileImageUrl = function (link) {
   var that = this;
 
-  return urlParser.resolve(that.config.indexPages['est'], link);
+  return url.resolve(that.config.indexPage, link);
 };
 
-MinuvalikParser.prototype.compileOfferUrl = function (language, link) {
+MinuvalikParser.prototype.compileOfferUrl = function (link) {
   var that = this;
-  return urlParser.resolve(that.config.indexPages['est'], link);
+  return url.resolve(that.config.indexPage, link);
 };
 
 MinuvalikParser.prototype.priceCleanup = function (price) {
   return price;
 }
 
-MinuvalikParser.prototype.compilePageUrl = function (language, link) {
+MinuvalikParser.prototype.compilePageUrl = function (link) {
   var that = this;
 
-  return that.config.indexPages['est'] + link;
+  return that.config.indexPage + link;
+};
+
+MinuvalikParser.prototype.getMainLanguage = function (link) {
+  return 'est';
 };
 
 module.exports = MinuvalikParser;
