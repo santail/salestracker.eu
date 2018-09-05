@@ -34,7 +34,13 @@ function MinuvalikParser() {
         'exists': false
       },
       'rus': {
-        'exists': true
+        'exists': true,
+        'compiler': function (originalUrl) {
+          var parsedUrl = url.parse(originalUrl);
+          parsedUrl.pathname = parsedUrl.pathname.replace(/^\/ee\//gi, "/ru/");
+
+          return url.format(parsedUrl);
+        }
       }
     },
     'paging': {
@@ -95,7 +101,7 @@ util.inherits(MinuvalikParser, AbstractParser);
 
 MinuvalikParser.prototype.compilePagingPattern = function () {
   var that = this;
-  
+
   return that.config.indexPage + that.config.paging.pattern;
 }
 
@@ -105,8 +111,14 @@ MinuvalikParser.prototype.compileImageUrl = function (link) {
   return url.resolve(that.config.indexPage, link);
 };
 
-MinuvalikParser.prototype.compileOfferUrl = function (link) {
+MinuvalikParser.prototype.compileOfferUrl = function (link, language) {
   var that = this;
+
+  if (language && !that.config.languages[language].main) {
+    var compiler = languages[language].compiler;
+    return compiler(link);
+  }
+
   return url.resolve(that.config.indexPage, link);
 };
 

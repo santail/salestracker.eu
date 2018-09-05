@@ -1,9 +1,9 @@
 var elasticsearch = require('elasticsearch');
 var _ = require('lodash');
-var url = require('url');
 var util = require('util');
 
 var LOG = require("../lib/services/Logger");
+var parserFactory = require("../lib/services/ParserFactory");
 var SessionFactory = require('../lib/services/SessionFactory');
 
 var worker = SessionFactory.getQueueConnection();
@@ -25,27 +25,10 @@ elastic.indices.create({
     }
 });
 
-var languages = {
-    'est': {
-        'exists': true,
-        'main': true
-    },
-    'eng': {
-        'exists': false
-    },
-    'rus': {
-        'exists': true,
-        'compiler': function (originalUrl) {
-            var parsedUrl = url.parse(originalUrl);
-            parsedUrl.pathname = parsedUrl.pathname.replace(/^\/ee\//gi, "/ru/");
-
-            return url.format(parsedUrl);
-        }
-    }
-};
-
 worker.process('processData', 10, function (job, done) {
     var offer = job.data;
+
+    var parser = parserFactory.getParser(offer.site);
 
     SessionFactory.getDbConnection().offers.save(offer, function (err, saved) {
         if (err) {
@@ -58,7 +41,7 @@ worker.process('processData', 10, function (job, done) {
             return done(new Error('DB save query failed'));
         }
 
-        if (languages[offer.language].main) {
+        if (parser.config.languages[offer.language].main) {
             if (offer.pictures && offer.pictures.length > 0) {
                 worker.create('processImage', {
                         'site': offer.site,
@@ -79,15 +62,15 @@ worker.process('processData', 10, function (job, done) {
                     });
             }
 
-            _.each(_.keys(languages), function (language) {
-                if (languages[language].main || !languages[language].exists) {
+            _.each(_.keys(parser.config.languages), function (language) {
+                if (parser.config.languages[language].main || !parser.config.languages[language].exists) {
                     return;
                 }
 
                 worker.create('processOffer', {
                         'site': offer.site,
                         'language': language,
-                        'url': compileOfferUrl(language, offer.url)
+                        'url': parser.compileOfferUrl(offer.url, language)
                     })
                     .attempts(3).backoff({
                         delay: 60 * 1000,
@@ -124,8 +107,3 @@ worker.process('processData', 10, function (job, done) {
         });
     });
 });
-
-var compileOfferUrl = function (language, url) {
-    var compiler = languages[language].compiler;
-    return compiler(url);
-};

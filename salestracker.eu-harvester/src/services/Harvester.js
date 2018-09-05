@@ -7,9 +7,9 @@ var slugify = require('slugify');
 var util = require("util");
 
 var Crawler = require("./Crawler");
-var parserFactory = require("./ParserFactory");
 
 var LOG = require("../../lib/services/Logger");
+var parserFactory = require("../../lib/services/ParserFactory");
 var SessionFactory = require("../../lib/services/SessionFactory");
 
 
