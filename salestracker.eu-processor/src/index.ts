@@ -13,25 +13,81 @@ var elastic = new elasticsearch.Client({
     log: 'error'
 });;
 
-LOG.info(util.format('[STATUS] [OK] [%s] Initializing indexes'));
+LOG.info(util.format('[STATUS] [OK] Initializing indexes'));
 
-elastic.indices.create({
+elastic.indices.exists({
     index: 'salestracker'
-}, function (err, resp, status) {
-    if (err) {
-        LOG.error(util.format('[STATUS] [Failure] Initializing indexes failed', err));
-    } else {
-        LOG.info(util.format('[STATUS] [OK] Initializing indexes succeeded', resp, status));
+})
+.then(function (exists) {
+    if (!exists) {
+        return elastic.indices.create({
+            index: 'salestracker'
+        });
     }
+})
+/*
+.then(function () {
+    return elastic.indices.putMapping({
+        index: 'salestracker',
+        type: "offers",
+        body: {
+          properties: {
+            title: {
+              type: "string"
+            },
+            description: {
+              type: "string"
+            },
+            details: {
+              type: "string"
+            },
+            language: {
+              type: "string",
+              "index": "not_analyzed"
+            },
+            vendor: {
+              type: "string"
+            },
+            active: {
+              type: "boolean"
+            },
+            url: {
+              type: "string",
+              "index": "not_analyzed"
+            },
+            original_url: {
+              type: "string",
+              "index": "not_analyzed"
+            },
+            price: {
+              type: "double"
+            },
+            original_price: {
+              type: "double"
+            },
+            "discount": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          }
+        }
+    });
+})
+*/
+.then(function() {
+    LOG.info(util.format('[STATUS] [OK] Initializing indexes succeeded'));
+})
+.catch(function (err) {
+    LOG.error(util.format('[STATUS] [Failure] Initializing indexes failed', err));
 });
 
 worker.process('processData', 10, function (job, done) {
     var data = job.data;
 
     var parser = parserFactory.getParser(data.site);
+    var offer = parser.compileTranslations(data);
 
     if (parser.config.languages[data.language].main) {
-        var offer = parser.compileTranslations(data);
 
         SessionFactory.getDbConnection().offers.save(offer, function (err, saved) {
             if (err) {
