@@ -45,8 +45,8 @@ worker.process('processData', 10, function (job, done) {
             if (offer.pictures && offer.pictures.length > 0) {
                 worker.create('processImage', {
                         'site': offer.site,
-                        'offerUrl': offer.url,
-                        'url': offer.pictures[0]
+                        'offerHref': offer.href,
+                        'href': offer.pictures[0]
                     })
                     .attempts(3).backoff({
                         delay: 60 * 1000,
@@ -55,10 +55,10 @@ worker.process('processData', 10, function (job, done) {
                     .removeOnComplete(true)
                     .save(function (err) {
                         if (err) {
-                            LOG.error(util.format('[STATUS] [FAILED] [%s] %s Image processing schedule failed', offer.site, offer.url, err));
+                            LOG.error(util.format('[STATUS] [FAILED] [%s] %s Image processing schedule failed', offer.site, offer.href, err));
                         }
 
-                        LOG.debug(util.format('[STATUS] [OK] [%s] %s Image processing scheduled', offer.site, offer.url));
+                        LOG.debug(util.format('[STATUS] [OK] [%s] %s Image processing scheduled', offer.site, offer.href));
                     });
             }
 
@@ -70,7 +70,7 @@ worker.process('processData', 10, function (job, done) {
                 worker.create('processOffer', {
                         'site': offer.site,
                         'language': language,
-                        'url': parser.compileOfferUrl(offer.url, language)
+                        'href': parser.compileOfferHref(offer.href, language)
                     })
                     .attempts(3).backoff({
                         delay: 60 * 1000,
@@ -79,15 +79,15 @@ worker.process('processData', 10, function (job, done) {
                     .removeOnComplete(true)
                     .save(function (err) {
                         if (err) {
-                            LOG.error(util.format('[STATUS] [FAILED] [%s] %s Offer processing schedule failed', offer.site, offer.url, err));
+                            LOG.error(util.format('[STATUS] [FAILED] [%s] %s Offer processing schedule failed', offer.site, offer.href, err));
                         }
 
-                        LOG.debug(util.format('[STATUS] [OK] [%s] %s Offer processing scheduled', offer.site, offer.url));
+                        LOG.debug(util.format('[STATUS] [OK] [%s] %s Offer processing scheduled', offer.site, offer.href));
                     });
             });
         }
 
-        LOG.info(util.format('[STATUS] [OK] [%s] Offer saved %s', offer.site, offer.url));
+        LOG.info(util.format('[STATUS] [OK] [%s] Offer saved %s', offer.site, offer.href));
 
         delete offer._id;
         delete offer.pictures;
@@ -102,7 +102,7 @@ worker.process('processData', 10, function (job, done) {
                 return done(err);
             }
 
-            LOG.info(util.format('[STATUS] [OK] [%s] Offer indexed %s', offer.site, offer.url));
+            LOG.info(util.format('[STATUS] [OK] [%s] Offer indexed %s', offer.site, offer.href));
             return done(null, resp);
         });
     });

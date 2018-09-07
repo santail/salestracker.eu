@@ -35,11 +35,11 @@ function MinuvalikParser() {
       },
       'rus': {
         'exists': true,
-        'compiler': function (originalUrl) {
-          var parsedUrl = url.parse(originalUrl);
-          parsedUrl.pathname = parsedUrl.pathname.replace(/^\/ee\//gi, "/ru/");
+        'compiler': function (href) {
+          var parsed = url.parse(href);
+          parsed.pathname = parsed.pathname.replace(/^\/ee\//gi, "/ru/");
 
-          return url.format(parsedUrl);
+          return url.format(parsed);
         }
       }
     },
@@ -67,7 +67,7 @@ function MinuvalikParser() {
       },
       'pictures': function ($) {
         return $('.deal_rules_td .dd_video_photo > a').map(function (i, el) {
-          return that.compileImageUrl($(this).attr('href'));
+          return that.compileImageHref($(this).attr('href'));
         }).get();
       },
       'additional': function ($) {
@@ -105,17 +105,17 @@ MinuvalikParser.prototype.compilePagingPattern = function () {
   return that.config.indexPage + that.config.paging.pattern;
 }
 
-MinuvalikParser.prototype.compileImageUrl = function (link) {
+MinuvalikParser.prototype.compileImageHref = function (link) {
   var that = this;
 
   return url.resolve(that.config.indexPage, link);
 };
 
-MinuvalikParser.prototype.compileOfferUrl = function (link, language) {
+MinuvalikParser.prototype.compileOfferHref = function (link, language) {
   var that = this;
 
   if (language && !that.config.languages[language].main) {
-    var compiler = languages[language].compiler;
+    var compiler = that.config.languages[language].compiler;
     return compiler(link);
   }
 
@@ -126,7 +126,7 @@ MinuvalikParser.prototype.priceCleanup = function (price) {
   return price;
 }
 
-MinuvalikParser.prototype.compilePageUrl = function (link) {
+MinuvalikParser.prototype.compilePageHref = function (link) {
   var that = this;
 
   return that.config.indexPage + link;

@@ -17,8 +17,8 @@ AbstractParser.prototype.getOffers = function (content) {
 
   var metadata = _.map(dataItems, function (item) {
     var metadata = {
-      'id': that.compileOfferUrl(item),
-      'url': that.compileOfferUrl(item)
+      'id': that.compileOfferHref(item),
+      'href': that.compileOfferHref(item)
     }
 
     if (that.config.json) {
@@ -29,7 +29,7 @@ AbstractParser.prototype.getOffers = function (content) {
   });
 
   return _.filter(metadata, function (item) {
-    return item.url;
+    return item.href;
   });
 };
 
@@ -77,19 +77,19 @@ AbstractParser.prototype.parse = function (body, parseFinished) {
   return parseFinished(null, offer);
 };
 
-AbstractParser.prototype.compilePageUrl = function (link) {
+AbstractParser.prototype.compilePageHref = function (link) {
   var that = this;
 
   return that.config.indexPage + link;
 };
 
-AbstractParser.prototype.compileOfferUrl = function (link) {
+AbstractParser.prototype.compileOfferHref = function (link) {
   var that = this;
 
   return that.config.indexPage + link.replace(/&amp;/g, '&');
 };
 
-AbstractParser.prototype.compileImageUrl = function (link) {
+AbstractParser.prototype.compileImageHref = function (link) {
   var that = this;
 
   return that.config.indexPage + link.replace(/&amp;/g, '&');
@@ -125,7 +125,7 @@ AbstractParser.prototype.compilePagingPattern = function () {
   var that = this;
 
   var pattern = that.config.paging.pattern ? that.config.paging.pattern : that.config.indexPage;
-  return that.compilePageUrl(pattern)
+  return that.compilePageHref(pattern)
 }
 
 module.exports = AbstractParser;

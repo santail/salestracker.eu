@@ -89,11 +89,11 @@ worker.process('processPage', numParallel, function (job, done) {
     var harvester = new Harvester();
     harvester.processPage(config, function (err, offers) {
         if (err) {
-            LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Page harvesting failed', config.site, config.url, err));
+            LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Page harvesting failed', config.site, config.href, err));
             return done(err);
         }
 
-        LOG.info(util.format('[STATUS] [OK] [%s] [%s] Page harvesting finished', config.site, config.url));
+        LOG.info(util.format('[STATUS] [OK] [%s] [%s] Page harvesting finished', config.site, config.href));
         return done(null, offers);
     });
 });
@@ -104,11 +104,11 @@ worker.process('processOffer', numParallel, function (job, done) {
     var harvester = new Harvester();
     harvester.processOffer(config, function (err, offers) {
         if (err) {
-            LOG.error(util.format('[STATUS] [Failure] [%s] Offer harvesting failed %s', config.site, config.url, err));
+            LOG.error(util.format('[STATUS] [Failure] [%s] Offer harvesting failed %s', config.site, config.href, err));
             return done(err);
         }
 
-        LOG.info(util.format('[STATUS] [OK] [%s] Offer harvesting finished %s', config.site, config.url));
+        LOG.info(util.format('[STATUS] [OK] [%s] Offer harvesting finished %s', config.site, config.href));
         return done(null, offers);
     });
 });
@@ -119,11 +119,11 @@ worker.process('processImage', numParallel, function (job, done) {
     var harvester = new Harvester();
     harvester.processImage(config, function (err, offers) {
         if (err) {
-            LOG.error(util.format('[STATUS] [Failure] [%s] Image harvesting failed %s', config.site, config.url, err));
+            LOG.error(util.format('[STATUS] [Failure] [%s] Image harvesting failed %s', config.site, config.href, err));
             return done(err);
         }
 
-        LOG.info(util.format('[STATUS] [OK] [%s] Image harvesting finished %s', config.site, config.url));
+        LOG.info(util.format('[STATUS] [OK] [%s] Image harvesting finished %s', config.site, config.href));
         return done(null, offers);
     });
 });

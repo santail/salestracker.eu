@@ -93,13 +93,13 @@ Crawler.prototype.request = function (options) {
                 retries--;
 
                 if (err) {
-                    LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Fetching url failed. Retry in %s msec. Retries left %s', that.config.site, options.url, timeout, retries, err));
+                    LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Fetching href failed. Retry in %s msec. Retries left %s', that.config.site, options.href, timeout, retries, err));
                 }
                 else if (response.statusCode !== 200) {
-                    LOG.error(util.format('[STATUS] [Failure] [%s] [%s] [%s] Fetching url failed. Retry in %s msec. Retries left %s', that.config.site, options.url, response.statusCode, timeout, retries));
+                    LOG.error(util.format('[STATUS] [Failure] [%s] [%s] [%s] Fetching href failed. Retry in %s msec. Retries left %s', that.config.site, options.href, response.statusCode, timeout, retries));
                 }
                 else {
-                    LOG.error(util.format('[STATUS] [Failure] [%s] [%s] [%s] Fetching url failed. No data received. Retry in %s msec. Retries left %s', that.config.site, options.url, response.statusCode, timeout, retries));
+                    LOG.error(util.format('[STATUS] [Failure] [%s] [%s] [%s] Fetching href failed. No data received. Retry in %s msec. Retries left %s', that.config.site, options.href, response.statusCode, timeout, retries));
                 }
 
                 setTimeout(function () {
@@ -112,7 +112,7 @@ Crawler.prototype.request = function (options) {
                 }, timeout);
             }
             else {
-                LOG.error(util.format('[STATUS] [Failure] [%s] [%s] [%s] Fetching url failed', that.config.site, options.url, response.statusCode));
+                LOG.error(util.format('[STATUS] [Failure] [%s] [%s] [%s] Fetching href failed', that.config.site, options.href, response.statusCode));
 
                 retries = null;
                 return options.onError(new Error('Error fetching page. No retries left.'));
@@ -125,7 +125,7 @@ Crawler.prototype.request = function (options) {
                 data = null;
 
                 if (err) {
-                    LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Parsing page body failed %s', that.config.site, options.url, err));
+                    LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Parsing page body failed %s', that.config.site, options.href, err));
                     return options.onError(err);
                 }
 
@@ -159,7 +159,7 @@ Crawler.prototype.parseJSONResponseBody = function (data, options, callback) {
         }
     }
     catch (ex) {
-        LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Parsing page body failed %s', that.config.site, options.url, ex));
+        LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Parsing page body failed %s', that.config.site, options.href, ex));
     }
 
     try {
@@ -189,7 +189,7 @@ Crawler.prototype.parseHtmlResponseBody = function (data, options, callback) {
         data = null;
 
         if (err) {
-            LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Cleanup response body failed', that.config.site, options.url, err));
+            LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Cleanup response body failed', that.config.site, options.href, err));
             return callback(err);
         }
 

@@ -56,7 +56,7 @@ Harvester.prototype.gatherOffers = function (options, gatherOffersFinished) {
     language = parser.getMainLanguage();
 
   options = _.extend(options, {
-    'url': indexPage.replace(/{search_criteria}/g, options.search), // TODO add default paging parameters
+    'href': indexPage.replace(/{search_criteria}/g, options.search), // TODO add default paging parameters
     'language': language
   });
 
@@ -74,7 +74,7 @@ Harvester.prototype.gatherOffers = function (options, gatherOffersFinished) {
 Harvester.prototype.processIndexPage = function (options, processIndexPageFinished) {
   var that = this;
 
-  LOG.info(util.format('[STATUS] [OK] [%s] [%s] Fetching index page', options.site, options.url));
+  LOG.info(util.format('[STATUS] [OK] [%s] [%s] Fetching index page', options.site, options.href));
 
   var parser = parserFactory.getParser(options.site);
 
@@ -84,12 +84,12 @@ Harvester.prototype.processIndexPage = function (options, processIndexPageFinish
 
   var crawler = new Crawler();
   crawler.request({
-    url: options.url,
+    url: options.href,
     json: parser.config.json,
     headers: parser.config.headers,
     payload: options.payload,
     onError: function (err) {
-      LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Fetching index page failed', options.site, options.url, err));
+      LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Fetching index page failed', options.site, options.href, err));
       return processIndexPageFinished(err);
     },
     onSuccess: function (content) {
@@ -113,13 +113,13 @@ Harvester.prototype.processPaginatedIndexes = function (options, content, proces
   var paginatedIndexesHandlers = [];
 
   if (!parser.config.payload) {
-    paginatedIndexesHandlers = _.map(pagingParams.pages, function (pageUrl, index) {
+    paginatedIndexesHandlers = _.map(pagingParams.pages, function (href, index) {
       return function (paginatedIndexHandlerFinished) {
         content = null;
 
         SessionFactory.getQueueConnection().create('processPage', {
             'site': options.site,
-            'url': pageUrl,
+            'href': href,
             'pageIndex': index + 1,
             'totalPages': pagingParams.pages.length
           })
@@ -130,11 +130,11 @@ Harvester.prototype.processPaginatedIndexes = function (options, content, proces
           .removeOnComplete(true)
           .save(function (err) {
             if (err) {
-              LOG.error(util.format('[STATUS] [FAILED] [%s] %s Page processing schedule failed', options.site, pageUrl, err));
+              LOG.error(util.format('[STATUS] [FAILED] [%s] %s Page processing schedule failed', options.site, href, err));
               return paginatedIndexHandlerFinished(err);
             }
 
-            LOG.debug(util.format('[STATUS] [OK] [%s] %s Page processing scheduled', options.site, pageUrl));
+            LOG.debug(util.format('[STATUS] [OK] [%s] %s Page processing scheduled', options.site, href));
             return paginatedIndexHandlerFinished(null);
           });
       };
@@ -146,7 +146,7 @@ Harvester.prototype.processPaginatedIndexes = function (options, content, proces
 
         SessionFactory.getQueueConnection().create('processPage', {
             'site': options.site,
-            'url': payload.url,
+            'href': payload.href,
             'payload': payload.payload,
             'pageIndex': index + 1,
             'totalPages': pagingParams.payloads.length
@@ -158,11 +158,11 @@ Harvester.prototype.processPaginatedIndexes = function (options, content, proces
           .removeOnComplete(true)
           .save(function (err) {
             if (err) {
-              LOG.error(util.format('[STATUS] [FAILED] [%s] %s Page processing schedule failed', options.site, payload.url, err));
+              LOG.error(util.format('[STATUS] [FAILED] [%s] %s Page processing schedule failed', options.site, payload.href, err));
               return paginatedIndexHandlerFinished(err);
             }
 
-            LOG.debug(util.format('[STATUS] [OK] [%s] %s Page processing scheduled', options.site, payload.url));
+            LOG.debug(util.format('[STATUS] [OK] [%s] %s Page processing scheduled', options.site, payload.href));
             return paginatedIndexHandlerFinished(null);
           });
       };
@@ -198,12 +198,12 @@ Harvester.prototype.processPage = function (options, processPageFinished) {
 
   var crawler = new Crawler();
   crawler.request({
-    url: options.url,
+    url: options.href,
     json: parser.config.json,
     headers: parser.config.headers,
     payload: options.payload,
     onError: function (err) {
-      LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Fetching page failed', options.site, options.url, err));
+      LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Fetching page failed', options.site, options.href, err));
       return processPageFinished(err);
     },
     onSuccess: function (content) {
@@ -235,11 +235,11 @@ Harvester.prototype.processPage = function (options, processPageFinished) {
             .removeOnComplete(true)
             .save(function (err) {
               if (err) {
-                LOG.error(util.format('[STATUS] [FAILED] [%s] %s Offer processing schedule failed', options.site, offer.url, err));
+                LOG.error(util.format('[STATUS] [FAILED] [%s] %s Offer processing schedule failed', options.site, offer.href, err));
                 return offerHandlerFinished(err);
               }
 
-              LOG.debug(util.format('[STATUS] [OK] [%s] %s Offer processing scheduled', options.site, offer.url));
+              LOG.debug(util.format('[STATUS] [OK] [%s] %s Offer processing scheduled', options.site, offer.href));
               return offerHandlerFinished(null);
             });
         };
@@ -261,7 +261,7 @@ Harvester.prototype.processPage = function (options, processPageFinished) {
 Harvester.prototype.processOffer = function (options, processOfferFinished) {
   var that = this;
 
-  LOG.debug(util.format('[STATUS] [OK] [%s] Offer processing started %s', options.site, options.url));
+  LOG.debug(util.format('[STATUS] [OK] [%s] Offer processing started %s', options.site, options.href));
 
   var parser = parserFactory.getParser(options.site);
 
@@ -270,14 +270,14 @@ Harvester.prototype.processOffer = function (options, processOfferFinished) {
       body = null;
 
       if (err) {
-        LOG.error(util.format('[STATUS] [Failure] [%s] [%s] [%s] Parsing offer failed', options.site, options.url, err));
+        LOG.error(util.format('[STATUS] [Failure] [%s] [%s] [%s] Parsing offer failed', options.site, options.href, err));
         return processOfferFinished(err);
       }
 
       var runningTime = new Date();
 
       offer = _.extend(offer, {
-        'url': options.url,
+        'href': options.href,
         'site': options.site,
         'language': options.language,
         'active': true,
@@ -292,15 +292,15 @@ Harvester.prototype.processOffer = function (options, processOfferFinished) {
         .removeOnComplete(true)
         .save(function (err) {
           if (err) {
-            LOG.error(util.format('[STATUS] [FAILED] [%s] %s Offer data processing schedule failed', options.site, offer.url, err));
+            LOG.error(util.format('[STATUS] [FAILED] [%s] %s Offer data processing schedule failed', options.site, offer.href, err));
             return processOfferFinished(err);
           }
 
-          LOG.debug(util.format('[STATUS] [OK] [%s] %s Offer data processing scheduled', options.site, offer.url));
+          LOG.debug(util.format('[STATUS] [OK] [%s] %s Offer data processing scheduled', options.site, offer.href));
           return processOfferFinished(null);
         });
 
-      LOG.debug(util.format('[STATUS] [OK] [%s] Offer parsing finished %s', options.site, options.url));
+      LOG.debug(util.format('[STATUS] [OK] [%s] Offer parsing finished %s', options.site, options.href));
     });
   };
 
@@ -309,11 +309,11 @@ Harvester.prototype.processOffer = function (options, processOfferFinished) {
   } else {
     var crawler = new Crawler();
     crawler.request({
-      url: options.url,
+      url: options.href,
       headers: parser.config.headers,
       onError: function (err, offer) {
         if (err) {
-          LOG.error(util.format('[STATUS] [Failure] [%s] Offer processing failed %s', options.site, options.url, err));
+          LOG.error(util.format('[STATUS] [Failure] [%s] Offer processing failed %s', options.site, options.href, err));
           return processOfferFinished(err);
         }
 
@@ -327,20 +327,20 @@ Harvester.prototype.processOffer = function (options, processOfferFinished) {
 Harvester.prototype.processImage = function (options, processImageFinished) {
   var that = this;
 
-  LOG.debug(util.format('[STATUS] [OK] [%s] Image processing started %s', options.site, options.url));
+  LOG.debug(util.format('[STATUS] [OK] [%s] Image processing started %s', options.site, options.href));
 
   request({
-    url: options.url,
+    url: options.href,
     encoding: 'binary'
   }, (err, res, body) => {
     if (err) {
-      LOG.error(util.format('[STATUS] [Failure] [%s] Image processing failed %s', options.site, options.url, err));
+      LOG.error(util.format('[STATUS] [Failure] [%s] Image processing failed %s', options.site, options.href, err));
       return processImageFinished(err);
     }
 
     if (body && res.statusCode === 200) {
-      const offerUrl = new URL(options.offerUrl);
-      options.dest = path.join(process.cwd(), './uploads/offers/' + options.site + '/' + slugify(offerUrl.pathname));
+      const offerHref = new URL(options.offerHref);
+      options.dest = path.join(process.cwd(), './uploads/offers/' + options.site + '/' + slugify(offerHref.pathname));
 
       fs.ensureDir(options.dest, '0777', (err) => {
         if (err) {
@@ -349,11 +349,11 @@ Harvester.prototype.processImage = function (options, processImageFinished) {
           }
         }
 
-        options.dest = path.join(options.dest, path.basename(options.url));
+        options.dest = path.join(options.dest, path.basename(options.href));
 
         fs.writeFile(options.dest, body, 'binary', (err) => {
           if (err) {
-            LOG.error(util.format('[STATUS] [Failure] [%s] Image storing failed %s', options.site, options.url, err));
+            LOG.error(util.format('[STATUS] [Failure] [%s] Image storing failed %s', options.site, options.href, err));
             return processImageFinished(err);
           }
 
@@ -362,8 +362,8 @@ Harvester.prototype.processImage = function (options, processImageFinished) {
       });
     } else {
       if (!body) {
-        LOG.error(util.format('[STATUS] [Failure] [%s] Image retrieving failed %s', options.site, options.url, err));
-        return processImageFinished(new Error(`Image loading error - empty body. URL: ${options.url}`));
+        LOG.error(util.format('[STATUS] [Failure] [%s] Image retrieving failed %s', options.site, options.href, err));
+        return processImageFinished(new Error(`Image loading error - empty body. URL: ${options.href}`));
       }
 
       return processImageFinished(new Error(`Image loading error - server responded ${res.statusCode}`));
