@@ -121,30 +121,15 @@ AbstractParser.prototype.compilePagingParameters = function (content, options) {
   };
 };
 
-AbstractParser.prototype.compileTranslations = function (data) {
+AbstractParser.prototype.compileOffer = function (data) {
   var that = this;
 
-  var offer = {
-    'translations': {}
-  };
-  offer['translations'][data.language] = {};
+  var offer = {};
 
   _.each(_.keys(data), function (property) {
-    if (data.hasOwnProperty(property)) {
-      if (!_.includes(that.config.translations, property)) {
-        if (property !== 'language') {
-          if (!offer.hasOwnProperty(property)) {
-            offer[property] = {};
-          }
-
-          offer[property] = data[property];
-        }
-      } else {
-        if (!offer['translations'][data.language].hasOwnProperty(property)) {
-          offer['translations'][data.language][property] = {};
-        }
-
-        offer['translations'][data.language][property] = data[property];
+    if (!_.includes(that.config.translations, property)) {
+      if (!_.includes(['language', 'origin'], property)) {
+        offer[property] = data[property];
       }
     }
   });
@@ -152,11 +137,26 @@ AbstractParser.prototype.compileTranslations = function (data) {
   return offer;
 };
 
+AbstractParser.prototype.compileTranslations = function (data) {
+  var that = this;
+
+  var translations = {};
+  translations[data.language] = {};
+
+  _.each(_.keys(data), function (property) {
+    if (data.hasOwnProperty(property) && _.includes(that.config.translations, property)) {
+        translations[data.language][property] = data[property];
+      }
+  });
+
+  return translations;
+};
+
 AbstractParser.prototype.compilePagingPattern = function () {
   var that = this;
 
   var pattern = that.config.paging.pattern ? that.config.paging.pattern : that.config.indexPage;
   return that.compilePageHref(pattern)
-}
+};
 
 module.exports = AbstractParser;

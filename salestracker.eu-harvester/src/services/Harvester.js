@@ -266,7 +266,7 @@ Harvester.prototype.processOffer = function (options, processOfferFinished) {
   var parser = parserFactory.getParser(options.site);
 
   var offerDataHandler = function (body) {
-    parser.parse(body, function (err, offer) {
+    parser.parse(body, function (err, data) {
       body = null;
 
       if (err) {
@@ -276,7 +276,7 @@ Harvester.prototype.processOffer = function (options, processOfferFinished) {
 
       var runningTime = new Date();
 
-      offer = _.extend(offer, {
+      data = _.extend(data, {
         'href': options.href,
         'site': options.site,
         'language': options.language,
@@ -284,7 +284,11 @@ Harvester.prototype.processOffer = function (options, processOfferFinished) {
         'parsed': runningTime.getDate() + "/" + runningTime.getMonth() + "/" + runningTime.getFullYear()
       });
 
-      SessionFactory.getQueueConnection().create('processData', offer)
+      if (options.origin) {
+        data.origin = options.origin;
+      }
+
+      SessionFactory.getQueueConnection().create('processData', data)
         .attempts(3).backoff({
           delay: 60 * 1000,
           type: 'exponential'
@@ -292,11 +296,11 @@ Harvester.prototype.processOffer = function (options, processOfferFinished) {
         .removeOnComplete(true)
         .save(function (err) {
           if (err) {
-            LOG.error(util.format('[STATUS] [FAILED] [%s] %s Offer data processing schedule failed', options.site, offer.href, err));
+            LOG.error(util.format('[STATUS] [FAILED] [%s] %s Offer data processing schedule failed', options.site, data.href, err));
             return processOfferFinished(err);
           }
 
-          LOG.debug(util.format('[STATUS] [OK] [%s] %s Offer data processing scheduled', options.site, offer.href));
+          LOG.debug(util.format('[STATUS] [OK] [%s] %s Offer data processing scheduled', options.site, data.href));
           return processOfferFinished(null);
         });
 
