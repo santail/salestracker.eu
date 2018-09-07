@@ -91,7 +91,8 @@ function MinuvalikParser() {
       'vendor': function ($) {
         return '';
       }
-    }
+    },
+    'translations': ['title', 'description', 'details', 'additional', 'href']
   };
 
   this.config = _.extend(this.config, config);

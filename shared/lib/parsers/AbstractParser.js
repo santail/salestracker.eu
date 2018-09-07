@@ -121,6 +121,37 @@ AbstractParser.prototype.compilePagingParameters = function (content, options) {
   };
 };
 
+AbstractParser.prototype.compileTranslations = function (data) {
+  var that = this;
+
+  var offer = {
+    'translations': {}
+  };
+  offer['translations'][data.language] = {};
+
+  _.each(_.keys(data), function (property) {
+    if (data.hasOwnProperty(property)) {
+      if (!_.includes(that.config.translations, property)) {
+        if (property !== 'language') {
+          if (!offer.hasOwnProperty(property)) {
+            offer[property] = {};
+          }
+
+          offer[property] = data[property];
+        }
+      } else {
+        if (!offer['translations'][data.language].hasOwnProperty(property)) {
+          offer['translations'][data.language][property] = {};
+        }
+
+        offer['translations'][data.language][property] = data[property];
+      }
+    }
+  });
+
+  return offer;
+};
+
 AbstractParser.prototype.compilePagingPattern = function () {
   var that = this;
 

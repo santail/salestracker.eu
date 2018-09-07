@@ -26,84 +26,86 @@ elastic.indices.create({
 });
 
 worker.process('processData', 10, function (job, done) {
-    var offer = job.data;
+    var data = job.data;
 
-    var parser = parserFactory.getParser(offer.site);
+    var parser = parserFactory.getParser(data.site);
 
-    SessionFactory.getDbConnection().offers.save(offer, function (err, saved) {
-        if (err) {
-            LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Saving offer failed', offer.site, offer.id, err));
-            return done(err);
-        }
+    if (parser.config.languages[data.language].main) {
+        var offer = parser.compileTranslations(data);
 
-        if (!saved) {
-            LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Saving offer failed', offer.site, offer.id, err));
-            return done(new Error('DB save query failed'));
-        }
-
-        if (parser.config.languages[offer.language].main) {
-            if (offer.pictures && offer.pictures.length > 0) {
-                worker.create('processImage', {
-                        'site': offer.site,
-                        'offerHref': offer.href,
-                        'href': offer.pictures[0]
-                    })
-                    .attempts(3).backoff({
-                        delay: 60 * 1000,
-                        type: 'exponential'
-                    })
-                    .removeOnComplete(true)
-                    .save(function (err) {
-                        if (err) {
-                            LOG.error(util.format('[STATUS] [FAILED] [%s] %s Image processing schedule failed', offer.site, offer.href, err));
-                        }
-
-                        LOG.debug(util.format('[STATUS] [OK] [%s] %s Image processing scheduled', offer.site, offer.href));
-                    });
-            }
-
-            _.each(_.keys(parser.config.languages), function (language) {
-                if (parser.config.languages[language].main || !parser.config.languages[language].exists) {
-                    return;
-                }
-
-                worker.create('processOffer', {
-                        'site': offer.site,
-                        'language': language,
-                        'href': parser.compileOfferHref(offer.href, language)
-                    })
-                    .attempts(3).backoff({
-                        delay: 60 * 1000,
-                        type: 'exponential'
-                    })
-                    .removeOnComplete(true)
-                    .save(function (err) {
-                        if (err) {
-                            LOG.error(util.format('[STATUS] [FAILED] [%s] %s Offer processing schedule failed', offer.site, offer.href, err));
-                        }
-
-                        LOG.debug(util.format('[STATUS] [OK] [%s] %s Offer processing scheduled', offer.site, offer.href));
-                    });
-            });
-        }
-
-        LOG.info(util.format('[STATUS] [OK] [%s] Offer saved %s', offer.site, offer.href));
-
-        delete offer._id;
-        delete offer.pictures;
-
-        elastic.index({
-            index: 'salestracker',
-            type: 'offers',
-            body: offer
-        }, function (err, resp) {
+        SessionFactory.getDbConnection().offers.save(offer, function (err, saved) {
             if (err) {
-                LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Indexing offer failed', offer.site, offer.id, err));
+                LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Saving offer failed', data.site, data.id, err));
                 return done(err);
             }
 
-            LOG.info(util.format('[STATUS] [OK] [%s] Offer indexed %s', offer.site, offer.href));
-            return done(null, resp);
+            if (!saved) {
+                LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Saving offer failed', data.site, data.id, err));
+                return done(new Error('DB save query failed'));
+            }
+
+            LOG.info(util.format('[STATUS] [OK] [%s] Offer saved %s', data.site, data.href));
+
+            delete data._id;
+            delete data.pictures;
+
+            elastic.index({
+                index: 'salestracker',
+                type: 'offers',
+                body: data
+            }, function (err, resp) {
+                if (err) {
+                    LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Indexing offer failed', data.site, data.id, err));
+                    return done(err);
+                }
+
+                LOG.info(util.format('[STATUS] [OK] [%s] Offer indexed %s', data.site, data.href));
+                return done(null, resp);
+            });
         });
-    });
+
+        if (data.pictures && data.pictures.length > 0) {
+            worker.create('processImage', {
+                    'site': data.site,
+                    'offerHref': data.href,
+                    'href': data.pictures[0]
+                })
+                .attempts(3).backoff({
+                    delay: 60 * 1000,
+                    type: 'exponential'
+                })
+                .removeOnComplete(true)
+                .save(function (err) {
+                    if (err) {
+                        LOG.error(util.format('[STATUS] [FAILED] [%s] %s Image processing schedule failed', data.site, data.href, err));
+                    }
+
+                    LOG.debug(util.format('[STATUS] [OK] [%s] %s Image processing scheduled', data.site, data.href));
+                });
+        }
+
+        _.each(_.keys(parser.config.languages), function (language) {
+            if (parser.config.languages[language].main || !parser.config.languages[language].exists) {
+                return;
+            }
+
+            worker.create('processOffer', {
+                    'site': data.site,
+                    'language': language,
+                    'href': parser.compileOfferHref(data.href, language)
+                })
+                .attempts(3).backoff({
+                    delay: 60 * 1000,
+                    type: 'exponential'
+                })
+                .removeOnComplete(true)
+                .save(function (err) {
+                    if (err) {
+                        LOG.error(util.format('[STATUS] [FAILED] [%s] %s Offer processing schedule failed', data.site, data.href, err));
+                    }
+
+                    LOG.debug(util.format('[STATUS] [OK] [%s] %s Offer processing scheduled', data.site, data.href));
+                });
+        });
+    }
 });
