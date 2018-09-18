@@ -88,9 +88,10 @@ worker.process('processData', 10, function (job, done) {
     var parser = parserFactory.getParser(data.site);
     var translations = parser.compileTranslations(data);
 
-    if (!data.origin && parser.config.languages[data.language].main) {
+    if (!data.origin_href && parser.config.languages[data.language].main) {
         var offer = parser.compileOffer(data);
         offer.translations = translations;
+        offer.origin_href = data.href;
 
         SessionFactory.getDbConnection().offers.save(offer, function (err, saved) {
             if (err) {
@@ -114,7 +115,7 @@ worker.process('processData', 10, function (job, done) {
                         'site': data.site,
                         'language': language,
                         'href': parser.compileOfferHref(data.href, language),
-                        'origin': offer._id
+                        'origin_href': offer.origin_href
                     })
                     .attempts(3).backoff({
                         delay: 60 * 1000,
@@ -143,33 +144,33 @@ worker.process('processData', 10, function (job, done) {
                     return done(err);
                 }
 
+                if (data.pictures && data.pictures.length > 0) {
+                    worker.create('processImage', {
+                            'site': data.site,
+                            'offerHref': data.href,
+                            'href': data.pictures[0]
+                        })
+                        .attempts(3).backoff({
+                            delay: 60 * 1000,
+                            type: 'exponential'
+                        })
+                        .removeOnComplete(true)
+                        .save(function (err) {
+                            if (err) {
+                                LOG.error(util.format('[STATUS] [FAILED] [%s] %s Image processing schedule failed', data.site, data.href, err));
+                            }
+    
+                            LOG.debug(util.format('[STATUS] [OK] [%s] %s Image processing scheduled', data.site, data.href));
+                        });
+                }
+
                 LOG.info(util.format('[STATUS] [OK] [%s] Offer indexed %s', data.site, data.href));
                 return done(null, resp);
             });
-
-            if (data.pictures && data.pictures.length > 0) {
-                worker.create('processImage', {
-                        'site': data.site,
-                        'offerHref': data.href,
-                        'href': data.pictures[0]
-                    })
-                    .attempts(3).backoff({
-                        delay: 60 * 1000,
-                        type: 'exponential'
-                    })
-                    .removeOnComplete(true)
-                    .save(function (err) {
-                        if (err) {
-                            LOG.error(util.format('[STATUS] [FAILED] [%s] %s Image processing schedule failed', data.site, data.href, err));
-                        }
-
-                        LOG.debug(util.format('[STATUS] [OK] [%s] %s Image processing scheduled', data.site, data.href));
-                    });
-            }
         });
-    } else if (data.origin) {
+    } else if (data.origin_href) {
         SessionFactory.getDbConnection().offers.findOne({
-            _id: ObjectId(data.origin)
+            origin_href: data.origin_href
         }, function (err, offer) {
             if (err) {
                 LOG.error(util.format('[STATUS] [Failure] Checking offer failed', err));
@@ -177,22 +178,52 @@ worker.process('processData', 10, function (job, done) {
             }
 
             SessionFactory.getDbConnection().offers.update({
-                _id: ObjectId(data.origin)
+                origin_href: data.origin_href
             }, {
                 $set: {
                     translations: _.extend(offer.translations, translations)
                 }
-            }, function (err, doc) {
+            }, function (err) {
                 if (err) {
-                    LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Updating offer failed', data.site, data.origin, err));
+                    LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Updating offer failed', data.site, data.href, err));
+                    return done(err);
                 }
-    
-                if (!doc) {
-                    LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Updating offer failed', data.site, data.origin, err));
-                }
-    
-                LOG.info(util.format('[STATUS] [OK] [%s] [%s] Updating offer finished', data.site, data.origin));
-                return done(null, doc);
+
+                elastic.deleteByQuery({
+                    index: 'salestracker',
+                    type: 'offers',
+                    body: {
+                        query: {
+                            term: {
+                                origin_href: data.origin_href
+                            }
+                        }
+                    }
+                }, function (err) {
+                    if (err) {
+                        LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Updating offer failed', data.site, data.href, err));
+                        return done(err);
+                    }
+
+                    offer.translations = _.extend(offer.translations, translations);
+
+                    delete offer._id;
+                    delete offer.pictures;
+
+                    elastic.index({
+                        index: 'salestracker',
+                        type: 'offers',
+                        body: offer
+                    }, function (err, resp) {
+                        if (err) {
+                            LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Indexing offer failed', data.site, data.id, err));
+                            return done(err);
+                        }
+
+                        LOG.info(util.format('[STATUS] [OK] [%s] Offer indexed %s', data.site, data.href));
+                        return done(null, resp);
+                    });
+                });
             });
         });
     }

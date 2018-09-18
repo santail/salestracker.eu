@@ -284,8 +284,8 @@ Harvester.prototype.processOffer = function (options, processOfferFinished) {
         'parsed': runningTime.getDate() + "/" + runningTime.getMonth() + "/" + runningTime.getFullYear()
       });
 
-      if (options.origin) {
-        data.origin = options.origin;
+      if (options.origin_href) {
+        data.origin_href = options.origin_href;
       }
 
       SessionFactory.getQueueConnection().create('processData', data)
