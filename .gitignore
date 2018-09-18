@@ -90,3 +90,4 @@ uploads
 **/*config/env/local.js
 *.pem
 
+data/
