@@ -18,7 +18,7 @@
   "scripts": {
     "start": "node server",
     "start:server": "ts-node src/server",
-    "dev:server": "nodemon -e ts --ignore \"src/client/**/*\" --ignore \"src/server/tests/**/*\"  --exec \"npm run start:server\"",
+    "dev:server": "nodemon -e ts --ignore \"client/src/**/*\" --ignore \"src/server/tests/**/*\"  --exec \"npm run start:server\"",
     "dev:client": "webpack -wd",
     "test": "mocha -r ts-node/register -r jsdom-global/register -r src/client/tests/configureTests \"src/client/tests/**/*.*\" \"src/server/tests/**/*.*\"",
     "test:watch": "npm run test -- --watch-extensions ts,tsx --watch",
@@ -64,6 +64,7 @@
     "webpack-cli": "^3.1.0"
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "body-parser": "^1.18.2",
     "chalk": "^2.4.1",
     "compression": "^1.7.2",

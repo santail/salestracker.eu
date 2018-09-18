@@ -3,9 +3,9 @@ const CleanWebpackPlugin = require("clean-webpack-plugin");
 const webpack = require('webpack');
 
 module.exports = {
-  entry: "./src/client/index.tsx",
+  entry: "./client/src/index.tsx",
   output: {
-    path: path.resolve(__dirname, "./public/js"),
+    path: path.resolve(__dirname, "./client/public/js"),
     filename: "bundle.js"
   },
   resolve: {
@@ -43,7 +43,7 @@ module.exports = {
     }
   },
   plugins: [
-    new CleanWebpackPlugin([path.resolve(__dirname, "./public/js")]),
+    new CleanWebpackPlugin([path.resolve(__dirname, "/client/public/js")]),
     new webpack.HotModuleReplacementPlugin()
   ]
 };

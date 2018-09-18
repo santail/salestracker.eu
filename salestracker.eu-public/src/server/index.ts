@@ -14,10 +14,10 @@ connect(process.env.MONGODB_URI!!, { useMongoClient: true });
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-app.use(express.static(resolve(__dirname, '../../public/')));
+app.use(express.static(resolve(__dirname, '../../client/public/')));
 
 app.get('*', (req: Request, res: Response) => {
-    res.sendFile(resolve(__dirname, '../../public/index.html'));
+    res.sendFile(resolve(__dirname, '../../client/public/index.html'));
 });
 
 const port = process.env.PORT || 9000;
