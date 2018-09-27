@@ -27,11 +27,11 @@ module.exports = {
   // for obsecurity reasons
   sessionKey: 'sessionId',
   sessionCollection: 'sessions',
-  logo: 'modules/core/client/img/brand/logo.png',
-  favicon: 'modules/core/client/img/brand/favicon.ico',
+  logo: 'server/src/modules/core/client/img/brand/logo.png',
+  favicon: 'server/src/modules/core/client/img/brand/favicon.ico',
   uploads: {
     profileUpload: {
-      dest: './modules/users/client/img/profile/uploads/', // Profile upload destination path
+      dest: './uploads/profile', // Profile upload destination path
       limits: {
         fileSize: 1*1024*1024 // Max file size in bytes (1 MB)
       }

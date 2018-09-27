@@ -52,7 +52,7 @@ var getGlobbedPaths = function (globPatterns, excludes) {
  * Validate NODE_ENV existence
  */
 var validateEnvironmentVariable = function () {
-  var environmentFiles = glob.sync('./config/env/' + process.env.NODE_ENV + '.js');
+  var environmentFiles = glob.sync('./env/' + process.env.NODE_ENV + '.js');
   console.log();
   if (!environmentFiles.length) {
     if (process.env.NODE_ENV) {
@@ -120,7 +120,7 @@ var initGlobalConfigFolders = function (config, assets) {
   };
 
   // Setting globbed client paths
-  config.folders.client = getGlobbedPaths(path.join(process.cwd(), 'modules/*/client/'), process.cwd().replace(new RegExp(/\\/g), '/'));
+  config.folders.client = getGlobbedPaths('./modules/*/client/'), process.cwd().replace(new RegExp(/\\/g), '/');
 };
 
 /**
@@ -129,8 +129,7 @@ var initGlobalConfigFolders = function (config, assets) {
 var initGlobalConfigFiles = function (config, assets) {
   // Appending files
   config.files = {
-    server: {},
-    client: {}
+    server: {}
   };
 
   // Setting Globbed model files
@@ -142,20 +141,8 @@ var initGlobalConfigFiles = function (config, assets) {
   // Setting Globbed config files
   config.files.server.configs = getGlobbedPaths(assets.server.config);
 
-  // Setting Globbed socket files
-  config.files.server.sockets = getGlobbedPaths(assets.server.sockets);
-
   // Setting Globbed policies files
   config.files.server.policies = getGlobbedPaths(assets.server.policies);
-
-  // Setting Globbed js files
-  config.files.client.js = getGlobbedPaths(assets.client.lib.js, 'public/').concat(getGlobbedPaths(assets.client.js, ['public/']));
-
-  // Setting Globbed css files
-  config.files.client.css = getGlobbedPaths(assets.client.lib.css, 'public/').concat(getGlobbedPaths(assets.client.css, ['public/']));
-
-  // Setting Globbed test files
-  config.files.client.tests = getGlobbedPaths(assets.client.tests);
 };
 
 /**
@@ -166,32 +153,32 @@ var initGlobalConfig = function () {
   validateEnvironmentVariable();
 
   // Get the default assets
-  var defaultAssets = require(path.join(process.cwd(), 'config/assets/default'));
+  var defaultAssets = require(path.join(process.cwd(), 'server/src/config/assets/default'));
 
   // Get the current assets
-  var environmentAssets = require(path.join(process.cwd(), 'config/assets/', process.env.NODE_ENV)) || {};
+  var environmentAssets = require(path.join(process.cwd(), 'server/src/config/assets/', process.env.NODE_ENV)) || {};
 
   // Merge assets
   var assets = _.merge(defaultAssets, environmentAssets);
 
   // Get the default config
-  var defaultConfig = require(path.join(process.cwd(), 'config/env/default'));
+  var defaultConfig = require(path.join(process.cwd(), 'server/src/config/env/default'));
 
   // Get the current config
-  var environmentConfig = require(path.join(process.cwd(), 'config/env/', process.env.NODE_ENV)) || {};
+  var environmentConfig = require(path.join(process.cwd(), 'server/src/config/env/', process.env.NODE_ENV)) || {};
 
   // Merge config files
   var config = _.merge(defaultConfig, environmentConfig);
 
   // read package.json for MEAN.JS project information
-  var pkg = require(path.resolve('./package.json'));
+  var pkg = require(path.resolve(path.join(process.cwd(), './package.json')));
   config.meanjs = pkg;
 
   // We only extend the config object with the local.js custom/local environment if we are on
   // production or development environment. If test environment is used we don't merge it with local.js
   // to avoid running test suites on a prod/dev environment (which delete records and make modifications)
   if (process.env.NODE_ENV !== 'test') {
-    config = _.merge(config, (fs.existsSync(path.join(process.cwd(), 'config/env/local.js')) && require(path.join(process.cwd(), 'config/env/local.js'))) || {});
+    config = _.merge(config, (fs.existsSync('./env/local.js')) && require('./env/local.js')) || {};
   }
 
   // Initialize global globbed files

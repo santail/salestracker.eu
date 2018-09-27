@@ -32,8 +32,6 @@ module.exports.initLocalVariables = function (app) {
   app.locals.keywords = config.app.keywords;
   app.locals.googleAnalyticsTrackingID = config.app.googleAnalyticsTrackingID;
   app.locals.facebookAppId = config.facebook.clientID;
-  app.locals.jsFiles = config.files.client.js;
-  app.locals.cssFiles = config.files.client.css;
   app.locals.livereload = config.livereload;
   app.locals.logo = config.logo;
   app.locals.favicon = config.favicon;
@@ -139,10 +137,10 @@ module.exports.initModulesConfiguration = function (app, db) {
 module.exports.initHelmetHeaders = function (app) {
   // Use helmet to secure Express headers
   var SIX_MONTHS = 15778476000;
-  app.use(helmet.xframe());
+  app.use(helmet.frameguard());
   app.use(helmet.xssFilter());
-  app.use(helmet.nosniff());
-  app.use(helmet.ienoopen());
+  app.use(helmet.noSniff());
+  app.use(helmet.ieNoOpen());
   app.use(helmet.hsts({
     maxAge: SIX_MONTHS,
     includeSubdomains: true,
@@ -203,17 +201,6 @@ module.exports.initErrorRoutes = function (app) {
 };
 
 /**
- * Configure Socket.io
- */
-module.exports.configureSocketIO = function (app, db) {
-  // Load the Socket.io configuration
-  var server = require('./socket.io')(app, db);
-
-  // Return server object
-  return server;
-};
-
-/**
  * Initialize the Express application
  */
 module.exports.init = function (db) {
@@ -249,9 +236,6 @@ module.exports.init = function (db) {
 
   // Initialize error routes
   this.initErrorRoutes(app);
-
-  // Configure Socket.io
-  app = this.configureSocketIO(app, db);
 
   return app;
 };

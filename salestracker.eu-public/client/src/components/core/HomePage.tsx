@@ -2,7 +2,7 @@ const _ = require('lodash');
 const axios = require('axios');
 
 import * as React from 'react';
-import { FormEvent } from 'react';
+import { FormEvent, FormData } from 'react';
 import { ComponentBase } from 'resub';
 
 

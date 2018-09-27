@@ -11,7 +11,10 @@ var config = require('../config'),
 // Load the mongoose models
 module.exports.loadModels = function (callback) {
   // Globbing model files
+  console.error(config.files.server.models);
+  
   config.files.server.models.forEach(function (modelPath) {
+    console.error(modelPath);
     require(path.resolve(modelPath));
   });
 

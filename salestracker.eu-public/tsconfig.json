@@ -12,16 +12,16 @@
       "noUnusedParameters": false,
       "noImplicitReturns": true,
       "noFallthroughCasesInSwitch": true,
-//      "baseUrl": "./client/src/",
       "jsx": "react",
-//      "rootDir": "./client/src/",
       "experimentalDecorators": true,
       "emitDecoratorMetadata": true,
       "allowJs": true
     },
     "include": [
         "./client/src//**/*.ts",
-        "./src//**/*.ts"
+        "./client/tests//**/*.ts",
+        "./server/src//**/*.ts",
+        "./server/tests//**/*.ts"
     ],
     "exclude": [
       "node_modules"
