@@ -1,16 +1,20 @@
 const _ = require('lodash');
-const axios = require('axios');
 
 import * as React from 'react';
-import { FormEvent, FormData } from 'react';
+import { FormEvent } from 'react';
 import { ComponentBase } from 'resub';
 
+import OfferService from '../../services/OfferService';
+import WishService from '../../services/WishService';
+import OfferStore, { Offer } from '../../stores/OfferStore';
+import WishStore, { User } from '../../stores/WishStore';
 
 interface HomePageProps extends React.Props<any> {
 }
 
 interface HomePageState {
-  users: any[],
+  users: User[],
+  offers: Offer[],
   loading: boolean;
   res: string;
   errors: any[];
@@ -20,8 +24,9 @@ class HomePage extends ComponentBase<HomePageProps, HomePageState> {
 
   protected _buildState(props: HomePageProps, initialBuild: boolean): Partial<HomePageState> {
     return {
-        res: '',
-        users: []
+        res: WishStore.getFormData(),
+        users: WishStore.getUsers(),
+        offers: OfferStore.getOffers()
     }
   }
 
@@ -29,14 +34,14 @@ class HomePage extends ComponentBase<HomePageProps, HomePageState> {
     return (
     	<div>
             <form onSubmit={this._onFormSubmit}>
-                <label htmlFor="username">Enter username</label>
-                <input id="username" name="username" type="text" />
+                <label htmlFor="content">Contains</label>
+                <input id="content" name="content" type="text" />
 
                 <label htmlFor="email">Enter your email</label>
                 <input id="email" name="email" type="email" />
 
-                <label htmlFor="birthdGate">Enter your birth date</label>
-                <input id="birthdate" name="birthdate" type="text" />
+                <label htmlFor="phone">Enter your phone number</label>
+                <input id="phone" name="phone" type="text" />
 
                 <button>Send data!</button>
             </form>
@@ -70,48 +75,19 @@ class HomePage extends ComponentBase<HomePageProps, HomePageState> {
     	</div>
     );
   }
-
-  componentDidMount() {
-    super.componentDidMount();
-
-    this.setState({users: [], loading: false});
-  }
-
-  private _onFormSubmit = (e: FormEvent<HTMLFormElement>):void => {
-    e.preventDefault();
-
-    const data = new FormData(e.target);
-    
-    this.setState({
-      res: this._stringifyFormData(data),
-    });
-
-    axios
-        .get("https://randomuser.me/api/?results=5")
-        .then(response =>
-            response.data.results.map(user => ({
-                name: `${user.name.first} ${user.name.last}`,
-                username: `${user.login.username}`,
-                email: `${user.email}`,
-                image: `${user.picture.thumbnail}`
-            }))
-        )
-        .then(users => {
-            this.setState({
-                users,
-                loading: false
-            });
-        })
-        .catch(errors => this.setState({ errors, loading: false }));
-  };
-
-  private _stringifyFormData = (fd: any): string => {
-    const data = {};
-      for (let key of fd.keys()) {
-        data[key] = fd.get(key);
+  
+    componentDidMount() {
+        OfferService.loadOffers();
     }
-    return JSON.stringify(data, null, 2);
-  }
+
+    private _onFormSubmit = (e: FormEvent < HTMLFormElement > ): void => {
+        e.preventDefault();
+
+        const data = new FormData(e.currentTarget);
+
+        WishService.saveWish(data);
+        WishService.loadWishes();
+    }
 }
 
 export = HomePage;
