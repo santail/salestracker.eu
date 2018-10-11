@@ -4,6 +4,7 @@ var fs = require('fs-extra');
 var path = require('path');
 var request = require('request');
 var slugify = require('slugify');
+const { URL } = require('url');
 var util = require("util");
 
 var Crawler = require("./Crawler");
@@ -281,7 +282,8 @@ Harvester.prototype.processOffer = function (options, processOfferFinished) {
         'site': options.site,
         'language': options.language,
         'active': true,
-        'parsed': runningTime.getDate() + "/" + runningTime.getMonth() + "/" + runningTime.getFullYear()
+        'parsed': runningTime.getDate() + "/" + runningTime.getMonth() + "/" + runningTime.getFullYear(),
+        'expires': runningTime + 1 * 60 * 60 * 1000 // in one hour
       });
 
       if (options.origin_href) {
