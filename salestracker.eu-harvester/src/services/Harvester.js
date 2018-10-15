@@ -3,6 +3,7 @@ var async = require('async');
 var fs = require('fs-extra');
 var mongojs = require('mongojs');
 var path = require('path');
+var Promise = require('promise');
 var request = require('request');
 var slugify = require('slugify');
 const { URL } = require('url');
@@ -19,34 +20,34 @@ var Harvester = function () {
   this.db = SessionFactory.getDbConnection();
 };
 
-Harvester.prototype.cleanupSite = function (options, cleanupFinished) {
+Harvester.prototype.cleanupSite = function (options) {
+  var that = this;
+
+  if (!options.shouldCleanup) {
+    return Promise.resolve();
+  }
+
   LOG.info(util.format('[STATUS] [OK] [%s] Cleanup started', options.site));
 
-  this.db.offers.remove({
-    'site': options.site
-  }, function (err) {
-    if (err) {
-      LOG.error(util.format('[STATUS] [Failure] [%s] Cleanup failed', options.site, err));
-      return cleanupFinished(err);
-    }
-
-    LOG.info(util.format('[STATUS] [OK] [%s] Cleanup finished', options.site));
-    return cleanupFinished(null);
+  return new Promise(function (fulfill, reject){
+    that.db.offers.remove({
+      'site': options.site
+    }, function (err) {
+      if (err) reject(err);
+      else fulfill();
+    });
   });
 };
 
-Harvester.prototype.processSite = function (options, processSiteFinished) {
+Harvester.prototype.processSite = function (options) {
+  var that = this;
   LOG.info(util.format('[STATUS] [OK] [%s] Site processing started', options.site));
 
-  // TODO extract to separate SiteProcessor -> process method
-  this.gatherOffers(options, function (err, offers) {
-    if (err) {
-      LOG.error(util.format('[STATUS] [Failure] [%s] Getting latest offers failed', options.site, err));
-      return processSiteFinished(err);
-    }
-
-    LOG.info(util.format('[STATUS] [OK] [%s] Getting latest offers finished', options.site));
-    return processSiteFinished(null, offers);
+  return new Promise(function (fulfill, reject){
+    that.gatherOffers(options, function (err, offers) {
+      if (err) reject(err);
+      else fulfill(offers);
+    });
   });
 };
 

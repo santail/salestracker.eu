@@ -3,6 +3,7 @@ var _ = require('lodash');
 var async = require('async');
 var fs = require('fs');
 var path = require('path');
+var Promise: PromiseConstructor = require('promise');
 var util = require('util');
 
 var Harvester = require('./services/Harvester');
@@ -54,21 +55,27 @@ worker.process('processSite', numParallel, function (job, done) {
 
         return function (siteProcessingFinished) {
             var harvester = new Harvester();
-            harvester.cleanupSite(config, function (err) {
-                if (err) {
-                    LOG.error(util.format('[STATUS] [FAILED] [%s] Site harvesting failed', config.site, err));
-                }
 
-                harvester.processSite(config, function (err) {
-                    if (err) {
-                        LOG.error(util.format('[STATUS] [FAILED] [%s] Site harvesting failed', config.site, err));
-                        return siteProcessingFinished(err);
-                    }
-
-                    LOG.info(util.format('[STATUS] [OK] [%s] Site harvesting finished', config.site));
-                    return siteProcessingFinished();
+            // cleanup site only if job configuration requires it
+            const cleanupPromise = harvester.cleanupSite(config)
+                .then(function () {
+                    LOG.info(util.format('[STATUS] [OK] [%s] Site cleanup finished', config.site));
+                }, function (err) {
+                    LOG.error(util.format('[STATUS] [Failure] [%s] Site cleanup failed', config.site, err));
                 });
-            });
+
+            const processSitePromise = harvester.processSite(config)
+                .then(function () {
+                    LOG.info(util.format('[STATUS] [OK] [%s] Getting latest offers finished', config.site));
+                }, function (err) {
+                    LOG.error(util.format('[STATUS] [Failure] [%s] Getting latest offers failed', config.site, err));
+                });
+
+            Promise.all([cleanupPromise, processSitePromise]).then(function () {
+                return siteProcessingFinished();
+            }, function (err) {
+                return siteProcessingFinished(err);
+            })
         };
     });
 
@@ -127,7 +134,6 @@ worker.process('processImage', numParallel, function (job, done) {
         return done(null, offers);
     });
 });
-
 
 var cleanUploads = function () {
     var uploadsPath = path.join(process.cwd(), './uploads/offers/');
