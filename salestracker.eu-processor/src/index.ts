@@ -9,6 +9,7 @@ var SessionFactory = require('../lib/services/SessionFactory');
 
 var worker = SessionFactory.getQueueConnection();
 
+// TODO Add check for elasticsearch server is running
 var elastic = new elasticsearch.Client({
     host: process.env.ELASTICSEARCH_URL || 'http://127.0.0.1:9200',
     log: 'error'
@@ -135,6 +136,12 @@ elastic.indices.exists({
                     if (err) {
                         LOG.error(util.format('[STATUS] [Failure] Checking offer failed', err));
                         return done(err);
+                    }
+
+                    if (!offer) {
+                        // TODO Mark somehow failed offer and re-run harvesting
+                        LOG.error(util.format('[STATUS] [Failure] Checking offer failed. Offer not found %', data.origin_href));
+                        return done(new Error('Offer not found for update: ' + data.origin_href));
                     }
 
                     SessionFactory.getDbConnection().offers.update({

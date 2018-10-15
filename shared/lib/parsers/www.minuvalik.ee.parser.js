@@ -25,6 +25,7 @@ function MinuvalikParser() {
     },
     'site': 'http://www.minuvalik.ee',
     'indexPage': 'https://www.minuvalik.ee/?c=all',
+    'ttl': 2 * 60 * 60 * 1000,
     'languages': {
       'est': {
         'exists': true,

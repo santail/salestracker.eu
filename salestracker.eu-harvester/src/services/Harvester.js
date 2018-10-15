@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var async = require('async');
 var fs = require('fs-extra');
+var mongojs = require('mongojs');
 var path = require('path');
 var request = require('request');
 var slugify = require('slugify');
@@ -260,10 +261,56 @@ Harvester.prototype.processPage = function (options, processPageFinished) {
 };
 
 Harvester.prototype.processOffer = function (options, processOfferFinished) {
-  var that = this;
+  var runningTime = new Date();
+  var parser = parserFactory.getParser(options.site);
 
   LOG.debug(util.format('[STATUS] [OK] [%s] Offer processing started %s', options.site, options.href));
 
+  // Check only main offer if already exists and extend expiration time, proceed to harvesting in other case.
+  if (_.isUndefined(options.origin_href) && parser.config.languages[options.language].main) {
+    SessionFactory.getDbConnection().offers.findOne({
+      "origin_href": options.href
+    }, function (err, foundOffer) {
+      if (err) {
+          LOG.error(util.format('[STATUS] [Failure] Checking offer failed', err));
+          return gatherOffer(options, processOfferFinished);
+      } 
+      else if (foundOffer) {
+        SessionFactory.getDbConnection().offers.update({
+          _id: mongojs.ObjectId(foundOffer._id)
+        }, {
+          $set: {
+            modified: new Date().toISOString(),
+            expires: runningTime + parser.config.ttl
+          } 
+        }, function (err, updatedOffer) {
+          if (err) {
+            // TODO Mark somehow offer that was excluded from processing
+            LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Offers expiration time update failed', options.site, options.href, err));
+            return processOfferFinished(err);
+          }
+
+          if (!updatedOffer) {
+            LOG.info(util.format('[STATUS] [OK] [%s] Offer not found. Proceed with harvesting', options.site, options.href));
+            return gatherOffer(options, processOfferFinished);
+          } else {
+            LOG.info(util.format('[STATUS] [OK] [%s] Offers expiration time extended', options.site, options.href));
+            return processOfferFinished(null);
+          }
+        });
+      } else {
+        LOG.info(util.format('[STATUS] [OK] [%s] Offer not found. Proceed with harvesting', options.site, options.href));
+        return gatherOffer(options, processOfferFinished);
+      };
+    });
+  }
+  else {
+    return gatherOffer(options, processOfferFinished);
+  }
+};
+
+var gatherOffer = function (options, processOfferFinished) {
+  var runningTime = new Date();
   var parser = parserFactory.getParser(options.site);
 
   var offerDataHandler = function (body) {
@@ -274,8 +321,6 @@ Harvester.prototype.processOffer = function (options, processOfferFinished) {
         LOG.error(util.format('[STATUS] [Failure] [%s] [%s] [%s] Parsing offer failed', options.site, options.href, err));
         return processOfferFinished(err);
       }
-
-      var runningTime = new Date();
 
       data = _.extend(data, {
         'href': options.href,
@@ -328,7 +373,7 @@ Harvester.prototype.processOffer = function (options, processOfferFinished) {
       onSuccess: offerDataHandler
     });
   }
-};
+}
 
 Harvester.prototype.processImage = function (options, processImageFinished) {
   var that = this;
