@@ -37,3 +37,15 @@ docker system prune
 
 # remove all
 docker system prune -a
+
+# 
+docker run -it -p 5000:5000 --link redis -e KUE_PREFIX=queue christophwitzko/kue-ui
+
+docker exec -it server-redis redis-cli FLUSHALL
+
+
+
+
+docker rm $(docker ps -a -q)
+docker rmi $(docker images -f "dangling=true" -q)
+docker volume rm $(docker volume ls -qf dangling=true)
