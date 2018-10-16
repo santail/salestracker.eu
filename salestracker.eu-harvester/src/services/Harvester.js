@@ -287,8 +287,8 @@ Harvester.prototype.processOffer = function (options, processOfferFinished) {
           _id: mongojs.ObjectId(foundOffer._id)
         }, {
           $set: {
-            modified: new Date().toISOString(),
-            expires: runningTime + parser.config.ttl
+            modified: runningTime.toISOString(),
+            expires: new Date(runningTime + parser.config.ttl).toISOString()
           } 
         }, function (err, updatedOffer) {
           if (err) {
@@ -334,8 +334,8 @@ var gatherOffer = function (options, processOfferFinished) {
         'site': options.site,
         'language': options.language,
         'active': true,
-        'parsed': runningTime.getDate() + "/" + runningTime.getMonth() + "/" + runningTime.getFullYear(),
-        'expires': runningTime + 1 * 60 * 60 * 1000 // in one hour
+        'parsed': runningTime.toISOString(),
+        'expires': new Date(runningTime + parser.config.ttl).toISOString() // in one hour
       });
 
       if (options.origin_href) {
