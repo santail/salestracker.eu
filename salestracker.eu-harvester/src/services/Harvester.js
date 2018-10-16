@@ -34,7 +34,13 @@ Harvester.prototype.cleanupSite = function (options) {
       'site': options.site
     }, function (err) {
       if (err) reject(err);
-      else fulfill();
+      else {
+        if (options.cleanupUploads) {
+          cleanUploads(options.site); // TODO Wrap to promise
+        }
+
+        fulfill()
+      };
     });
   });
 };
@@ -420,6 +426,35 @@ Harvester.prototype.processImage = function (options, processImageFinished) {
 
       return processImageFinished(new Error(`Image loading error - server responded ${res.statusCode}`));
     }
+  });
+};
+
+var cleanUploads = function (site) {
+  var uploadsPath = path.join(process.cwd(), './uploads/offers/' + site);
+
+  fs.readdir(uploadsPath, function (err, files) {
+      if (err) {
+          LOG.error(util.format('[STATUS] [FAILED] Error reading uploads directory', err));
+      } else {
+          if (files.length !== 0) {
+              _.each(files, function (file) {
+                  var filePath = uploadsPath + file;
+                  fs.stat(filePath, function (err, stats) {
+                      if (err) {
+                          LOG.error(util.format('[STATUS] [FAILED] Error reading uploaded file', err));
+                      } else {
+                          if (stats.isFile()) {
+                              fs.unlink(filePath, function (err) {
+                                  if (err) {
+                                      LOG.error(util.format('[STATUS] [FAILED] Error deleting uploaded file', err));
+                                  }
+                              });
+                          }
+                      }
+                  });
+              });
+          }
+      }
   });
 };
 
