@@ -1,4 +1,4 @@
-var elasticsearch = require('elasticsearch');
+
 var _ = require('lodash');
 var ObjectId = require('mongodb').ObjectID;
 var util = require('util');
@@ -8,12 +8,7 @@ var parserFactory = require("../lib/services/ParserFactory");
 var SessionFactory = require('../lib/services/SessionFactory');
 
 var worker = SessionFactory.getQueueConnection();
-
-// TODO Add check for elasticsearch server is running
-var elastic = new elasticsearch.Client({
-    host: process.env.ELASTICSEARCH_URL || 'http://127.0.0.1:9200',
-    log: 'error'
-});;
+var elastic = SessionFactory.getElasticsearchConnection();
 
 LOG.info(util.format('[STATUS] [OK] Initializing indexes'));
 

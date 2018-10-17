@@ -10,7 +10,9 @@
     "start:prod": "pm2 start index.js"
   },
   "dependencies": {
+    "@types/elasticsearch": "^5.0.27",
     "async": "^2.6.0",
+    "elasticsearch": "^15.1.1",
     "kue": "^0.11.6",
     "kue-scheduler": "^0.7.4",
     "lodash": "^4.17.5",

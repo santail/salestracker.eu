@@ -333,7 +333,6 @@ var gatherOffer = function (options, processOfferFinished) {
         'href': options.href,
         'site': options.site,
         'language': options.language,
-        'active': true,
         'parsed': runningTime.toISOString(),
         'expires': new Date(runningTime + parser.config.ttl).toISOString() // in one hour
       });

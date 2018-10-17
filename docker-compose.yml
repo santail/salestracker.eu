@@ -14,6 +14,7 @@ web-admin:
     MONGODB_URI: mongodb://mongo:27017/salestracker-dev
     PORT: 8000
   links:
+    - server-elasticsearch
     - server-mongodb
     - server-redis
 
@@ -22,6 +23,7 @@ web-public:
   build: ./salestracker.eu-public/
   dockerfile: Dockerfile
   links:
+    - server-elasticsearch
     - server-mongodb
   ports:
     - "9000:9000"
@@ -47,7 +49,9 @@ backend-finder:
   environment:
     REDIS_ADDR: redis://redis:6379
     MONGODB_URI: mongodb://mongo:27017/salestracker-dev
+    ELASTICSEARCH_URL: http://elasticsearch:9200
   links:
+    - server-elasticsearch
     - server-mongodb
     - server-redis
 
