@@ -30,16 +30,33 @@ setInterval(function () {
                         }
                     }
                 }
-            }, function (err, response, status) {
+            }, function (err, response) {
                 if (err) {
                     LOG.error(util.format('[STATUS] [Failure] [%s] Offers search failed', foundWish.content, err));
                 }
                 else {
-                    _.each(response.hits.hits, function (foundOffer) {
-                        console.log(foundOffer._source.translations.rus.title, status);
-                    })
+                    let notification = {
+                        wish: foundWish,
+                        offers: _.map(response.hits.hits, function (offer) {
+                            return offer._source;
+                        })
+                    };
+
+                    worker.create('sendNotification', notification)
+                        .attempts(3).backoff({
+                            delay: 60 * 1000,
+                            type: 'exponential'
+                        })
+                        .removeOnComplete(true)
+                        .save(function (err) {
+                            if (err) {
+                                LOG.error(util.format('[STATUS] [FAILED] Notification processing schedule failed', notification, err));
+                            }
+
+                            LOG.debug(util.format('[STATUS] [OK] Notification processing scheduled'));
+                        });
                 }
-                
+           
                 SessionFactory.getDbConnection().wishes.update({
                     _id: mongojs.ObjectId(foundWish._id)
                 }, {
