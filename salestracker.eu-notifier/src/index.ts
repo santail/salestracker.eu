@@ -1,31 +1,34 @@
 var util = require('util');
 
 var LOG = require('../lib/services/Logger');
-var SessionFactory = require("../lib/services/SessionFactory");
+var SessionFactory = require('../lib/services/SessionFactory');
 
-var scheduler = SessionFactory.getSchedulerConnection();
+var Messenger = require('./services/Messenger');
 
-var scheduledJob = scheduler.createJob('every', {})
-    .attempts(1)
-    .removeOnComplete(true)
-    .backoff({
-        delay: 60 * 1000,
-        type: 'exponential'
-    })
-    .priority('high')
-    .removeOnComplete(true)
-    .save(function (err) {
+
+var worker = SessionFactory.getQueueConnection();
+
+worker.process('sendNotification', 10, function (job, done) {
+    var data = job.data;
+
+    const wish = data.wish;
+    const offers = data.offers;
+
+    let notification = {
+        email: wish.contacts.email,
+        phone: wish.contacts.phone,
+        contains: wish.content,
+        offers: offers
+    };
+
+    Messenger.send(notification, function (err) {
         if (err) {
-            LOG.error(util.format('[STATUS] [FAILED] [%s] Job not scheduled', err));
+            LOG.error(util.format('[STATUS] [Failure] Notification failed', err));
+            return done(err);
         }
-
-        LOG.info(util.format('[STATUS] [OK] Job scheduled'));
+    
+        LOG.info(util.format('[STATUS] [OK] Notification sent'));
+        return done();
     });
 
-scheduler.every('30 seconds', scheduledJob);
-
-scheduler.process('every', function (job, done) {
-    console.log(util.format('[STATUS] [OK] Next iteration'), job.data);
-
-    return done();
-});
+})

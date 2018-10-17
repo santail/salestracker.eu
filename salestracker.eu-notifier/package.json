@@ -11,15 +11,16 @@
   "license": "ISC",
   "dependencies": {
     "async": "^2.6.0",
+    "elasticsearch": "^15.1.1",
     "kue": "^0.11.6",
     "kue-scheduler": "^0.7.4",
     "lodash": "^4.17.5",
     "mailgun-js": "^0.7.13",
-    "promise": "^8.0.1",
-    "twilio": "^2.11.0",
     "mongojs": "^2.6.0",
+    "promise": "^8.0.1",
     "ts-node": "^7.0.1",
     "tsconfig-paths": "^3.5.0",
+    "twilio": "^2.11.0",
     "typescript": "^3.0.0",
     "winston": "^2.4.2"
   },
