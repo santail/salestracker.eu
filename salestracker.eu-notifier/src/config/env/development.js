@@ -86,9 +86,9 @@ module.exports = {
   },
   notifier: {
     twilio: {
-      AccountSID: 'ACd1bf8420ca6755efc182e1f96068177d',
-      AuthToken: 'aea7130ceb8f49b9937bdb7f11f063ca',
-      from: '+15005550006'
+      AccountSID: 'AC47db10149694cab9cf625c58803650d3',
+      AuthToken: '4f0ae099ee487367e6f9d6b6e5c7bd8d',
+      from: '+37258821581'
     },
     mailgun: {
       api_key: 'key-ae63224be01baeeec348c3c1808f058a',

@@ -13,6 +13,14 @@ var path = require('path'),
  */
 exports.create = function (req, res) {
   var wish = new Wish(req.body);
+
+  wish.contacts = {
+    email: req.body.email,
+    phone: req.body.phone
+  };
+
+  wish.period = 1 * 60 * 1000; // one minute
+
   wish.user = req.user;
 
   wish.save(function (err) {
@@ -39,8 +47,10 @@ exports.read = function (req, res) {
 exports.update = function (req, res) {
   var wish = req.wish;
 
-  wish.title = req.body.title;
-  wish.content = req.body.content;
+  wish.contacts = {
+    email: req.body.email,
+    phone: req.body.phone
+  }
 
   wish.save(function (err) {
     if (err) {

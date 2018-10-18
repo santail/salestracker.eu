@@ -11,8 +11,10 @@ var mongoose = require('mongoose'),
  */
 var WishSchema = new Schema({
 	content: String,
-    phone: String,
-    email: String,
+    contacts: {
+		email: String,
+		phone: String,
+	},
 	active: Boolean,
     created: { 'type': Date, 'default': Date.now },
 	user: { type: Schema.ObjectId, ref: 'User' }
@@ -22,8 +24,8 @@ var WishSchema = new Schema({
 
 WishSchema.index({
 	'content': "text",
-	'phone': "text",
-	'email': "text"
+	'contacts.phone': "text",
+	'contacts.email': "text"
 }, {
 	name: 'idx_wish_content_phone_email'
 });

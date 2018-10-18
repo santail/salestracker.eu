@@ -1,4 +1,3 @@
-import { withStatement } from "babel-types";
 
 var _ = require('lodash');
 var mongojs = require('mongojs');
@@ -12,14 +11,32 @@ var db = SessionFactory.getDbConnection();
 var worker = SessionFactory.getQueueConnection();
 var elastic = SessionFactory.getElasticsearchConnection();
 
-setInterval(function () {
-    var now = Date.now();
+const performSearch = function () {
+    const checkTime = new Date();
 
-    SessionFactory.getDbConnection().wishes.findOne({}, function (err, foundWish) {
+    SessionFactory.getDbConnection().wishes.findOne({
+        $and: [
+            {
+                created: {
+                    "$lte": checkTime
+                }
+            }, {
+                $or: [{
+                    reactivates: {
+                        $exists: false
+                    }
+                }, {
+                    reactivates: {
+                        "$lte": new Date(checkTime)
+                    }
+                }]
+            }
+        ]
+    }, function (err, foundWish) {
         if (err) {
             LOG.error(util.format('[STATUS] [Failure] Checking wish failed', err));
         } else if (foundWish) {
-            
+
             elastic.search({
                 index: 'salestracker',
                 type: 'offers',
@@ -33,8 +50,7 @@ setInterval(function () {
             }, function (err, response) {
                 if (err) {
                     LOG.error(util.format('[STATUS] [Failure] [%s] Offers search failed', foundWish.content, err));
-                }
-                else {
+                } else {
                     let notification = {
                         wish: foundWish,
                         offers: _.map(response.hits.hits, function (offer) {
@@ -56,12 +72,12 @@ setInterval(function () {
                             LOG.debug(util.format('[STATUS] [OK] Notification processing scheduled'));
                         });
                 }
-           
+
                 SessionFactory.getDbConnection().wishes.update({
                     _id: mongojs.ObjectId(foundWish._id)
                 }, {
                     $set: {
-                        checked: new Date().toISOString()
+                        reactivates: new Date(checkTime.getTime() + foundWish.period)
                     }
                 }, function (err, updatedWish) {
                     if (err) {
@@ -69,17 +85,22 @@ setInterval(function () {
                         LOG.error(util.format('[STATUS] [Failure] [%s] Wish check time update failed', foundWish.content, err));
                         return;
                     }
-    
+
                     if (!updatedWish) {
                         LOG.error(util.format('[STATUS] [Failure] [%s] Wish check time update failed', foundWish.content, err));
                     } else {
                         LOG.info(util.format('[STATUS] [OK] [%s] Wish check time updated', foundWish.content));
+                        performSearch();
                     }
                 });
             });
         } else {
             LOG.info(util.format('[STATUS] [OK] No unprocessed wishes found'));
+            setTimeout(function () {
+                performSearch();
+            }, 1000)
         };
     });
+};
 
-}, 10000);
+performSearch();
