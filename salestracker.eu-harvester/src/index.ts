@@ -14,7 +14,11 @@ var SessionFactory = require('../lib/services/SessionFactory');
 var numParallel = 2;
 
 var sites = [{
-    site: 'www.minuvalik.ee'
+    site: 'www.minuvalik.ee',
+    interval: 1 * 20 * 1000
+}, {
+    site: 'www.selver.ee',
+    interval: 1 * 20 * 1000
 }];
 
 var worker = SessionFactory.getQueueConnection();
@@ -35,7 +39,7 @@ _.each(sites, function (config) {
 
                 LOG.info(util.format('[STATUS] [OK] [%s] Site processing scheduled', config.site));
             });
-    }, 1 * 60 * 1000);
+    }, config.interval);
 });
 
 worker.process('processSite', numParallel, function (job, done) {

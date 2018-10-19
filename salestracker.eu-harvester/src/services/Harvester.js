@@ -220,11 +220,11 @@ Harvester.prototype.processPage = function (options, processPageFinished) {
 
       try {
         offers = parser.getOffers(content);
-      } catch (ex) {
+      } catch (err) {
         content = null;
 
         LOG.error(util.format('[STATUS] [Failure] [%s] Offers processing not scheduled', options.site, err));
-        return processPageFinished(new Error('Offers processing not scheduled', ex));
+        return processPageFinished(new Error('Offers processing not scheduled', err));
       }
 
       var offersHandlers = _.map(offers, function (offer) {
@@ -273,22 +273,26 @@ Harvester.prototype.processOffer = function (options, processOfferFinished) {
 
   LOG.debug(util.format('[STATUS] [OK] [%s] Offer processing started %s', options.site, options.href));
 
-  // Check only main offer if already exists and extend expiration time, proceed to harvesting in other case.
-  if (_.isUndefined(options.origin_href) && parser.config.languages[options.language].main) {
-    SessionFactory.getDbConnection().offers.findOne({
-      "origin_href": options.href
-    }, function (err, foundOffer) {
-      if (err) {
-          LOG.error(util.format('[STATUS] [Failure] Checking offer failed', err));
-          return gatherOffer(options, processOfferFinished);
-      } 
-      else if (foundOffer) {
+  const isMainOffer = _.isUndefined(options.origin_href) && parser.config.languages[options.language].main;
+  const href = isMainOffer ? options.href : options.origin_href;
+
+  SessionFactory.getDbConnection().offers.findOne({
+    "origin_href": href
+  }, function (err, foundMainOffer) {
+    if (err) {
+        LOG.error(util.format('[STATUS] [Failure] Checking offer failed', err));
+        return gatherOffer(options, processOfferFinished);
+    } 
+    else if (foundMainOffer) {
+      const isTranslated = !_.isUndefined(foundMainOffer.translations[options.language]);
+
+      if (isMainOffer) {
         SessionFactory.getDbConnection().offers.update({
-          _id: mongojs.ObjectId(foundOffer._id)
+          _id: mongojs.ObjectId(foundMainOffer._id)
         }, {
           $set: {
-            modified: runningTime.toISOString(),
-            expires: new Date(runningTime + parser.config.ttl).toISOString()
+            modified: runningTime,
+            expires: new Date(runningTime + parser.config.ttl)
           } 
         }, function (err, updatedOffer) {
           if (err) {
@@ -298,22 +302,28 @@ Harvester.prototype.processOffer = function (options, processOfferFinished) {
           }
 
           if (!updatedOffer) {
-            LOG.info(util.format('[STATUS] [OK] [%s] Offer not found. Proceed with harvesting', options.site, options.href));
+            LOG.info(util.format('[STATUS] [OK] [%s] Offer not updated. Proceed with harvesting', options.site, options.href));
             return gatherOffer(options, processOfferFinished);
           } else {
             LOG.info(util.format('[STATUS] [OK] [%s] Offers expiration time extended', options.site, options.href));
             return processOfferFinished(null);
           }
         });
-      } else {
-        LOG.info(util.format('[STATUS] [OK] [%s] Offer not found. Proceed with harvesting', options.site, options.href));
+      } 
+      else if (isTranslated) {
+        LOG.info(util.format('[STATUS] [OK] [%s] Offer already translated. Skipping.', options.site, options.href));
+        return processOfferFinished(null);
+      }
+      else {
+        LOG.info(util.format('[STATUS] [OK] [%s] Offer translation not found. Proceed with harvesting', options.site, options.href));
         return gatherOffer(options, processOfferFinished);
-      };
-    });
-  }
-  else {
-    return gatherOffer(options, processOfferFinished);
-  }
+      }
+    } 
+    else {
+      LOG.info(util.format('[STATUS] [OK] [%s] Offer not found. Proceed with harvesting', options.site, options.href));
+      return gatherOffer(options, processOfferFinished);
+    };
+  });
 };
 
 var gatherOffer = function (options, processOfferFinished) {
@@ -329,12 +339,14 @@ var gatherOffer = function (options, processOfferFinished) {
         return processOfferFinished(err);
       }
 
+      LOG.debug(util.format('[STATUS] [OK] [%s] Offer parsing finished %s', options.site, options.href));
+
       data = _.extend(data, {
         'href': options.href,
         'site': options.site,
         'language': options.language,
-        'parsed': runningTime.toISOString(),
-        'expires': new Date(runningTime + parser.config.ttl).toISOString() // in one hour
+        'parsed': runningTime,
+        'expires': new Date(runningTime + parser.config.ttl) // in one hour
       });
 
       if (options.origin_href) {
@@ -356,8 +368,6 @@ var gatherOffer = function (options, processOfferFinished) {
           LOG.debug(util.format('[STATUS] [OK] [%s] %s Offer data processing scheduled', options.site, data.href));
           return processOfferFinished(null);
         });
-
-      LOG.debug(util.format('[STATUS] [OK] [%s] Offer parsing finished %s', options.site, options.href));
     });
   };
 

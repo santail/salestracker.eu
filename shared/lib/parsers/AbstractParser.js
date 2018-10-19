@@ -159,4 +159,22 @@ AbstractParser.prototype.compilePagingPattern = function () {
   return that.compilePageHref(pattern)
 };
 
+AbstractParser.prototype.getMainLanguage = function () {
+  var that = this;
+
+  var mainLanguage = _.find(_.keys(that.config.languages), function (language) {
+    return that.config.languages[language].main;
+  });
+
+  if (!mainLanguage) {
+    console.error(new Error('Main language is not set'));
+  }
+
+  return mainLanguage;
+};
+
+AbstractParser.prototype.priceCleanup = function (price) {
+  return price;
+};
+
 module.exports = AbstractParser;

@@ -1,48 +1,39 @@
 'use strict';
 
-var util = require('util'),
-  urlParser = require("url"),
-  AbstractParser = require("./AbstractParser"),
-  utils = require("../services/Utils");
+var url = require("url");
+var util = require('util');
+
+var AbstractParser = require("./AbstractParser");
 
 function SelverParser() {
-  var that = this;
-
   AbstractParser.call(this);
 
+  var that = this;
+
   this.config = {
-    'site': 'www.selver.ee',
-    'index': {
-      'est': 'http://www.selver.ee/soodushinnaga-tooted?limit=96'
-    },
-    'paging': {
-      finit: true,
-      applyParameters: function paging_func(language, $) {
-        var paging = {
-          'pattern': '&p={pageNumber}',
-          'first': 1,
-          'last': $('body > div.main-container div.category-products > div.toolbar > div.pages > ol > li:nth-child(' + ($('body > div.main-container div.category-products > div.toolbar > div.pages > ol > li').length - 1) + ') > a').attr('href').replace(/.*p=(\d)/, "$1"),
-          'pages': function pages() {
-            var pages = [];
-
-            for (var pageNumber = 1; pageNumber <= this.last; pageNumber++) {
-              pages.push(that.compilePageUrl(language, this.pattern.replace('{pageNumber}', pageNumber)));
-            }
-
-            return pages;
-          }
-        };
-
-        return {
-          'first': paging.first,
-          'last': paging.last,
-          'pages': paging.pages()
-        };
+    'site': 'http://www.selver.ee',
+    'indexPage': 'http://www.selver.ee/soodushinnaga-tooted?limit=96',
+    'languages': {
+      'est': {
+        'exists': true,
+        'main': true
       }
     },
-    'list': function list($) {
-      return $('#products-grid > li > a').map(function list_iterator() {
-        return utils.unleakString($(this).attr('href'));
+    'paging': {
+      'finit': true,
+      'pattern': '&p={paging_pagenumber}',
+      'first': function () {
+        return 1;
+      },
+      'last': function ($) {
+        var lastItemIndex = $('body > div.main-container div.category-products > div.toolbar > div.pages > ol > li').length - 1;
+        return $('body > div.main-container div.category-products > div.toolbar > div.pages > ol > li:nth-child(' + (lastItemIndex) + ') > a').attr('href').replace(/.*p=(\d)/, "$1");
+      }
+    },
+    'ttl': 2 * 60 * 60 * 1000,
+    'list': function ($) {
+      return $('#products-grid > li > a').map(function () {
+        return $(this).attr('href');
       }).get();
     },
     'templates': {
@@ -53,14 +44,14 @@ function SelverParser() {
 
         return header.next('td.data').text().replace(/Määramata/g, '');
       },
-      'title': function ($, language) {
-        return utils.unleakString($('div.product-essential.row div.page-title > h1').text());
+      'title': function ($) {
+        return $('div.product-essential.row div.page-title > h1').text();
       },
       'description': function ($) {
-        return utils.unleakString($('div.product-essential.row div > span[itemprop="description"]').text());
+        return $('div.product-essential.row div > span[itemprop="description"]').text();
       },
-      'pictures': function ($, language) {
-        return [utils.unleakString(that.compileImageUrl(language, $('#main-image-default > a').attr('href')))];
+      'pictures': function ($) {
+        return [that.compileImageHref($('#main-image-default > a').attr('href'))];
       },
       'price': function ($) {
         return that.priceCleanup($('div.product-essential div.price-box:first-child p.special-price span.price > span:nth-child(1)').text());
@@ -74,20 +65,26 @@ function SelverParser() {
 
 util.inherits(SelverParser, AbstractParser);
 
-SelverParser.prototype.compilePageUrl = function compilePageUrl(language, link) {
+SelverParser.prototype.compilePagingPattern = function () {
   var that = this;
 
-  return that.config.index[language] + link;
+  return that.config.indexPage + that.config.paging.pattern;
 };
 
-SelverParser.prototype.compileImageUrl = function (language, link) {
-  return "http" + link;
-};
-
-SelverParser.prototype.compileOfferUrl = function compileOfferUrl(language, link) {
+SelverParser.prototype.compilePageHref = function (link) {
   var that = this;
 
-  return urlParser.resolve(that.config.index[language], link);
+  return that.config.indexPage + link;
+};
+
+SelverParser.prototype.compileImageHref = function (link) {
+  return "http:" + link;
+};
+
+SelverParser.prototype.compileOfferHref = function (link) {
+  var that = this;
+
+  return url.resolve(that.config.indexPage, link);
 };
 
 module.exports = SelverParser;

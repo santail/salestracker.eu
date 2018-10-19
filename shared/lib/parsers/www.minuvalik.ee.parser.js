@@ -124,18 +124,10 @@ MinuvalikParser.prototype.compileOfferHref = function (link, language) {
   return url.resolve(that.config.indexPage, link);
 };
 
-MinuvalikParser.prototype.priceCleanup = function (price) {
-  return price;
-}
-
 MinuvalikParser.prototype.compilePageHref = function (link) {
   var that = this;
 
   return that.config.indexPage + link;
-};
-
-MinuvalikParser.prototype.getMainLanguage = function (link) {
-  return 'est';
 };
 
 module.exports = MinuvalikParser;
