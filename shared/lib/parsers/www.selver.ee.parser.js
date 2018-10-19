@@ -59,7 +59,8 @@ function SelverParser() {
       'original_price': function ($) {
         return that.priceCleanup($('div.product-essential div.price-box:nth-child(1) p.old-price span.price > span:nth-child(1)').text());
       }
-    }
+    },
+    'translations': ['title', 'description', 'href']
   };
 }
 

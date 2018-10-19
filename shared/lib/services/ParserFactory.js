@@ -5,7 +5,7 @@ function ParserFactory() {
 
 ParserFactory.prototype.getParser = function (site) {
     if (!this.parsers[site]) {
-        var Parser = require('./../parsers/' + site + ".parser.js"),
+        var Parser = require('./../parsers/' + site + ".parser"),
             parser = new Parser();
 
         this.parsers[site] = parser;

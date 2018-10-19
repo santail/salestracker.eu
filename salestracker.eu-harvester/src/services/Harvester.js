@@ -315,7 +315,7 @@ Harvester.prototype.processOffer = function (options, processOfferFinished) {
         return processOfferFinished(null);
       }
       else {
-        LOG.info(util.format('[STATUS] [OK] [%s] Offer translation not found. Proceed with harvesting', options.site, options.href));
+        LOG.info(util.format('[STATUS] [OK] [%s] Offer translation not found %s. Proceed with harvesting %s', options.site, options.origin_href, options.href));
         return gatherOffer(options, processOfferFinished);
       }
     } 
