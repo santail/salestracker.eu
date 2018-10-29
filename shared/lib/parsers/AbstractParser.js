@@ -15,6 +15,10 @@ AbstractParser.prototype.getOffers = function (content) {
 
   var dataItems = that.config.list.call(that, content);
 
+  if (process.env.NODE_ENV === 'development' && process.env.OFFERS_LIMIT) {
+    dataItems = dataItems.slice(0, process.env.OFFERS_LIMIT);
+  }
+
   var metadata = _.map(dataItems, function (item) {
     var metadata = {
       'id': that.compileOfferHref(item),
@@ -103,7 +107,9 @@ AbstractParser.prototype.compilePagingParameters = function (content, options) {
   const firstPage = that.config.paging.first(content);
   var lastPage = that.config.paging.last(content);
 
-  if (options.limit && options.limit < lastPage) {
+  if (process.env.NODE_ENV === 'development' && process.env.PAGING_PAGES_LIMIT && process.env.PAGING_PAGES_LIMIT < lastPage) {
+    lastPage = process.env.PAGING_PAGES_LIMIT;
+  } else if (options.limit && options.limit < lastPage) {
     lastPage = options.limit;
   } else if (that.config.paging.limit && that.config.paging.limit < lastPage) {
     lastPage = that.config.paging.limit;
@@ -177,7 +183,7 @@ AbstractParser.prototype.getMainLanguage = function () {
 
 AbstractParser.prototype.priceCleanup = function (price) {
   if (price) {
-    return price.replace(/[^0-9\.,]?/gi, '');
+    return price.replace(/[^0-9\.,]?/gi, '').replace(/,/gi, '.');
   }
 
   return '';

@@ -12,5 +12,6 @@ RUN npm install
 COPY . /usr/src/app
 
 ENV NODE_ENV development
+ENV SHOULD_HARVEST_PICTURES true
 
 CMD ["npm", "start"]

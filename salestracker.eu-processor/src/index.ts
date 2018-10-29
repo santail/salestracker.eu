@@ -1,5 +1,8 @@
 var _ = require('lodash');
 var ObjectId = require('mongodb').ObjectID;
+var path = require('path');
+var slugify = require('slugify');
+import { URL } from 'url';
 var util = require('util');
 
 var LOG = require("../lib/services/Logger");
@@ -35,8 +38,12 @@ elastic.ping({ // test
                     type: "offers",
                     body: {
                         properties: {
-                            origin_href: {
-                                type: "keyword",
+                            "price": {
+                                "type": "scaled_float",
+                                "scaling_factor": 100
+                            },
+                            "origin_href": {
+                                "type": "keyword",
                             }
                         }
                     }
@@ -55,6 +62,41 @@ elastic.ping({ // test
                         var offer = parser.compileOffer(data);
                         offer.translations = translations;
                         offer.origin_href = data.href;
+
+                        // should not process pictures if development environment and switched off
+                        var shouldProcessPictures = process.env.NODE_ENV !== 'development' || process.env.SHOULD_HARVEST_PICTURES !== 'false';
+                        if (data.pictures && data.pictures.length > 0) {
+                            var pictures: string[] = [];
+
+                            _.each(data.pictures, function (picture) {
+                                if (shouldProcessPictures) {
+                                    worker.create('processImage', {
+                                            'site': data.site,
+                                            'offerHref': data.href,
+                                            'href': picture
+                                        })
+                                        .attempts(3).backoff({
+                                            delay: 60 * 1000,
+                                            type: 'exponential'
+                                        })
+                                        .removeOnComplete(true)
+                                        .save(function (err) {
+                                            if (err) {
+                                                LOG.error(util.format('[STATUS] [FAILED] [%s] %s Image processing schedule failed', data.site, data.href, err));
+                                            }
+
+                                            LOG.debug(util.format('[STATUS] [OK] [%s] %s Image processing scheduled', data.site, data.href));
+                                        });
+                                }
+
+                                const offerHref = new URL(data.href);
+                                picture = path.join(data.site + '/' + slugify(offerHref.pathname), path.basename(picture));
+
+                                pictures.push(picture)
+                            });
+
+                            offer.pictures = pictures;
+                        }
 
                         SessionFactory.getDbConnection().offers.save(offer, function (err, saved) {
                             if (err) {
@@ -105,26 +147,6 @@ elastic.ping({ // test
                                 if (err) {
                                     LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Indexing offer failed', data.site, data.id, err));
                                     return done(err);
-                                }
-
-                                if (data.pictures && data.pictures.length > 0) {
-                                    worker.create('processImage', {
-                                            'site': data.site,
-                                            'offerHref': data.href,
-                                            'href': data.pictures[0]
-                                        })
-                                        .attempts(3).backoff({
-                                            delay: 60 * 1000,
-                                            type: 'exponential'
-                                        })
-                                        .removeOnComplete(true)
-                                        .save(function (err) {
-                                            if (err) {
-                                                LOG.error(util.format('[STATUS] [FAILED] [%s] %s Image processing schedule failed', data.site, data.href, err));
-                                            }
-
-                                            LOG.debug(util.format('[STATUS] [OK] [%s] %s Image processing scheduled', data.site, data.href));
-                                        });
                                 }
 
                                 LOG.info(util.format('[STATUS] [OK] [%s] Offer indexed %s', data.site, data.href));

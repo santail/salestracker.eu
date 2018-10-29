@@ -16,5 +16,7 @@ RUN npm install
 COPY . /usr/src/app
 
 ENV NODE_ENV development
+ENV PAGING_PAGES_LIMIT 1
+ENV OFFERS_LIMIT 1
 
 CMD ["npm", "start"]
