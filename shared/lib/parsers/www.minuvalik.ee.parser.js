@@ -87,13 +87,14 @@ function MinuvalikParser() {
         return that.priceCleanup($('.deal_rules_td > div#parent_div > div> div.dd_table_price').text());
       },
       'discount': function ($) {
-        return that.priceCleanup($('.deal_rules_td > div#parent_div div.dd_table_discount_info > span.fl_deals_fp_discount_row').text().replace(/alates |от /, ''));
+        return that.compileDiscount($('.deal_rules_td > div#parent_div div.dd_table_discount_info > span.fl_deals_fp_discount_row').text().replace(/alates |от /, ''));
       },
+      'currency': 'EUR',
       'vendor': function ($) {
         return '';
       }
     },
-    'translations': ['title', 'description', 'details', 'additional', 'href']
+    'translations': ['title', 'description', 'details', 'additional']
   };
 
   this.config = _.extend(this.config, config);

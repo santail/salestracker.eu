@@ -54,13 +54,38 @@ function SelverParser() {
         return [that.compileImageHref($('#main-image-default > a').attr('href'))];
       },
       'price': function ($) {
-        return that.priceCleanup($('div.product-essential div.price-box:first-child p.special-price span.price > span:nth-child(1)').text());
+        // check if no partner kaart section exists
+        var partnerCardBadge = $('#main-image-default span.product-image__badge--6');
+
+        if (partnerCardBadge.length) {
+          return that.priceCleanup(partnerCardBadge.find('span.product-image__badge--label').text());
+        }
+
+        return that.priceCleanup($('div.product-essential div.price-box:first-child p.special-price > span.price > span[itemprop=price]').text());
       },
       'original_price': function ($) {
-        return that.priceCleanup($('div.product-essential div.price-box:nth-child(1) p.old-price span.price > span:nth-child(1)').text());
-      }
+        // check if no partner kaart section exists
+        var partnerCardBadge = $('#main-image-default span.product-image__badge--6');
+
+        if (partnerCardBadge.length) {
+          return that.priceCleanup($('#bundleSummary div.price-box span.regular-price > span:first-child').text());
+        }
+
+        return that.priceCleanup($('div.product-essential div.price-box:first-child p.old-price > span.price > span:first-child').text());
+      },
+      'client_card_required':  function ($) {
+        // check if no partner kaart section exists
+        var partnerCardBadge = $('#main-image-default span.product-image__badge--6');
+
+        if (partnerCardBadge.length) {
+          return true;
+        }
+
+        return false;
+      },
+      'currency': 'EUR'
     },
-    'translations': ['title', 'description', 'href']
+    'translations': ['title', 'description']
   };
 }
 

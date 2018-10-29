@@ -128,7 +128,7 @@ AbstractParser.prototype.compileOffer = function (data) {
 
   _.each(_.keys(data), function (property) {
     if (!_.includes(that.config.translations, property)) {
-      if (!_.includes(['language', 'origin'], property)) {
+      if (!_.includes(['language', 'href'], property)) {
         offer[property] = data[property];
       }
     }
@@ -145,8 +145,10 @@ AbstractParser.prototype.compileTranslations = function (data) {
 
   _.each(_.keys(data), function (property) {
     if (data.hasOwnProperty(property) && _.includes(that.config.translations, property)) {
-        translations[data.language][property] = data[property];
-      }
+      translations[data.language][property] = data[property];
+    }
+
+    translations[data.language].href = data.href;
   });
 
   return translations;
@@ -174,7 +176,15 @@ AbstractParser.prototype.getMainLanguage = function () {
 };
 
 AbstractParser.prototype.priceCleanup = function (price) {
-  return price;
+  if (price) {
+    return price.replace(/[^0-9\.,]?/gi, '');
+  }
+
+  return '';
+};
+
+AbstractParser.prototype.compileDiscount = function (discount) {
+  return discount;
 };
 
 module.exports = AbstractParser;
