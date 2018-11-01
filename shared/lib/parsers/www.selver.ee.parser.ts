@@ -1,16 +1,13 @@
 'use strict';
 
+var _ = require("lodash");
 var url = require("url");
-var util = require('util');
 
-var AbstractParser = require("./AbstractParser");
+import AbstractParser, { ParserConfiguration } from "./AbstractParser";
 
-function SelverParser() {
-  AbstractParser.call(this);
+class SelverParser extends AbstractParser {
 
-  var that = this;
-
-  this.config = {
+  protected config: ParserConfiguration = {
     'site': 'http://www.selver.ee',
     'indexPage': 'http://www.selver.ee/soodushinnaga-tooted?limit=96',
     'languages': {
@@ -32,14 +29,14 @@ function SelverParser() {
     },
     'ttl': 2 * 60 * 60 * 1000,
     'list': function ($) {
-      return $('#products-grid > li > a').map(function () {
-        return $(this).attr('href');
+      return $('#products-grid > li > a').map(function (index, el) {
+        return $(el).attr('href');
       }).get();
     },
     'templates': {
       'vendor': function ($) {
-        var header = $('#product-attribute-specs-table tr > th').filter(function () {
-          return $(this).text() === 'Tootja';
+        var header = $('#product-attribute-specs-table tr > th').filter(function (el) {
+          return $(el).text() === 'Tootja';
         }).first();
 
         return header.next('td.data').text().replace(/Määramata/g, '');
@@ -50,28 +47,28 @@ function SelverParser() {
       'description': function ($) {
         return $('div.product-essential.row div > span[itemprop="description"]').text();
       },
-      'pictures': function ($) {
-        return [that.compileImageHref($('#main-image-default > a').attr('href'))];
+      'pictures': ($) => {
+        return [this.compileImageHref($('#main-image-default > a').attr('href'))];
       },
-      'price': function ($) {
+      'price': ($) => {
         // check if no partner kaart section exists
         var partnerCardBadge = $('#main-image-default span.product-image__badge--6');
 
         if (partnerCardBadge.length) {
-          return that.priceCleanup(partnerCardBadge.find('span.product-image__badge--label').text());
+          return this.priceCleanup(partnerCardBadge.find('span.product-image__badge--label').text());
         }
 
-        return that.priceCleanup($('div.product-essential div.price-box:first-child p.special-price > span.price > span[itemprop=price]').text());
+        return this.priceCleanup($('div.product-essential div.price-box:first-child p.special-price > span.price > span[itemprop=price]').text());
       },
-      'original_price': function ($) {
+      'original_price': ($) => {
         // check if no partner kaart section exists
         var partnerCardBadge = $('#main-image-default span.product-image__badge--6');
 
         if (partnerCardBadge.length) {
-          return that.priceCleanup($('#bundleSummary div.price-box span.regular-price > span:first-child').text());
+          return this.priceCleanup($('#bundleSummary div.price-box span.regular-price > span:first-child').text());
         }
 
-        return that.priceCleanup($('div.product-essential div.price-box:first-child p.old-price > span.price > span:first-child').text());
+        return this.priceCleanup($('div.product-essential div.price-box:first-child p.old-price > span.price > span:first-child').text());
       },
       'client_card_required':  function ($) {
         // check if no partner kaart section exists
@@ -83,34 +80,28 @@ function SelverParser() {
 
         return false;
       },
-      'currency': 'EUR'
+      'currency': () => {
+        return 'EUR';
+      }
     },
     'translations': ['title', 'description']
   };
+
+  compilePagingPattern = () => {
+    return this.config.indexPage + this.config.paging!!.pattern;
+  };
+  
+  compilePageHref = (link) => {
+    return this.config.indexPage + link;
+  };
+  
+  compileImageHref = (link) => {
+    return "http:" + link;
+  };
+  
+  compileOfferHref = (link) => {
+    return url.resolve(this.config.indexPage, link);
+  };
 }
-
-util.inherits(SelverParser, AbstractParser);
-
-SelverParser.prototype.compilePagingPattern = function () {
-  var that = this;
-
-  return that.config.indexPage + that.config.paging.pattern;
-};
-
-SelverParser.prototype.compilePageHref = function (link) {
-  var that = this;
-
-  return that.config.indexPage + link;
-};
-
-SelverParser.prototype.compileImageHref = function (link) {
-  return "http:" + link;
-};
-
-SelverParser.prototype.compileOfferHref = function (link) {
-  var that = this;
-
-  return url.resolve(that.config.indexPage, link);
-};
 
 module.exports = SelverParser;
