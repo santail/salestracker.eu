@@ -1,12 +1,9 @@
 var _ = require('lodash');
 
-var async = require('async');
-var fs = require('fs');
-var path = require('path');
 var Promise: PromiseConstructor = require('promise');
 var util = require('util');
 
-var Harvester = require('./services/Harvester');
+import harvester from './services/Harvester';
 
 var LOG = require('../lib/services/Logger');
 var SessionFactory = require('../lib/services/SessionFactory');
@@ -51,8 +48,6 @@ function start(config) {
 worker.process('processSite', numParallel, function (job, done) {
     var config = job.data;
 
-    var harvester = new Harvester();
-
     // cleanup site only if job configuration requires it
     const cleanupPromise = harvester.cleanupSite(config)
         .then(function () {
@@ -81,7 +76,6 @@ worker.process('processSite', numParallel, function (job, done) {
 worker.process('processPage', numParallel, function (job, done) {
     var config = job.data;
 
-    var harvester = new Harvester();
     harvester.processPage(config, function (err, result) {
         if (err) {
             LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Page harvesting failed', config.site, config.href, err));
@@ -96,7 +90,6 @@ worker.process('processPage', numParallel, function (job, done) {
 worker.process('processOffer', numParallel, function (job, done) {
     var config = job.data;
 
-    var harvester = new Harvester();
     harvester.processOffer(config, function (err, result) {
         if (err) {
             LOG.error(util.format('[STATUS] [Failure] [%s] Offer harvesting failed %s', config.site, config.href, err));
@@ -111,7 +104,6 @@ worker.process('processOffer', numParallel, function (job, done) {
 worker.process('processImage', numParallel, function (job, done) {
     var config = job.data;
 
-    var harvester = new Harvester();
     harvester.processImage(config, function (err, result) {
         if (err) {
             LOG.error(util.format('[STATUS] [Failure] [%s] Image harvesting failed %s', config.site, config.href, err));
