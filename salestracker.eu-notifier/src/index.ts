@@ -14,12 +14,21 @@ worker.process('sendNotification', 10, function (job, done) {
     const wish = data.wish;
     const offers = data.offers;
 
+    if (!wish.contacts) {
+        LOG.info(util.format('[STATUS] [OK] No contacts. Notification not sent.'));
+        return done();
+    }
+
     let notification = {
         email: wish.contacts.email,
         phone: wish.contacts.phone,
         contains: wish.content,
         offers: offers
-    };
+    } as any;
+
+    if (wish.contacts.telegram) {
+        notification.telegram = wish.contacts.telegram;
+    }
 
     Messenger.send(notification, function (err) {
         if (err) {

@@ -3,11 +3,13 @@ var config = require('../config/config');
 var util = require("util");
 var _ = require('underscore')._;
 var Mailgun = require('mailgun-js');
+var Telegram = require('telegraf/telegram')
 var twilio = require('twilio')(config.notifier.twilio.AccountSID, config.notifier.twilio.AuthToken);
 
 var LOG = require('../../lib/services/Logger');
 
 var Messenger = function () {
+  this._TelegramBot = new Telegram('527574719:AAE8yYNFlGnDhFfuh0Wx912UPUDfZ9i5ArY');
 };
   
 Messenger.prototype.send = function (notification, callback) {
@@ -19,6 +21,10 @@ Messenger.prototype.send = function (notification, callback) {
 
   if (notification.phone) {
     that.sendSms(notification);
+  }
+
+  if (notification.telegram) {
+    that.sendTelegram(notification);
   }
 
   callback();
@@ -47,7 +53,7 @@ Messenger.prototype.sendEmail = function (notification) {
       return;
     }
 
-    LOG.info(util.format('[STATUS] [Failure] [%s] Sending email completed', notification.email));
+    LOG.info(util.format('[STATUS] [OK] [%s] Sending email completed', notification.email));
   });
 };
 
@@ -76,11 +82,24 @@ Messenger.prototype.sendSms = function (notification) {
     });
 };
 
-Messenger.prototype.compileEmailBody = function (notification) {
+Messenger.prototype.sendTelegram = function (notification) {
+  this._TelegramBot.sendMessage('@goodlooking_test', this.compileTelegramMessage(notification), { parse_mode: 'HTML'});
+};
 
+Messenger.prototype.compileTelegramMessage = function (notification) {
+  var message = '';
+
+  _.each(notification.offers, function (offer) {
+    message += util.format("<a href='%s'>%s</a>\r\n\r\n", offer.translations.est.href, offer.translations.est.title);
+  });
+
+  return message;
+};
+
+Messenger.prototype.compileEmailBody = function (notification) {
   var content = "<h1>SalesTracker.eu has found something</h1> what could be potentially interesting to you";
 
-  content += util.format("<h2>You have been searching for '%s'</h2>", notification.contains);
+  content += util.format("<h2>You have been searching for <i>'%s'</i></h2>", notification.contains);
 
   _.each(notification.offers, function (offer) {
     var details = '';
@@ -94,16 +113,17 @@ Messenger.prototype.compileEmailBody = function (notification) {
     if (offer.original_price) {
      details += util.format('&nbsp;<span style="text-decoration: line-through;">%s</span>', offer.original_price);
     }
+
     if (offer.discount) {
      details += util.format('&nbsp;<span>%s</span>', offer.discount);
     }
 
-    if (offer.description) {
-      details += util.format('<br /><span>%s</span>',  offer.description);
+    if (offer.translations.est.description) {
+      details += util.format('<br /><span>%s</span>',  offer.translations.est.description);
     }
 
-    var url = offer.original_url ? offer.original_url : offer.url;
-    content += util.format('<p><a href="%s" title="%s" />%s</a>&nbsp;%s</p>', url, offer.title, offer.title, details);
+    content += util.format('<p><a href="%s" title="%s" />%s</a>&nbsp;%s</p>', 
+      offer.translations.est.href, offer.translations.est.title, offer.translations.est.title, details);
   });
 
   return '<table border="0" cellpadding="0" cellspacing="0" style="margin:0; padding:0" width="100%">' +
