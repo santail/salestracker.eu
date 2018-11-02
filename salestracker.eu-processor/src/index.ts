@@ -1,5 +1,4 @@
 var _ = require('lodash');
-var ObjectId = require('mongodb').ObjectID;
 var path = require('path');
 var slugify = require('slugify');
 import { URL } from 'url';
@@ -65,6 +64,7 @@ elastic.ping({ // test
 
                         // should not process pictures if development environment and switched off
                         var shouldProcessPictures = process.env.NODE_ENV !== 'development' || process.env.SHOULD_HARVEST_PICTURES !== 'false';
+                        
                         if (data.pictures && data.pictures.length > 0) {
                             var pictures: string[] = [];
 

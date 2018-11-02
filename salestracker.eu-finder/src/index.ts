@@ -1,4 +1,3 @@
-
 var _ = require('lodash');
 var mongojs = require('mongojs');
 var util = require('util');
@@ -11,39 +10,57 @@ var db = SessionFactory.getDbConnection();
 var worker = SessionFactory.getQueueConnection();
 var elastic = SessionFactory.getElasticsearchConnection();
 
+
+const WISH_CHECK_PERIOD = process.env.WISH_CHECK_PERIOD ? parseInt(process.env.WISH_CHECK_PERIOD, 10) : 1 * 60 * 60 * 1000;
+
 const performSearch = function () {
     const checkTime = new Date();
 
     SessionFactory.getDbConnection().wishes.findOne({
-        $and: [
-            {
-                created: {
-                    "$lte": checkTime
+        $and: [{
+            created: {
+                "$lte": checkTime
+            }
+        }, {
+            $or: [{
+                reactivates: {
+                    $exists: false
                 }
             }, {
-                $or: [{
-                    reactivates: {
-                        $exists: false
-                    }
-                }, {
-                    reactivates: {
-                        "$lte": new Date(checkTime)
-                    }
-                }]
-            }
-        ]
+                reactivates: {
+                    "$lte": new Date(checkTime)
+                }
+            }]
+        }]
     }, function (err, foundWish) {
         if (err) {
             LOG.error(util.format('[STATUS] [Failure] Checking wish failed', err));
         } else if (foundWish) {
+            var criteria: any[] = [
+                [{
+                    "match": {
+                        "translations.est.title": foundWish.content
+                    }
+                }]
+            ];
+
+            if (foundWish.last_processed) {
+                criteria.push({
+                    "range": {
+                        "parsed": {
+                            "gt": new Date(foundWish.last_processed)
+                        }
+                    }
+                });
+            }
 
             elastic.search({
                 index: 'salestracker',
                 type: 'offers',
                 body: {
-                    query: {
-                        term: {
-                            'translations.rus.title': foundWish.content
+                    "query": {
+                        "bool": {
+                            "must": criteria
                         }
                     }
                 }
@@ -51,48 +68,81 @@ const performSearch = function () {
                 if (err) {
                     LOG.error(util.format('[STATUS] [Failure] [%s] Offers search failed', foundWish.content, err));
                 } else {
-                    let notification = {
-                        wish: foundWish,
-                        offers: _.map(response.hits.hits, function (offer) {
-                            return offer._source;
-                        })
-                    };
+                    if (!response.hits.total) {
+                        LOG.info(util.format('[STATUS] [OK] No offers containing %s found', foundWish.content, response.hits));
 
-                    worker.create('sendNotification', notification)
-                        .attempts(3).backoff({
-                            delay: 60 * 1000,
-                            type: 'exponential'
-                        })
-                        .removeOnComplete(true)
-                        .save(function (err) {
+                        // nothing found, postpone current wish processing for some interval
+                        SessionFactory.getDbConnection().wishes.update({
+                            _id: mongojs.ObjectId(foundWish._id)
+                        }, {
+                            $set: { // TODO add flag with latest found offers create date
+                                reactivates: new Date(checkTime.getTime() + WISH_CHECK_PERIOD)
+                            }
+                        }, function (err, updatedWish) {
                             if (err) {
-                                LOG.error(util.format('[STATUS] [FAILED] Notification processing schedule failed', notification, err));
+                                // TODO Mark somehow wish that was not marked as processed
+                                LOG.error(util.format('[STATUS] [Failure] [%s] Wish check time update failed', foundWish.content, err));
+                                return performSearch();
                             }
 
-                            LOG.debug(util.format('[STATUS] [OK] Notification processing scheduled'));
+                            if (!updatedWish) {
+                                LOG.error(util.format('[STATUS] [Failure] [%s] Wish check time update failed', foundWish.content, err));
+                            } else {
+                                LOG.info(util.format('[STATUS] [OK] [%s] Wish check time updated', foundWish.content));
+                                return performSearch();
+                            }
                         });
-                }
-
-                SessionFactory.getDbConnection().wishes.update({
-                    _id: mongojs.ObjectId(foundWish._id)
-                }, {
-                    $set: {
-                        reactivates: new Date(checkTime.getTime() + foundWish.period)
-                    }
-                }, function (err, updatedWish) {
-                    if (err) {
-                        // TODO Mark somehow wish that was not marked as processed
-                        LOG.error(util.format('[STATUS] [Failure] [%s] Wish check time update failed', foundWish.content, err));
-                        return;
-                    }
-
-                    if (!updatedWish) {
-                        LOG.error(util.format('[STATUS] [Failure] [%s] Wish check time update failed', foundWish.content, err));
                     } else {
-                        LOG.info(util.format('[STATUS] [OK] [%s] Wish check time updated', foundWish.content));
-                        performSearch();
+                        var offers = _.map(response.hits.hits, function (offer) {
+                            return offer._source;
+                        });
+
+                        var latestProcessedOffer = _.maxBy(offers, function (offer) { // TODO probably move this sorting to elastic search query
+                            return offer.parsed;
+                        });
+
+                        let notification = {
+                            wish: foundWish,
+                            offers: offers
+                        };
+
+                        worker.create('sendNotification', notification)
+                            .attempts(3).backoff({
+                                delay: 60 * 1000,
+                                type: 'exponential'
+                            })
+                            .removeOnComplete(true)
+                            .save(function (err) {
+                                if (err) {
+                                    LOG.error(util.format('[STATUS] [FAILED] Notification processing schedule failed', notification, err));
+                                }
+
+                                LOG.debug(util.format('[STATUS] [OK] Notification processing scheduled'));
+                            });
+
+                        SessionFactory.getDbConnection().wishes.update({
+                            _id: mongojs.ObjectId(foundWish._id)
+                        }, {
+                            $set: { // TODO add flag with latest found offers create date
+                                reactivates: new Date(checkTime.getTime() + WISH_CHECK_PERIOD),
+                                last_processed: new Date(latestProcessedOffer.parsed)
+                            }
+                        }, function (err, updatedWish) {
+                            if (err) {
+                                // TODO Mark somehow wish that was not marked as processed
+                                LOG.error(util.format('[STATUS] [Failure] [%s] Wish check time update failed', foundWish.content, err));
+                                return;
+                            }
+
+                            if (!updatedWish) {
+                                LOG.error(util.format('[STATUS] [Failure] [%s] Wish check time update failed', foundWish.content, err));
+                            } else {
+                                LOG.info(util.format('[STATUS] [OK] [%s] Wish check time updated', foundWish.content));
+                                performSearch();
+                            }
+                        });
                     }
-                });
+                }
             });
         } else {
             LOG.info(util.format('[STATUS] [OK] No unprocessed wishes found'));
