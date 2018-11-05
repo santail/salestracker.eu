@@ -83,17 +83,15 @@ class MinuvalikParser extends AbstractParser {
       'details': ($) => {
         return $('.deal_rules_td .dd_descr').first().html();
       },
-      'original_price': ($) => {
-        return this.priceCleanup($('.deal_rules_td > div#parent_div div.dd_table_discount_info > span.dd_basic_price').text());
-      },
       'price': ($) => {
-        return this.priceCleanup($('.deal_rules_td > div#parent_div > div> div.dd_table_price').text());
-      },
-      'discount': ($) => {
-        return { 
-          amount: this.compileDiscount($('.deal_rules_td > div#parent_div div.dd_table_discount_info > span.fl_deals_fp_discount_row').text().replace(/alates |от /, '')), 
-          percents: 0 
-        }; // TODO calculate discount 
+        var current = this.priceCleanup($('.deal_rules_td > div#parent_div > div> div.dd_table_price').text());
+        var original = this.priceCleanup($('.deal_rules_td > div#parent_div div.dd_table_discount_info > span.dd_basic_price').text());
+        
+        return {
+          'current': current,
+          'original': original,
+          'discount': this.compileDiscount(current, original)
+        }
       },
       'currency': () => {
         return 'EUR';

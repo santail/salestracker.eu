@@ -15,11 +15,13 @@ interface OfferTemplates {
   additional?: (content: any) => string;
   description: (content: any) => string;
   details?: (content: any) => string;
-  original_price: (content: any) => string;
-  price: (content: any) => string;
-  discount: (content: any) => {
-    amount: number;
-    percents: number;
+  price: (content: any) => {
+    current: number | undefined;
+    original: number | undefined;
+    discount: {
+      amount: number | undefined;
+      percents: number | undefined;
+    }
   };
   currency: (content: any) => string;
   vendor?: (content: any) => string;
@@ -58,11 +60,16 @@ class AbstractParser {
       title: () => { return ''},
       pictures: () => { return []},
       currency: () => { return ''},
-      price: () => { return ''},
+      price: () => { return {
+        current: 0,
+        original: 0,
+        discount: {
+          amount: 0,
+          percents:  0
+        }
+      }},
       vendor: () => { return ''},
-      original_price: () => { return ''},
-      description: () => { return ''},
-      discount: () => { return { amount: 0, percents: 0 } }
+      description: () => { return ''}
     },
     languages: {},
     translations: [],
@@ -228,16 +235,27 @@ class AbstractParser {
     return mainLanguage;
   };
 
-  priceCleanup = (price) => {
+  priceCleanup = (price): number | undefined => {
     if (price) {
-      return price.replace(/[^0-9\.,]?/gi, '').replace(/,/gi, '.');
+      return Number((+(price.replace(/[^0-9\.,]?/gi, '').replace(/,/gi, '.'))).toFixed(2));
     }
 
-    return '';
+    return undefined;
   };
 
-  compileDiscount = (discount) => {
-    return discount;
+  compileDiscount = (current, original) => {
+    var amount;
+    var percents;
+    
+    if (current && original) {
+      amount = original - current;
+      percents = 100 - current / original * 100;
+    }
+
+    return { 
+      amount: Number((+amount).toFixed(2)), 
+      percents: Number((+percents).toFixed(2)), 
+    };
   };
 };
 

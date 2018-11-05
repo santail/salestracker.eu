@@ -3,7 +3,9 @@
 var _ = require("lodash");
 var url = require("url");
 
-import AbstractParser, { ParserConfiguration } from "./AbstractParser";
+import AbstractParser, {
+  ParserConfiguration
+} from "./AbstractParser";
 
 class SelverParser extends AbstractParser {
 
@@ -51,45 +53,42 @@ class SelverParser extends AbstractParser {
         return [this.compileImageHref($('#main-image-default > a').attr('href'))];
       },
       'price': ($) => {
+        var current;
+        var original;
+
         // check if partner kaart section exists
         var partnerCardBadge = $('#main-image-default span.product-image__badge--6');
-
         if (partnerCardBadge.length) {
-          return this.priceCleanup(partnerCardBadge.find('span.product-image__badge--label').text());
-        }
+          current = this.priceCleanup(partnerCardBadge.find('span.product-image__badge--label').text());
 
-        var priceContainer = $('#product_addtocart_form div.product p.special-price span.price');
-
-        if (priceContainer.length) {
-          return this.priceCleanup(priceContainer.find('span:first-child').text());
-        }
-
-        return this.priceCleanup($('div.product-essential div.price-box:first-child p.special-price > span.price > span[itemprop=price]').text());
-      },
-      'original_price': ($) => {
-        // check if no partner kaart section exists
-        var partnerCardBadge = $('#main-image-default span.product-image__badge--6');
-
-        if (partnerCardBadge.length) {
           var priceBadgeContainer = $('#bundleSummary div.price-box span.regular-price > span:first-child');
-
           if (priceBadgeContainer.length) {
-            return this.priceCleanup(priceBadgeContainer.text());
+            original = this.priceCleanup(priceBadgeContainer.text());
+          } else {
+            original = this.priceCleanup($('#product_addtocart_form div.price-box span.regular-price > span[itemprop=price]').text());
+          }
+        } else {
+          var priceContainer = $('#product_addtocart_form div.product p.special-price span.price');
+          if (priceContainer.length) {
+            current = this.priceCleanup(priceContainer.find('span:first-child').text());
+          } else {
+            current = this.priceCleanup($('div.product-essential div.price-box:first-child p.special-price > span.price > span[itemprop=price]').text());
           }
 
-          return this.priceCleanup($('#product_addtocart_form div.price-box span.regular-price > span[itemprop=price]').text());
+          var oldPriceContainer = $('#product_addtocart_form div.product p.old-price > span.price > span:first-child');
+          if (oldPriceContainer.length) {
+            original = this.priceCleanup(oldPriceContainer.text());
+          } else {
+
+            original = this.priceCleanup($('div.product-essential div.price-box:first-child p.old-price > span.price > span:first-child').text());
+          }
         }
 
-        var priceContainer = $('#product_addtocart_form div.product p.old-price > span.price > span:first-child');
-
-        if (priceContainer.length) {
-          return this.priceCleanup(priceContainer.text());
+        return {
+          'current': current,
+          'original': original,
+          'discount': this.compileDiscount(current, original)
         }
-
-        return this.priceCleanup($('div.product-essential div.price-box:first-child p.old-price > span.price > span:first-child').text());
-      },
-      'discount': function ($) {
-        return { amount: 0, percents: 0 }; // TODO calculate discount 
       },
       'client_card_required': function ($) {
         // check if no partner kaart section exists
