@@ -30,7 +30,6 @@ class OfferPageHarvester {
                         _id: mongojs.ObjectId(foundMainOffer._id)
                     }, {
                         $set: {
-                            modified: runningTime,
                             expires: new Date(runningTime + parser.config.ttl)
                         }
                     }, (err, updatedOffer) => {

@@ -35,11 +35,11 @@ class SelverParser extends AbstractParser {
     },
     'templates': {
       'vendor': function ($) {
-        var header = $('#product-attribute-specs-table tr > th').filter(function (el) {
-          return $(el).text() === 'Tootja';
+        var header = $('#product-attribute-specs-table > tbody > tr').filter(function (index, el) {
+          return $(el).find('th.label').text() === 'Tootja';
         }).first();
 
-        return header.next('td.data').text().replace(/Määramata/g, '');
+        return header.find('td.data').text().replace(/Määramata/g, '');
       },
       'title': function ($) {
         return $('div.product-essential.row div.page-title > h1').text();
@@ -51,11 +51,17 @@ class SelverParser extends AbstractParser {
         return [this.compileImageHref($('#main-image-default > a').attr('href'))];
       },
       'price': ($) => {
-        // check if no partner kaart section exists
+        // check if partner kaart section exists
         var partnerCardBadge = $('#main-image-default span.product-image__badge--6');
 
         if (partnerCardBadge.length) {
           return this.priceCleanup(partnerCardBadge.find('span.product-image__badge--label').text());
+        }
+
+        var priceContainer = $('#product_addtocart_form div.product p.special-price span.price');
+
+        if (priceContainer.length) {
+          return this.priceCleanup(priceContainer.find('span:first-child').text());
         }
 
         return this.priceCleanup($('div.product-essential div.price-box:first-child p.special-price > span.price > span[itemprop=price]').text());
@@ -65,12 +71,27 @@ class SelverParser extends AbstractParser {
         var partnerCardBadge = $('#main-image-default span.product-image__badge--6');
 
         if (partnerCardBadge.length) {
-          return this.priceCleanup($('#bundleSummary div.price-box span.regular-price > span:first-child').text());
+          var priceBadgeContainer = $('#bundleSummary div.price-box span.regular-price > span:first-child');
+
+          if (priceBadgeContainer.length) {
+            return this.priceCleanup(priceBadgeContainer.text());
+          }
+
+          return this.priceCleanup($('#product_addtocart_form div.price-box span.regular-price > span[itemprop=price]').text());
+        }
+
+        var priceContainer = $('#product_addtocart_form div.product p.old-price > span.price > span:first-child');
+
+        if (priceContainer.length) {
+          return this.priceCleanup(priceContainer.text());
         }
 
         return this.priceCleanup($('div.product-essential div.price-box:first-child p.old-price > span.price > span:first-child').text());
       },
-      'client_card_required':  function ($) {
+      'discount': function ($) {
+        return { amount: 0, percents: 0 }; // TODO calculate discount 
+      },
+      'client_card_required': function ($) {
         // check if no partner kaart section exists
         var partnerCardBadge = $('#main-image-default span.product-image__badge--6');
 
@@ -90,15 +111,15 @@ class SelverParser extends AbstractParser {
   compilePagingPattern = () => {
     return this.config.indexPage + this.config.paging!!.pattern;
   };
-  
+
   compilePageHref = (link) => {
     return this.config.indexPage + link;
   };
-  
+
   compileImageHref = (link) => {
     return "http:" + link;
   };
-  
+
   compileOfferHref = (link) => {
     return url.resolve(this.config.indexPage, link);
   };

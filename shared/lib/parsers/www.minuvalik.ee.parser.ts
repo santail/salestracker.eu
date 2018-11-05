@@ -90,7 +90,10 @@ class MinuvalikParser extends AbstractParser {
         return this.priceCleanup($('.deal_rules_td > div#parent_div > div> div.dd_table_price').text());
       },
       'discount': ($) => {
-        return this.compileDiscount($('.deal_rules_td > div#parent_div div.dd_table_discount_info > span.fl_deals_fp_discount_row').text().replace(/alates |от /, ''));
+        return { 
+          amount: this.compileDiscount($('.deal_rules_td > div#parent_div div.dd_table_discount_info > span.fl_deals_fp_discount_row').text().replace(/alates |от /, '')), 
+          percents: 0 
+        }; // TODO calculate discount 
       },
       'currency': () => {
         return 'EUR';

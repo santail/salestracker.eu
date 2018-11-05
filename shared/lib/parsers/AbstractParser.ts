@@ -9,6 +9,23 @@ interface LanguageConfiguration {
   compiler?: (url: string) => string;
 }
 
+interface OfferTemplates {
+  title: (content: any) => string;
+  pictures: (content: any) => string[];
+  additional?: (content: any) => string;
+  description: (content: any) => string;
+  details?: (content: any) => string;
+  original_price: (content: any) => string;
+  price: (content: any) => string;
+  discount: (content: any) => {
+    amount: number;
+    percents: number;
+  };
+  currency: (content: any) => string;
+  vendor?: (content: any) => string;
+  client_card_required?: (content: any) => boolean;
+}
+
 interface PagingConfiguration {
   first: (content: any) => number;
   last: (content: any) => number;
@@ -25,7 +42,7 @@ export interface ParserConfiguration {
   indexPage: string;
   list: (content: any) => any[];
   json?: boolean
-  templates: { [section: string]: (content?: any) => any[] | string | boolean } ;
+  templates: OfferTemplates;
   languages: { [language: string]: LanguageConfiguration };
   headers?: { [header: string]: string };
   translations: string[];
@@ -37,7 +54,16 @@ class AbstractParser {
   protected config: ParserConfiguration = {
     indexPage: '',
     list: () => [],
-    templates: {},
+    templates: {
+      title: () => { return ''},
+      pictures: () => { return []},
+      currency: () => { return ''},
+      price: () => { return ''},
+      vendor: () => { return ''},
+      original_price: () => { return ''},
+      description: () => { return ''},
+      discount: () => { return { amount: 0, percents: 0 } }
+    },
     languages: {},
     translations: [],
     ttl: 0,
