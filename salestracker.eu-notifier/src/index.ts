@@ -3,7 +3,7 @@ var util = require('util');
 var LOG = require('../lib/services/Logger');
 var SessionFactory = require('../lib/services/SessionFactory');
 
-var Messenger = require('./services/Messenger');
+import Messenger, { Notification } from './services/Messenger';
 
 
 var worker = SessionFactory.getQueueConnection();
@@ -19,15 +19,17 @@ worker.process('sendNotification', 10, function (job, done) {
         return done();
     }
 
-    let notification = {
-        email: wish.contacts.email,
-        phone: wish.contacts.phone,
-        contains: wish.content,
+    let notification: Notification = {
+        criterion: wish.content,
+        contacts: {
+            email: wish.contacts.email,
+            phone: wish.contacts.phone
+        },
         offers: offers
-    } as any;
+    };
 
     if (wish.contacts.telegram) {
-        notification.telegram = wish.contacts.telegram;
+        notification.contacts.telegram = wish.contacts.telegram;
     }
 
     Messenger.send(notification, function (err) {
