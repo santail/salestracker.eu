@@ -3,8 +3,14 @@
     "pictures": [
         "http://m1.selver.ee/media/catalog/product/cache/1/image/800x/9df78eab33525d08d6e5fb8d27136e95/7/3/7393714377012.jpg"
     ],
-    "price": "1.89",
-    "original_price": "2.39",
+    "price": {
+        "current": 1.89,
+        "discount": {
+            "amount": 0.5,
+            "percents": 20.92
+        },
+        "original": 2.39
+    },
     "client_card_required": false,
     "currency": "EUR",
     "title": "Siider Kopparberg metsamarja, 500 ml purk",

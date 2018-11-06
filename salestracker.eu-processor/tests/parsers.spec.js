@@ -9,7 +9,6 @@ var cheerio = require("cheerio");
 var sites = {
     'www.selver.ee': {
         'https://www.selver.ee/siider-kopparberg-metsamarja-500-ml-purk-1': true,
-        'https://www.selver.ee/the-famous-grouse-smoky-black-70-cl': true
     }
 };
 
