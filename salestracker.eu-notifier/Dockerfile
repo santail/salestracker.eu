@@ -12,5 +12,6 @@ RUN npm install
 COPY . /usr/src/app
 
 ENV NODE_ENV development
+ENV TELEGRAM_API_TOKEN 527574719:AAE8yYNFlGnDhFfuh0Wx912UPUDfZ9i5ArY
 
 CMD ["npm", "start"]
