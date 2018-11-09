@@ -4,9 +4,42 @@ var LOG = require("../../lib/services/Logger");
 var SessionFactory = require('../../lib/services/SessionFactory');
 
 
-var worker = SessionFactory.getQueueConnection();
-
 class WorkerService {
+    scheduleOfferProcessing = (options, callback) => {
+        SessionFactory.getQueueConnection().create('processOffer', options)
+            .attempts(3).backoff({
+                delay: 60 * 1000,
+                type: 'exponential'
+            })
+            .removeOnComplete(true)
+            .save(function (err) {
+                if (err) {
+                    LOG.error(util.format('[STATUS] [FAILED] [%s] %s Offer processing schedule failed', options.site, options.href, err));
+                    return callback(err);
+                }
+
+                LOG.debug(util.format('[STATUS] [OK] [%s] %s Offer processing scheduled', options.site, options.href));
+                return callback(null);
+            });
+    }
+
+    scheduleIndexPageProcessing = (options, callback) => {
+        SessionFactory.getQueueConnection().create('processIndexPage', options)
+            .attempts(3).backoff({
+                delay: 60 * 1000,
+                type: 'exponential'
+            })
+            .removeOnComplete(true)
+            .save(function (err) {
+                if (err) {
+                    LOG.error(util.format('[STATUS] [FAILED] [%s] %s Index page processing schedule failed', options.site, options.href, err));
+                    return callback(err);
+                }
+
+                LOG.debug(util.format('[STATUS] [OK] [%s] %s Index page processing scheduled', options.site, options.href));
+                return callback(null);
+            });
+    }
 
     schedulePageProcessing = (options, callback) => {
         SessionFactory.getQueueConnection().create('processPage', options)
@@ -27,7 +60,7 @@ class WorkerService {
     }
 
     scheduleDataProcessing(data: any, callback): any {
-        worker.create('processData', data)
+        SessionFactory.getQueueConnection().create('processData', data)
             .attempts(3).backoff({
                 delay: 60 * 1000,
                 type: 'exponential'

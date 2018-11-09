@@ -16,6 +16,9 @@ var sites = [{
 }, {
     site: 'www.selver.ee',
     interval: 1 * 60 * 60 * 1000
+}, {
+    site: 'www.zoomaailm.ee',
+    interval: 1 * 60 * 60 * 1000
 }];
 
 var worker = SessionFactory.getQueueConnection();
@@ -71,6 +74,20 @@ worker.process('processSite', numParallel, function (job, done) {
             LOG.error(util.format('[STATUS] [Failure] Sites harvesting failed', err));
             return done(err);
         });
+});
+
+worker.process('processIndexPage', numParallel, function (job, done) {
+    var config = job.data;
+
+    harvester.processIndexPage(config, function (err, result) {
+        if (err) {
+            LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Index page harvesting failed', config.site, config.href, err));
+            return done(err);
+        }
+
+        LOG.info(util.format('[STATUS] [OK] [%s] [%s] Index page harvesting finished', config.site, config.href));
+        return done(null, result);
+    });
 });
 
 worker.process('processPage', numParallel, function (job, done) {

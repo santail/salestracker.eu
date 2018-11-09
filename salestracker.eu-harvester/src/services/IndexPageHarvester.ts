@@ -7,7 +7,6 @@ import WorkerService from "./WorkerService";
 
 var LOG = require("../../lib/services/Logger");
 var ParserFactory = require("../../lib/services/ParserFactory");
-var SessionFactory = require("../../lib/services/SessionFactory");
 
 
 class IndexPageHarvester {
@@ -32,7 +31,9 @@ class IndexPageHarvester {
                 return processIndexPageFinished(err);
             },
             onSuccess: (content) => {
-                if (parser.config.paging) {
+                if (options.hierarchy) { // if this is initial index page containing first level of hierarchical catalog links
+                    this._processHierarchicalIndexes(options, content, processIndexPageFinished);
+                } else if (parser.config.paging) {
                     this._processPaginatedIndexes(options, content, processIndexPageFinished);
                 } else {
                     this._processSimpleIndexes(options, content, processIndexPageFinished);
@@ -40,6 +41,45 @@ class IndexPageHarvester {
             }
         });
     };
+
+    private _processHierarchicalIndexes = (options, content, processPaginatedIndexesFinished) => {
+        var parser = ParserFactory.getParser(options.site);
+
+        var hierarchicalIndexPages = parser.getHierarchicalIndexPages(options, content);
+
+        if (!hierarchicalIndexPages.length) {
+            WorkerService.scheduleIndexPageProcessing({
+                'site': options.site,
+                'href': options.href
+            }, processPaginatedIndexesFinished);
+        } 
+        else {
+            var nextHierarchyLevel = options.hierarchy + 1;
+
+            var categorizedIndexesHandlers = _.map(hierarchicalIndexPages, (href) => {
+                var config = {
+                    'site': options.site,
+                    'href': href
+                } as any;
+
+                if (!_.isUndefined(parser.config.hierarchy['level-' + nextHierarchyLevel]) || parser.config.hierarchy!!.pattern) {
+                    config.hierarchy = nextHierarchyLevel;
+                }
+
+                return (categorizedIndexHandlerFinished) => WorkerService.scheduleIndexPageProcessing(config, categorizedIndexHandlerFinished);
+            });
+
+            async.series(categorizedIndexesHandlers, function (err, results) {
+                if (err) {
+                    LOG.error(util.format('[STATUS] [Failure] [%s] Pages processing not scheduled', options.site, err));
+                    return processPaginatedIndexesFinished(err);
+                }
+
+                LOG.info(util.format('[STATUS] [OK] [%s] Pages processing scheduled', options.site));
+                return processPaginatedIndexesFinished(null, results);
+            });
+        }
+    }
 
     private _processPaginatedIndexes = (options, content, processPaginatedIndexesFinished) => {
         var parser = ParserFactory.getParser(options.site);
@@ -83,9 +123,9 @@ class IndexPageHarvester {
         });
     };
 
-    private _processSimpleIndexes = function (config, content, processSimpleIndexesFinished) {
-        LOG.info(util.format('[STATUS] [OK] [%s] No paging found', config.site));
-        LOG.info(util.format('[STATUS] [OK] [%s] Processing offers', config.site));
+    private _processSimpleIndexes = function (options, content, processSimpleIndexesFinished) {
+        LOG.info(util.format('[STATUS] [OK] [%s] No paging found', options.site));
+        LOG.info(util.format('[STATUS] [OK] [%s] Processing offers', options.site));
 
         return processSimpleIndexesFinished(null, content);
     };

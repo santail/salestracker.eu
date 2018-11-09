@@ -42,6 +42,7 @@ export interface ParserConfiguration {
   site: string;
   paging?: PagingConfiguration;
   indexPage: string;
+  hierarchy?: { [level: string]: (content: any) => string[] };
   list: (content: any) => any[];
   json?: boolean
   templates: OfferTemplates;
@@ -55,6 +56,10 @@ class AbstractParser {
 
   protected config: ParserConfiguration = {
     indexPage: '',
+    hierarchy: {
+      groups: () => { return []},
+      categories: () => { return []}
+    },
     list: () => [],
     templates: {
       title: () => { return ''},
@@ -97,7 +102,7 @@ class AbstractParser {
     }
 
     for (var pageNumber: number = firstPage; pageNumber <= lastPage; pageNumber++) {
-      pages.push(this.compilePagingPattern()
+      pages.push(this.compilePagingPattern(options)
         .replace(/{paging_pagenumber}/g, pageNumber.toString())
         .replace(/{search_criteria}/g, options.search)
       );
@@ -108,7 +113,15 @@ class AbstractParser {
     };
   };
 
-  compilePagingPattern = () => {
+  getHierarchicalIndexPages = (options, content) => {
+    if (this.config.hierarchy!!.pattern) {
+      return this.config.hierarchy!!.pattern(content);
+    }
+    
+    return this.config.hierarchy!!['level-' + options.hierarchy](content);
+  }
+
+  compilePagingPattern = (options) => {
     var pattern = this.config.paging!!.pattern ? this.config.paging!!.pattern : this.config.indexPage;
     return this.compilePageHref(pattern)
   };

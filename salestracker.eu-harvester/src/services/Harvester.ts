@@ -7,6 +7,7 @@ import Crawler from "./Crawler";
 import ImageHarvester from "./ImageHarvester";
 import IndexPageHarvester from "./IndexPageHarvester";
 import OfferPageHarvester from "./OfferPageHarvester";
+import WorkerService from "./WorkerService";
 
 var LOG = require("../../lib/services/Logger");
 var parserFactory = require("../../lib/services/ParserFactory");
@@ -52,14 +53,18 @@ class Harvester {
   public processSite = (options) => {
     LOG.info(util.format('[STATUS] [OK] [%s] Site processing started', options.site));
 
-    var parser = parserFactory.getParser(options.site),
-      indexPage = parser.config.indexPage,
-      language = parser.getMainLanguage();
+    var parser = parserFactory.getParser(options.site);
+    var indexPage = parser.config.indexPage;
+    var language = parser.getMainLanguage();
 
     options = _.extend(options, {
       'href': indexPage.replace(/{search_criteria}/g, options.search), // TODO add default paging parameters
       'language': language
     });
+
+    if (parser.config.hierarchy) {
+      options.hierarchy = 1;
+    }
 
     return new Promise((fulfill, reject) => {
       IndexPageHarvester.processIndexPage(options, (err, offers) => {
@@ -73,6 +78,23 @@ class Harvester {
       });
     });
   };
+
+  /*
+   *
+   */
+  public processIndexPage = (options, processPageFinished) => {
+    LOG.info(util.format('[STATUS] [OK] [%s] [%s] Index page processing started', options.site, options.href));
+
+    IndexPageHarvester.processIndexPage(options, (err, offers) => {
+      if (err) {
+        LOG.error(util.format('[STATUS] [Failure] [%s] Index page processing failed', options.site, err));
+        return processPageFinished(err);
+      }
+
+      LOG.info(util.format('[STATUS] [OK] [%s] Index page processing finished', options.site));
+      return processPageFinished(null, offers);
+    });
+  }
 
   /*
    *
@@ -108,26 +130,10 @@ class Harvester {
           return function (offerHandlerFinished) {
             content = null;
 
-            var jobConfig = _.extend({
+            WorkerService.scheduleOfferProcessing(_.extend({
               'site': options.site,
               'language': parser.getMainLanguage()
-            }, offer);
-
-            SessionFactory.getQueueConnection().create('processOffer', jobConfig)
-              .attempts(3).backoff({
-                delay: 60 * 1000,
-                type: 'exponential'
-              })
-              .removeOnComplete(true)
-              .save(function (err) {
-                if (err) {
-                  LOG.error(util.format('[STATUS] [FAILED] [%s] %s Offer processing schedule failed', options.site, offer.href, err));
-                  return offerHandlerFinished(err);
-                }
-
-                LOG.debug(util.format('[STATUS] [OK] [%s] %s Offer processing scheduled', options.site, offer.href));
-                return offerHandlerFinished(null);
-              });
+            }, offer), offerHandlerFinished);
           };
         });
 

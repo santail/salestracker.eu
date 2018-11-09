@@ -9,6 +9,9 @@ var cheerio = require("cheerio");
 var sites = {
     'www.selver.ee': {
         'https://www.selver.ee/siider-kopparberg-metsamarja-500-ml-purk-1': true,
+    },
+    'www.zoomaailm.ee': {
+        'https://www.zoomaailm.ee/ee/koerad/kausid/alusel-kausid-koertele/keraamilised-kausid-edition-komplekt-alusega-2tkx0-3l-12cm-35x22cm': true,
     }
 };
 
@@ -22,8 +25,10 @@ _.each(_.keys(sites), function (site) {
         _.each(_.keys(sites[site]), function (url) {
             const offerHref = new URL(url);
 
-            var data = JSON.parse(fs.readFileSync(__dirname + '/' + site + '/' + offerHref.pathname + '.data.json', 'utf8'));
-            var content = fs.readFileSync(__dirname + '/' + site + '/' + offerHref.pathname, 'utf8');
+            var filename = _.last(offerHref.pathname.split('/'));
+
+            var data = JSON.parse(fs.readFileSync(__dirname + '/' + site + '/' + filename + '.data.json', 'utf8'));
+            var content = fs.readFileSync(__dirname + '/' + site + '/' + filename, 'utf8');
 
             describe(url, function () {
 

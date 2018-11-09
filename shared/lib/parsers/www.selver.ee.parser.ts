@@ -1,11 +1,8 @@
 'use strict';
 
-var _ = require("lodash");
 var url = require("url");
 
-import AbstractParser, {
-  ParserConfiguration
-} from "./AbstractParser";
+import AbstractParser, { ParserConfiguration } from "./AbstractParser";
 
 class SelverParser extends AbstractParser {
 

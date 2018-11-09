@@ -63,3 +63,6 @@ curl -X POST -H 'Content-Type: application/json' "http://localhost:9200/salestra
 
 # delete index
 curl -X DELETE "localhost:9200/salestracker-eng"
+
+# run tests
+mocha -r ts-node/register tests/parsers.spec.js
