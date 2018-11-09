@@ -33,6 +33,8 @@ class HomePage extends ComponentBase<HomePageProps, HomePageState> {
   render() {
     return (
     	<div>
+            <p>Пожалуйста когда появятся скидки на пылесос, сообщите мне на электронную почту и на телефон. Я буду ждать 3 недели.</p>
+            
             <form onSubmit={this._onFormSubmit}>
                 <label htmlFor="content">Contains</label>
                 <input id="content" name="content" type="text" />

@@ -3,10 +3,12 @@
 /**
  * Module dependencies.
  */
-var path = require('path'),
-  mongoose = require('mongoose'),
-  Wish = mongoose.model('Wish'),
-  errorHandler = require('../core/errors.server.controller');
+var _ = require('lodash')._;
+var franc = require('franc');
+var mongoose = require('mongoose');
+
+var Wish = mongoose.model('Wish');
+var errorHandler = require('../core/errors.server.controller');
 
 /**
  * Create a wish
@@ -14,13 +16,23 @@ var path = require('path'),
 exports.create = function (req, res) {
   var wish = new Wish(req.body);
 
+  const detectionResult = franc.all(req.body.content, {whitelist: ['rus', 'eng', 'est']})
+
+  const language = _.maxBy(detectionResult, function(result) {
+    return result[1];
+  });
+
   wish.contacts = {
     email: req.body.email,
     phone: req.body.phone
   };
 
-  wish.period = 1 * 60 * 1000; // one minute
+  if (language && language[0] !== 'und') {
+    wish.locale = language[0];
+  }
 
+  wish.expires = new Date(new Date().getTime() + 1 * 30 * 24 * 60 * 60 * 1000); // expires in one month
+  
   wish.user = req.user;
 
   wish.save(function (err) {

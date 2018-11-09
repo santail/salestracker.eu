@@ -12,14 +12,15 @@ var elastic = SessionFactory.getElasticsearchConnection();
 
 
 const WISH_CHECK_PERIOD = process.env.WISH_CHECK_PERIOD ? parseInt(process.env.WISH_CHECK_PERIOD, 10) : 1 * 60 * 60 * 1000;
+const DEFAULT_LANGUAGE = 'est';
 
 const performSearch = function () {
     const checkTime = new Date();
 
     SessionFactory.getDbConnection().wishes.findOne({
         $and: [{
-            created: {
-                "$lte": checkTime
+            expires: {
+                "$gte": new Date(checkTime)
             }
         }, {
             $or: [{
@@ -36,8 +37,8 @@ const performSearch = function () {
         if (err) {
             LOG.error(util.format('[STATUS] [Failure] Checking wish failed', err));
         } else if (foundWish) {
-            if (!foundWish.locale) {
-                foundWish.locale = 'est'; // fallback to default language
+            if (!foundWish.locale) { // we use 'locale' property as 'language' is reserved for mongodb 
+                foundWish.locale = DEFAULT_LANGUAGE; // fallback to default language
             }
 
             foundWish.language = foundWish.locale;

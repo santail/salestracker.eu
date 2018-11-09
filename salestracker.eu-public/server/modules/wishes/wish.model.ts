@@ -15,7 +15,8 @@ var WishSchema = new Schema({
 		email: String,
 		phone: String,
 	},
-	active: Boolean,
+	locale: String,
+	expires: { 'type': Date },
     created: { 'type': Date, 'default': Date.now },
 	user: { type: Schema.ObjectId, ref: 'User' }
 }, {

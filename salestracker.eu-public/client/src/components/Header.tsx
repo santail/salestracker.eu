@@ -23,7 +23,7 @@ class Header extends ComponentBase<HeaderProperties, HeaderState> {
         return (
             <div className="container-fluid">
                 <div className="page-header">
-                    <div className="logo"><a href="/index.html" title=""><img src="/images/logo.png" alt="" /></a></div>
+                    <div className="logo"><a href="/" title=""><img src="/images/logo.png" alt="" /></a></div>
 
                     <ul className="middle-nav">
                         <li>
