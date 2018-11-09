@@ -114,3 +114,4 @@ worker.process('processImage', numParallel, function (job, done) {
         return done(null, result);
     });
 });
+

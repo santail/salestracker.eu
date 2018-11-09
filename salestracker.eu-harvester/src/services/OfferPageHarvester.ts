@@ -3,6 +3,8 @@ var mongojs = require('mongojs');
 var util = require("util");
 
 import Crawler from "./Crawler";
+import WorkerService from "./WorkerService";
+
 var LOG = require("../../lib/services/Logger");
 var parserFactory = require("../../lib/services/ParserFactory");
 var sessionFactory = require("../../lib/services/SessionFactory");
@@ -26,27 +28,7 @@ class OfferPageHarvester {
                 const isTranslated = !_.isUndefined(foundMainOffer.translations[options.language]);
 
                 if (isMainOffer) {
-                    sessionFactory.getDbConnection().offers.update({
-                        _id: mongojs.ObjectId(foundMainOffer._id)
-                    }, {
-                        $set: {
-                            expires: new Date(runningTime + parser.config.ttl)
-                        }
-                    }, (err, updatedOffer) => {
-                        if (err) {
-                            // TODO Mark somehow offer that was excluded from processing
-                            LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Offers expiration time update failed', options.site, options.href, err));
-                            return processOfferFinished(err);
-                        }
-
-                        if (!updatedOffer) {
-                            LOG.info(util.format('[STATUS] [OK] [%s] Offer not updated. Proceed with harvesting', options.site, options.href));
-                            return this._gatherOffer(options, processOfferFinished);
-                        } else {
-                            LOG.info(util.format('[STATUS] [OK] [%s] Offers expiration time extended', options.site, options.href));
-                            return processOfferFinished(null);
-                        }
-                    });
+                    this._extendExpirationTime(foundMainOffer._id, new Date(runningTime + parser.config.ttl), options, processOfferFinished);
                 } else if (isTranslated) {
                     LOG.info(util.format('[STATUS] [OK] [%s] Offer already translated. Skipping.', options.site, options.href));
                     return processOfferFinished(null);
@@ -65,7 +47,7 @@ class OfferPageHarvester {
         var runningTime = new Date();
         var parser = parserFactory.getParser(options.site);
 
-        var offerDataHandler = function (body) {
+        var parseResponseData = function (body) {
             parser.parse(body, function (err, data) {
                 body = null;
 
@@ -88,26 +70,12 @@ class OfferPageHarvester {
                     data.origin_href = options.origin_href;
                 }
 
-                sessionFactory.getQueueConnection().create('processData', data)
-                    .attempts(3).backoff({
-                        delay: 60 * 1000,
-                        type: 'exponential'
-                    })
-                    .removeOnComplete(true)
-                    .save(function (err) {
-                        if (err) {
-                            LOG.error(util.format('[STATUS] [FAILED] [%s] %s Offer data processing schedule failed', options.site, data.href, err));
-                            return processOfferFinished(err);
-                        }
-
-                        LOG.debug(util.format('[STATUS] [OK] [%s] %s Offer data processing scheduled', options.site, data.href));
-                        return processOfferFinished(null);
-                    });
+                WorkerService.scheduleDataProcessing(data, processOfferFinished);
             });
         };
 
         if (parser.config.json) {
-            offerDataHandler(options);
+            parseResponseData(options);
         } else {
             var crawler = new Crawler();
             crawler.request({
@@ -121,11 +89,34 @@ class OfferPageHarvester {
 
                     return processOfferFinished(null, offer);
                 },
-                onSuccess: offerDataHandler
+                onSuccess: parseResponseData
             });
         }
     };
 
+    private _extendExpirationTime(offerId, expirationTime, options, callback) {
+        sessionFactory.getDbConnection().offers.update({
+            _id: mongojs.ObjectId(offerId)
+        }, {
+            $set: {
+                expires: expirationTime
+            }
+        }, (err, updatedOffer) => {
+            if (err) {
+                // TODO Mark somehow offer that was excluded from processing
+                LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Offers expiration time update failed', options.site, options.href, err));
+                return callback(err);
+            }
+
+            if (!updatedOffer) {
+                LOG.info(util.format('[STATUS] [OK] [%s] Offer not updated. Proceed with harvesting', options.site, options.href));
+                return this._gatherOffer(options, callback);
+            } else {
+                LOG.info(util.format('[STATUS] [OK] [%s] Offers expiration time extended', options.site, options.href));
+                return callback(null);
+            }
+        });
+    }
 }
 
 export default new OfferPageHarvester();

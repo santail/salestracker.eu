@@ -11,7 +11,10 @@ class SmsComposer extends Composer {
         var body = "";
 
         _.each(notification.offers, function (offer) {
-            body += util.format("%s %s: %s%\r\n\r\n", offer.translations.est.title, offer.price.current, offer.price.discount.percents);
+            body += util.format("%s -%s%\r\nOli %s€, nüüd %s€\r\n%s\r\n\r\n", 
+                offer.title, offer.price.discount.percents, 
+                offer.price.original, offer.price.current,
+                offer.href);
         });
 
         return body;

@@ -249,7 +249,7 @@ class AbstractParser {
     
     if (current && original) {
       amount = original - current;
-      percents = 100 - current / original * 100;
+      percents = Math.floor(100 - current / original * 100);
     }
 
     return { 

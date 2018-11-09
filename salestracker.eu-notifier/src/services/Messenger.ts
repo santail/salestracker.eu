@@ -7,9 +7,9 @@ var Telegram = require('telegraf/telegram')
 var twilio = require('twilio')(config.notifier.twilio.AccountSID, config.notifier.twilio.AuthToken);
 
 var LOG = require('../../lib/services/Logger');
-var EmailComposer = require('./EmailComposer');
-var SmsComposer = require('./SmsComposer');
-var TelegramComposer = require('./TelegramComposer');
+import EmailComposer from './EmailComposer';
+import SmsComposer from './SmsComposer';
+import TelegramComposer from './TelegramComposer';
 
 export interface Notification {
   criterion: string;

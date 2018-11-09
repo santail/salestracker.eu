@@ -12,8 +12,8 @@ class SmsComposer extends Composer {
 
         _.each(notification.offers, function (offer) {
           message += util.format("<a href='%s'>%s</a> %s %s%\r\n\r\n", 
-            offer.translations.est.href, 
-            offer.translations.est.title, 
+            offer.href, 
+            offer.title, 
             offer.price.current, 
             offer.price.discount.percents);
         });

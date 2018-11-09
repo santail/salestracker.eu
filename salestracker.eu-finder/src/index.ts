@@ -36,10 +36,19 @@ const performSearch = function () {
         if (err) {
             LOG.error(util.format('[STATUS] [Failure] Checking wish failed', err));
         } else if (foundWish) {
+            if (!foundWish.locale) {
+                foundWish.locale = 'est'; // fallback to default language
+            }
+
+            foundWish.language = foundWish.locale;
+            delete foundWish.locale;
+
+            var indexName = 'salestracker-' + foundWish.language;
+            
             var criteria: any[] = [
                 [{
                     "match": {
-                        "translations.est.title": foundWish.content
+                        "title": foundWish.content
                     }
                 }]
             ];
@@ -55,7 +64,7 @@ const performSearch = function () {
             }
 
             elastic.search({
-                index: 'salestracker',
+                index: indexName,
                 type: 'offers',
                 body: {
                     "query": {
@@ -148,7 +157,7 @@ const performSearch = function () {
             LOG.info(util.format('[STATUS] [OK] No unprocessed wishes found'));
             setTimeout(function () {
                 performSearch();
-            }, 1000)
+            }, 10000)
         };
     });
 };

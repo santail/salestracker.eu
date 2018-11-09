@@ -20,6 +20,9 @@ class Harvester {
     this._db = SessionFactory.getDbConnection();
   }
 
+  /*
+   *
+   */
   public cleanupSite = (options) => {
     if (!options.shouldCleanup) {
       return Promise.resolve();
@@ -43,6 +46,9 @@ class Harvester {
     });
   };
 
+  /*
+   *
+   */
   public processSite = (options) => {
     LOG.info(util.format('[STATUS] [OK] [%s] Site processing started', options.site));
 
@@ -68,6 +74,9 @@ class Harvester {
     });
   };
 
+  /*
+   *
+   */
   public processPage = (options, processPageFinished) => {
     LOG.info(util.format('[STATUS] [OK] [%s] Page processing %s of %s started', options.site, options.pageIndex, options.totalPages));
 
@@ -135,12 +144,18 @@ class Harvester {
     });
   };
 
+  /*
+   *
+   */
   public processOffer = (options, processOfferFinished) => {
     LOG.debug(util.format('[STATUS] [OK] [%s] Offer processing started %s', options.site, options.href));
 
     return OfferPageHarvester.processOfferPage(options, processOfferFinished);
   };
 
+  /*
+   *
+   */
   public processImage = (options, processImageFinished) => {
     LOG.debug(util.format('[STATUS] [OK] [%s] Image processing started %s', options.site, options.href));
 

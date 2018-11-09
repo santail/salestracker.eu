@@ -22,19 +22,19 @@ class SmsComposer extends Composer {
           details += util.format('&nbsp;<span style="text: bold;">%s</span>', offer.price.current);
       
           if (offer.price.current) {
-           details += util.format('&nbsp;<span style="text-decoration: line-through;">%s</span>', offer.price.current);
+           details += util.format('&nbsp;<span style="text-decoration: line-through;">%s</span>', offer.price.original);
           }
       
           if (offer.discount) {
            details += util.format('&nbsp;<span>%s</span>', offer.discount.amount);
           }
       
-          if (offer.translations.est.description) {
-            details += util.format('<br /><span>%s</span>',  offer.translations.est.description);
+          if (offer.description) {
+            details += util.format('<br /><span>%s</span>',  offer.description);
           }
       
           content += util.format('<p><a href="%s" title="%s" />%s</a>&nbsp;%s</p>', 
-            offer.translations.est.href, offer.translations.est.title, offer.translations.est.title, details);
+            offer.href, offer.title, offer.title, details);
         });
       
         return '<table border="0" cellpadding="0" cellspacing="0" style="margin:0; padding:0" width="100%">' +

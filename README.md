@@ -49,3 +49,17 @@ docker exec -it server-redis redis-cli FLUSHALL
 docker rm $(docker ps -a -q)
 docker rmi $(docker images -f "dangling=true" -q)
 docker volume rm $(docker volume ls -qf dangling=true)
+
+
+
+
+
+
+
+
+# return all documents
+curl -X POST -H 'Content-Type: application/json' "http://localhost:9200/salestracker-eng/_search?pretty" -d '
+{"query": {"match_all" : { }}}'
+
+# delete index
+curl -X DELETE "localhost:9200/salestracker-eng"
