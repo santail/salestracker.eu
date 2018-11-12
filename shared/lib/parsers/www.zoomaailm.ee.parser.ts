@@ -16,7 +16,10 @@ class ZoomaailmParser extends AbstractParser {
                 'main': true
             },
             'rus': {
-                'exists': true
+                'exists': true,
+                'findHref': ($) => {
+                    return $('div.header-container div.header div.form-language > a.lang-selector_ru').attr('href');
+                }
             }
         },
         'hierarchy': {
@@ -59,8 +62,8 @@ class ZoomaailmParser extends AbstractParser {
                 return $('div.product-essential div.product-shop div.product-name > h1').text().trim();
             },
             'pictures': ($) => {
-                return $('div.product-essential div.product-img-box > div.more-views > ul > li > a').map(function (index, el) {
-                    return $(el).attr('onclick').replace(/popWin\('(.*?)/, "$1").replace(/', (.*)/, "");
+                return $('div.product-essential div.product-img-box > div.more-views > ul > li > a > img').map(function (index, el) {
+                    return $(el).attr('src').replace(/\/thumbnail\/56x/, "");
                 }).get();
             },
             'price': ($) => {

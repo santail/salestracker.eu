@@ -50,7 +50,7 @@ class MinuvalikParser extends AbstractParser {
       },
       'rus': {
         'exists': true,
-        'compiler': this._offerTranslationHrefCompiler
+        'compileHref': this._offerTranslationHrefCompiler
       }
     },
     'paging': {
@@ -119,7 +119,7 @@ class MinuvalikParser extends AbstractParser {
   
   compileOfferHref = (link, language) => {
     if (language && !this.config.languages[language].main) {
-      var compiler = this.config.languages[language].compiler;
+      var compiler = this.config.languages[language].compileHref;
 
       if (compiler) {
         return compiler(link);

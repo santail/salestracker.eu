@@ -47,8 +47,13 @@ class OfferPageHarvester {
         var runningTime = new Date();
         var parser = parserFactory.getParser(options.site);
 
-        var parseResponseData = function (body) {
-            parser.parse(body, function (err, data) {
+        var parseResponseData = (body) => {
+            parser.parse(body, (err, data) => {
+                var translations = this._findTranslationHrefs(options, body);
+                if (translations) {
+                    data.translations = translations;
+                }
+
                 body = null;
 
                 if (err) {
@@ -116,6 +121,24 @@ class OfferPageHarvester {
                 return callback(null);
             }
         });
+    }
+
+    private _findTranslationHrefs = (options, body): { [language: string]: string } => {
+        var parser = parserFactory.getParser(options.site);
+
+        var translations = {};
+
+        _.each(_.keys(parser.config.languages), function (language) {
+            if (parser.config.languages[language].main || !parser.config.languages[language].exists) {
+                return;
+            }
+
+            if (parser.config.languages[language].findHref) {
+                translations[language] = parser.config.languages[language].findHref(body);
+            }
+        });
+
+        return translations;
     }
 }
 

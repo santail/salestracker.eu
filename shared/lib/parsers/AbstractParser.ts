@@ -6,7 +6,8 @@ var util = require("util");
 interface LanguageConfiguration {
   main?: boolean;
   exists: boolean;
-  compiler?: (url: string) => string;
+  compileHref?: (url: string) => string;
+  findHref?: (content: any) => string;
 }
 
 interface OfferTemplates {

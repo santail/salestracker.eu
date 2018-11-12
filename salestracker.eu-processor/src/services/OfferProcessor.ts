@@ -65,10 +65,18 @@ class OfferProcessor {
                         return;
                     }
 
+                    var href;
+
+                    if (data.translations && data.translations[language]) {
+                        href = data.translations[language];
+                    } else {
+                        href = parser.compileOfferHref(data.href, language);
+                    }
+
                     WorkerService.scheduleOfferProcessing({
                         'site': data.site,
                         'language': language,
-                        'href': parser.compileOfferHref(data.href, language),
+                        'href': href,
                         'origin_href': offer.origin_href
                     });
                 });
