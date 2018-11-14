@@ -28,7 +28,7 @@ class BarboraParser extends AbstractParser {
         'main': true
       },
       'rus': {
-        'exists': true
+        'exists': false
       }
     },
     'paging': {
@@ -64,7 +64,19 @@ class BarboraParser extends AbstractParser {
       'description': ($) => {
         return $('div.b-page-container > dl.b-product-info--info-2').html();
       },
-      'vendor': () => {
+      'vendor': ($) => {
+        var descriptionSection = $('div.b-page-container > dl.b-product-info--info-2');
+
+        if (descriptionSection.length) {
+          var vendorHeader = descriptionSection.find('dt.b-product-info--info-3-title').filter(function (index, el) {
+            return $(el).text().toLowerCase() === 'Tootja kontaktid'.toLowerCase();
+          }).first();
+
+          if (vendorHeader.length) {
+            return vendorHeader.next('dd').text();
+          }
+        }
+
         return '';
       }
     },

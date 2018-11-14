@@ -32,28 +32,22 @@ class IndexPageHarvester {
             },
             onSuccess: (content) => {
                 if (options.hierarchy) { // if this is initial index page containing first level of hierarchical catalog links
-                    this._processHierarchicalIndexes(options, content, processIndexPageFinished);
+                    this._processHierarchicalIndexPage(options, content, processIndexPageFinished);
                 } else if (parser.config.paging) {
-                    this._processPaginatedIndexes(options, content, processIndexPageFinished);
+                    this._startPaginatedIndexPageProcessing(options, content, processIndexPageFinished);
                 } else {
-                    this._processSimpleIndexes(options, content, processIndexPageFinished);
+                    this._startSimpleIndexPageProcessing(options, content, processIndexPageFinished);
                 }
             }
         });
     };
 
-    private _processHierarchicalIndexes = (options, content, processPaginatedIndexesFinished) => {
+    private _processHierarchicalIndexPage = (options, content, processPaginatedIndexesFinished) => {
         var parser = ParserFactory.getParser(options.site);
 
         var hierarchicalIndexPages = parser.getHierarchicalIndexPages(options, content);
 
-        if (!hierarchicalIndexPages.length) {
-            WorkerService.scheduleIndexPageProcessing({
-                'site': options.site,
-                'href': options.href
-            }, processPaginatedIndexesFinished);
-        } 
-        else {
+        if (hierarchicalIndexPages.length) {
             var nextHierarchyLevel = options.hierarchy + 1;
 
             var categorizedIndexesHandlers = _.map(hierarchicalIndexPages, (href) => {
@@ -79,35 +73,52 @@ class IndexPageHarvester {
                 return processPaginatedIndexesFinished(null, results);
             });
         }
+        else {
+            WorkerService.scheduleIndexPageProcessing({
+                'site': options.site,
+                'href': options.href
+            }, processPaginatedIndexesFinished);
+        } 
     }
 
-    private _processPaginatedIndexes = (options, content, processPaginatedIndexesFinished) => {
+    private _startPaginatedIndexPageProcessing = (options, content, callback) => {
         var parser = ParserFactory.getParser(options.site);
-        var pagingParams = parser.getPagingParameters(content, options);
-
-        content = null;
 
         LOG.info(util.format('[STATUS] [OK] [%s] Paging found', options.site));
 
+        if (parser.config.paging.finit) {
+            this._processFinitePagination(options, content, callback);
+        } else {
+            this._processInfinitePagination(options, callback);
+        }
+
+        content = null;
+    };
+
+    private _processFinitePagination(options, content, callback): any {
+        var parser = ParserFactory.getParser(options.site);
+        var pagingParams = parser.compilePagingParameters(content, options);
+
         var paginatedIndexesHandlers = [];
 
-        if (!parser.config.payload) {
-            paginatedIndexesHandlers = _.map(pagingParams.pages, (href, index) => {
-                return (paginatedIndexHandlerFinished) => WorkerService.schedulePageProcessing({
-                    'site': options.site,
-                    'href': href,
-                    'pageIndex': index + 1,
-                    'totalPages': pagingParams.pages.length
-                }, paginatedIndexHandlerFinished);
-            });
-        } else {
+        if (parser.config.payload) {
             paginatedIndexesHandlers = _.map(pagingParams.payloads, (payload, index) => {
                 return (paginatedIndexHandlerFinished) => WorkerService.schedulePageProcessing({
                     'site': options.site,
                     'href': payload.href,
                     'payload': payload.payload,
-                    'pageIndex': index + 1,
-                    'totalPages': pagingParams.payloads.length
+                    'page_index': index + 1,
+                    'total_pages': pagingParams.payloads.length
+                }, paginatedIndexHandlerFinished);
+            });
+        } 
+        else {
+            paginatedIndexesHandlers = _.map(pagingParams.pages, (href, index) => {
+                return (paginatedIndexHandlerFinished) => WorkerService.schedulePageProcessing({
+                    'site': options.site,
+                    'href': href,
+                    'page_index': index + 1,
+                    'total_pages': pagingParams.pages.length
                 }, paginatedIndexHandlerFinished);
             });
         }
@@ -115,15 +126,29 @@ class IndexPageHarvester {
         async.series(paginatedIndexesHandlers, function (err, results) {
             if (err) {
                 LOG.error(util.format('[STATUS] [Failure] [%s] Pages processing not scheduled', options.site, err));
-                return processPaginatedIndexesFinished(err);
+                return callback(err);
             }
 
             LOG.info(util.format('[STATUS] [OK] [%s] Pages processing scheduled', options.site));
-            return processPaginatedIndexesFinished(null, results);
+            return callback(null, results);
         });
     };
 
-    private _processSimpleIndexes = function (options, content, processSimpleIndexesFinished) {
+    private _processInfinitePagination(options: any, callback: any): any {
+        var parser = ParserFactory.getParser(options.site);
+        var href = parser.compileNextPageHref();
+
+        LOG.info(util.format('[STATUS] [OK] [%s] Next page processing scheduled', options.site));
+
+        WorkerService.schedulePageProcessing({
+            'site': options.site,
+            'href': href,
+            'page_index': 1,
+            'infinite_pagination': true
+        }, callback);
+    };
+
+    private _startSimpleIndexPageProcessing = function (options, content, processSimpleIndexesFinished) {
         LOG.info(util.format('[STATUS] [OK] [%s] No paging found', options.site));
         LOG.info(util.format('[STATUS] [OK] [%s] Processing offers', options.site));
 

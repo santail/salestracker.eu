@@ -100,7 +100,7 @@ class Harvester {
    *
    */
   public processPage = (options, processPageFinished) => {
-    LOG.info(util.format('[STATUS] [OK] [%s] Page processing %s of %s started', options.site, options.pageIndex, options.totalPages));
+    LOG.info(util.format('[STATUS] [OK] [%s] Page processing %s of %s started', options.site, options.page_index, options.total_pages));
 
     var parser = parserFactory.getParser(options.site);
 
@@ -146,6 +146,31 @@ class Harvester {
           LOG.info(util.format('[STATUS] [OK] [%s] Offers processing scheduled', options.site));
           return processPageFinished(null, results);
         });
+
+        if (options.infinite_pagination) {
+          if (process.env.NODE_ENV === 'development' && process.env.PAGING_PAGES_LIMIT && parseInt(process.env.PAGING_PAGES_LIMIT, 10) === options.page_index) {
+            return processPageFinished(null);
+          }
+
+          LOG.info(util.format('[STATUS] [OK] [%s] Proccessing next infinite paging page', options.site));
+
+          if (_.isEmpty(offers) || _.last(offers).href === options.last_processed_offer) {
+            LOG.info(util.format('[STATUS] [OK] [%s] Last infinite paging page found. Stop processing.', options.site));
+            return processPageFinished(null);
+          }
+
+          var href = parser.compileNextPageHref(options.page_index);
+
+          LOG.info(util.format('[STATUS] [OK] [%s] Next infinite paging page processing scheduled', options.site));
+
+          WorkerService.schedulePageProcessing({
+            'site': options.site,
+            'href': href,
+            'page_index': options.page_index + 1,
+            'infinite_pagination': true,
+            'last_processed_offer': _.last(offers).href
+          }, processPageFinished);
+        }
       }
     });
   };
