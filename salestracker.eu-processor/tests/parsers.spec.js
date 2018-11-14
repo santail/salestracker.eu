@@ -7,6 +7,9 @@ var tidy = require('htmltidy').tidy;
 var cheerio = require("cheerio");
 
 var sites = {
+    'www.barbora.ee': {
+        'https://www.barbora.ee/toode/valge-sok-mee-mandlitega-toblerone-100-g': true,
+    },
     'www.selver.ee': {
         'https://www.selver.ee/siider-kopparberg-metsamarja-500-ml-purk-1': true,
     },

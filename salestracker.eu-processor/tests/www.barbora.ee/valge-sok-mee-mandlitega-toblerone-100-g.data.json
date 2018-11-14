@@ -1,0 +1,17 @@
+{
+    "vendor": "",
+    "pictures": [
+        "https://www.barbora.ee/api/Images/GetInventoryImage?id=76407be1-1fa7-48bb-bc32-99b4bdcae0ba"
+    ],
+    "price": {
+        "current": 1.49,
+        "discount": {
+            "amount": 0.2,
+            "percents": 11
+        },
+        "original": 1.69
+    },
+    "currency": "EUR",
+    "title": "Valge šok.mee,mandlitega TOBLERONE 100g",
+    "description": "<dt class=\"b-product-info--info-3-title\">Описание</dt>\n<dd itemprop=\"description\">Kolmnurkne Toblerone valge šokolaad mandlitega, 100g</dd>\n<dt class=\"b-product-info--info-3-title\">Состав</dt>\n<dd>TÄISPIIMAPULBER, suhkur, kakaovõi, mesi, MANDLID, emulgaator (SOJAletsitiin), vaniliin.</dd>\n<dt class=\"b-product-info--info-3-title\">АЛЛЕРГЕНЫ</dt>\n<dd>В составе есть: молока и молочных продуктов (включая лактозу), орехов и их продуктов, соевых бобов и их продуктов</dd>"
+}

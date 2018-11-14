@@ -1,0 +1,1690 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+
+    <meta name="apple-itunes-app" content="app-id=1339130115">
+    <meta name="description" content="Kolmnurkne Toblerone valge šokolaad mandlitega, 100g" />
+    <meta name="og:description" content="Kolmnurkne Toblerone valge šokolaad mandlitega, 100g" />
+    <meta name="og:type" content="website" />
+    <meta name="og:title" content="Valge šok.mee,mandlitega TOBLERONE 100g" />
+    <meta name="og:sitename" content="Barbora"/>
+
+
+    <link rel="image_src" href="/Assets/Images/logo-square.png" />
+    <meta name="og:image" content="/Assets/Images/logo-square-min-EE.png" />
+
+    <link rel="shortcut icon" href="/Assets/Images/favicon.ico" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+    <style>
+        .b-home-alt-main-section--form-wrap--title,
+        .b-home-alt-main-section--text-wrap--text1,
+        .b-home-alt-main-section--text-wrap--bottom-text,
+        .b-home-alt-cards-section,
+        .b-home-alt--section-title,
+        .b-home-alt-benefits-section-part--title,
+        .b-home-alt-search-section--text-title,
+        .b-home-alt-products-section-text,
+        .b-home-alt-reg-section--icon-text h1 {
+            font-family: "proximaNova"!important;
+        }
+    </style>
+
+    
+
+    <link rel="stylesheet" type="text/css" href="/Assets/Styles/main.css?v=201811141516"/>
+
+    <title>Valge šok.mee,mandlitega TOBLERONE 100g</title>
+
+    <script type="text/javascript">
+        window.currentPage = "";
+    </script>
+
+    <script type="text/javascript">
+        function showNetworkErrorAlert() {
+            alert('Последняя операция не удалась, попробуйте еще раз или перезагрузите страницу.');
+        }
+    </script>
+
+    <script type="text/javascript" onerror="showNetworkErrorAlert()" src="/shared/translations?languageId=909b6b59-bf29-497c-80e4-1c844f1849c7"></script>
+
+    <script type="text/javascript">
+        if (!document.location.origin) {
+            document.location.origin = document.location.protocol + "//" + document.location.hostname + (document.location.port ? ':' + document.location.port : '');
+        }
+        // these are needed in order not to have to hardcode urls in JavaScript
+        // and to be able to change route names and not to break links
+
+
+
+        window.b_urls = {
+            home: "/",
+            cart: "/ostukorv",
+            search: "/otsing",
+            searchSuggestions: "/otsingu-abi",
+            product: "/toode",
+            timeslots: "/tarneaknad",
+            payment: "/maksmine",
+            termsAndConditions: "/info/termsandconditions",
+            whatisfavourite: "/info/whatisfavourite",
+            userInfoNew: "/uus-minu-andmed",
+            eShopApiBaseUrl: document.location.origin + "/api/eshop/v1/",
+            popUpCampaignImageUrlTemplate: document.location.origin + "/api/images/GetPopUpCampaignImage?id=",
+            privacyPolicy: "/info/privacypolicy",
+            serviceZones: "/info/teeninduspiirkonnad",
+        };
+
+        window.b_data = {
+            enviromentLocation: "EE",
+            loyaltyCardInfoLink: "http://www.maxima.ee",
+            customerSupportEmail: "info@barbora.ee",
+            customerSupportPhone: "555 66 369",
+            jobApplicationsEmail:"karjera@barbora.lt",
+            androidAppDownloadLink: "https://play.google.com/store/apps/details?id=ee.barbora",
+            iOsAppDownloadLink: "https://itunes.apple.com/us/app/appname/id1339130115?ls=1&amp;mt=8",
+            customerDataRouteName: "uus-minu-andmed",
+            allowedToFrequentShopperProgram: false,
+            TranslationsPlaceholderMatchingRegex: /{([0-9])+:(.+?)}/g,
+                authCookieName: ".BRBAUTH",
+            javaScriptTimeoutMilliseconds: 30000,
+            eShopDisplayUrl: "barbora.ee"
+        };
+
+        window.b_js_routes = [{"RouteName":"customerDataPagesList","Url":"/","ControllerName":null,"ActionName":null,"SequenceInRouting":39},{"RouteName":"customerDataAddressList","Url":"/kohaletoimetamise-aadress","ControllerName":null,"ActionName":null,"SequenceInRouting":40},{"RouteName":"customerDataAddressEdit","Url":"/kohaletoimetamise-aadress/:id","ControllerName":null,"ActionName":null,"SequenceInRouting":41},{"RouteName":"customerDataAddressAdd","Url":"/kohaletoimetamise-aadress/lisa-aadress","ControllerName":null,"ActionName":null,"SequenceInRouting":42},{"RouteName":"customerDataOrderHistory","Url":"/tellimuste-ajalugu","ControllerName":null,"ActionName":null,"SequenceInRouting":43},{"RouteName":"customerDataAciuCard","Url":"/minu-aitah-kaart","ControllerName":null,"ActionName":null,"SequenceInRouting":44},{"RouteName":"customerDataUserSettings","Url":"/kasutaja-seaded","ControllerName":null,"ActionName":null,"SequenceInRouting":45},{"RouteName":"customerDataChangeEmail","Url":"/kasutaja-seaded/muuda-epost","ControllerName":null,"ActionName":null,"SequenceInRouting":46},{"RouteName":"customerDataChangePassword","Url":"/kasutaja-seaded/muuda-parool","ControllerName":null,"ActionName":null,"SequenceInRouting":47},{"RouteName":"customerDataOrderHistoryDetails","Url":"/ostude-ajalugu/:id","ControllerName":null,"ActionName":null,"SequenceInRouting":48},{"RouteName":"customerDataSavedBaskets","Url":"/salvestatud-ostukorv","ControllerName":null,"ActionName":null,"SequenceInRouting":49},{"RouteName":"customerDataPaymentCards","Url":"/maksekaardid","ControllerName":null,"ActionName":null,"SequenceInRouting":50},{"RouteName":"customerDataSavedBasketsItem","Url":"/salvestatud-ostukorv/:id","ControllerName":null,"ActionName":null,"SequenceInRouting":51}];
+
+        window.b_js_urls = {};
+        window.b_js_routes.forEach(function(route) {
+            window.b_js_urls[route.RouteName] = window.b_urls.userInfoNew + route.Url;
+        });
+
+        // google analytics
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date(); a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+        ga("create", "UA-45214439-9", "auto");
+        ga("require", "ec");
+
+            
+            ga('set', 'dimension1', '000000000000123260'); // dynx_itemid == Data Feed ID
+            ga('set', 'dimension2', ''); // dynx_itemid2 == Data Feed ID2
+            ga('set', 'dimension3', 'offerdetail'); // dynx_pagetype
+            ga('set', 'dimension4', '1,4900'); // dynx_totalvalue == Data Feed Sale Price / Price (jeigu yra - akcijos kaina, jeigu ne, įprasta kaina)
+            
+
+        ga('send', 'pageview');
+
+        // facebook pixel code
+        !function (f, b, e, v, n, t, s) {
+            if (f.fbq) return; n = f.fbq = function () {
+                n.callMethod ?
+                    n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+            }; if (!f._fbq) f._fbq = n;
+            n.push = n; n.loaded = !0; n.version = '2.0'; n.queue = []; t = b.createElement(e); t.async = !0;
+            t.src = v; s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s)
+        }(window,
+            document, 'script', '//connect.facebook.net/en_US/fbevents.js');
+
+        fbq('init', '231057490908594');
+        fbq('track', "PageView");
+
+        var userActions = {
+            click: "click",
+            detail: "detail",
+            addToCart: "addToCart",
+            removeFromCart: "removeFromCart",
+            checkoutStepViewBasket: "checkout-step-view-basket",
+            checkoutStepShipping: "checkout-step-shipping",
+            checkoutStepPayment: "checkout-step-payment",
+            checkoutStepReceipt: "checkout-step-receipt",
+            purchase: "purchase",
+            completeRegistration: "CompleteRegistration",
+            impression: "impression",
+            internalPromotionClick: "internalPromotionClick"
+        };
+
+        var gaEventCategories = {
+            product: "product",
+            cart: "cart",
+            checkout: "checkout",
+            customer: "customer",
+            promotions: "promotions"
+        };
+
+        var reportToFacebook = function (action, data) {
+            if (data === undefined) {
+                fbq('track', action);
+            }
+            else {
+                fbq('track', action, data);
+            }
+        };
+
+        var getInfoForFacebookFromProductList = function(products) {
+            return {
+                "content_ids": products.map(function(inv) { return inv.id; }),
+                "content_type": "product",
+                "contents": products.map(function(inv) {
+                    var sUnit = inv.units ? inv.units.find(function(obj) { return obj.unit === 'kg' }) : undefined;
+                    if (sUnit === undefined) {
+                        sUnit = inv.unit;
+                    }
+                    return {
+                        "id": inv.id,
+                        "quantity": inv.quantity_unit_independent ? inv.quantity_unit_independent : inv.quantity,
+                        "item_price": sUnit ? sUnit.price : inv.price
+                    }
+                })
+            };
+        }
+
+        var getInfoForFacebookFromProduct = function(product, value, currency) {
+            return {
+                "content_ids": product.id,
+                "content_type": "product",
+                "value": value,
+                "currency": currency
+            }
+        }
+
+        var getInfoForGoogleAnalyticsFromProductInfo = function (product, isImpression) {
+
+            if (isImpression !== true) {
+                isImpression = false;
+            }
+
+            
+
+            var productData = {};
+
+            var missingFields = [];
+
+            if (product.id !== null && product.id !== undefined) {
+                productData.id = product.id;
+            }
+            else {
+                missingFields.push("id");
+            }
+
+            if (product.title !== null && product.title !== undefined) {
+                productData.name = product.title;
+            }
+            else {
+                missingFields.push("title");
+            }
+
+            if (product.brand_name !== null && product.brand_name !== undefined) {
+                productData.brand = product.brand_name;
+            }
+
+            if (product.category_name_full_path !== null && product.category_name_full_path !== undefined) {
+                productData.category = product.category_name_full_path;
+            }
+            else {
+                missingFields.push("category_name_full_path");
+            }
+
+            if (
+                (
+                        product.unit !== null
+                            && product.unit !== undefined
+                            && product.unit.price !== null
+                            && product.unit.price !== undefined
+                    )
+                    ||
+                    (
+                        product.price !== null
+                            && product.price !== undefined
+                    )
+            ) {
+                try {
+                    productData.price = product.unit.price;
+                }
+                catch (e) {
+                    productData.price = product.price;
+                }
+            }
+            else {
+                missingFields.push("price");
+            }
+
+            if (product.product_position_in_list !== null && product.product_position_in_list !== undefined) {
+                productData.position = product.product_position_in_list;
+            }
+
+            if (isImpression === false) {
+                if (product.quantity_unit_independent !== null && product.quantity_unit_independent !== undefined) {
+                    productData.quantity = product.quantity_unit_independent < 1 ? 1 : product.quantity_unit_independent;
+                }
+                else if (product.quantity !== null && product.quantity !== undefined) {
+                    productData.quantity = product.quantity < 1 ? 1 : product.quantity;
+                }
+            }
+
+            if (isImpression === true) {
+                if (product.list !== null && product.list !== undefined) {
+                    productData.list = product.list;
+                }
+                else {
+                    missingFields.push("list");
+                }
+            }
+
+            if (missingFields.length > 0) {
+                console.warn("missing fields: " + missingFields.join(", "));
+            }
+
+            return productData;
+        };
+
+        var gaIntercept = function () {
+            var argumentsExcludingFirst = Array.prototype.slice.call(arguments, 1);
+
+            ga.apply(this, argumentsExcludingFirst);
+        };
+
+        var reportUserActionToThirdParty = function (action, data) {
+            var defaultCurrency = "EUR";
+            var dataForFb = null;
+
+            switch (action) {
+                case userActions.click:
+                    gaIntercept(userActions.click, "ec:addProduct", getInfoForGoogleAnalyticsFromProductInfo(data));
+                    gaIntercept(userActions.click, "ec:setAction", "click", {
+                        list: data.list
+                    });
+                    gaIntercept(userActions.click, "send", "event", gaEventCategories.product, action);
+                    break;
+
+                case userActions.detail:
+                    //gaIntercept(userActions.detail, "ec:addImpression", getInfoForGoogleAnalyticsFromProductInfo(data, true));
+                    gaIntercept(userActions.detail, "ec:addProduct", getInfoForGoogleAnalyticsFromProductInfo(data));
+                    gaIntercept(userActions.detail, "ec:setAction", "detail");
+                    gaIntercept(userActions.detail, "send", "event", gaEventCategories.product, action);
+                    dataForFb = getInfoForFacebookFromProduct(data, data.price, defaultCurrency);
+                    reportToFacebook("ViewContent", dataForFb);
+                    break;
+
+                case userActions.addToCart:
+                    gaIntercept(userActions.addToCart, "ec:addProduct", getInfoForGoogleAnalyticsFromProductInfo(data));
+                    gaIntercept(userActions.addToCart, "ec:setAction", "add", {
+                        list: data.list
+                    });
+                    gaIntercept(userActions.addToCart, "send", "event", gaEventCategories.cart, action);
+                    dataForFb = getInfoForFacebookFromProductList([data]);
+                    reportToFacebook("AddToCart", dataForFb);
+                    break;
+
+                case userActions.removeFromCart:
+                    gaIntercept(userActions.removeFromCart, "ec:addProduct", getInfoForGoogleAnalyticsFromProductInfo(data));
+                    gaIntercept(userActions.removeFromCart, "ec:setAction", "remove");
+                    gaIntercept(userActions.removeFromCart, "send", "event", gaEventCategories.cart, action);
+                    break;
+
+                case userActions.checkoutStepViewBasket:
+                    data.forEach(function (product) {
+                        gaIntercept(userActions.checkoutStepViewBasket, "ec:addProduct", getInfoForGoogleAnalyticsFromProductInfo(product));
+                    });
+                    gaIntercept(userActions.checkoutStepViewBasket, "ec:setAction", "checkout", { "step": 1 });
+                    gaIntercept(userActions.checkoutStepViewBasket, "send", "event", gaEventCategories.checkout, action);
+                    break;
+
+                case userActions.checkoutStepShipping:
+                    data.forEach(function (product) {
+                        gaIntercept(userActions.checkoutStepShipping, "ec:addProduct", getInfoForGoogleAnalyticsFromProductInfo(product));
+                    });
+                    gaIntercept(userActions.checkoutStepShipping, "ec:setAction", "checkout", { "step": 2 });
+                    gaIntercept(userActions.checkoutStepShipping, "send", "event", gaEventCategories.checkout, action);
+                    break;
+
+                case userActions.checkoutStepPayment:
+                    data.forEach(function (product) {
+                        gaIntercept(userActions.checkoutStepPayment, "ec:addProduct", getInfoForGoogleAnalyticsFromProductInfo(product));
+                    });
+                    gaIntercept(userActions.checkoutStepPayment, "ec:setAction", "checkout", { "step": 3 });
+                    gaIntercept(userActions.checkoutStepPayment, "send", "event", gaEventCategories.checkout, action);
+                    break;
+
+                case userActions.checkoutStepReceipt:
+                    try {
+                        data.inventoryInfo.forEach(function (product) {
+                            gaIntercept(userActions.checkoutStepReceipt, "ec:addProduct", getInfoForGoogleAnalyticsFromProductInfo(product));
+                        });
+                        gaIntercept(userActions.checkoutStepReceipt, "ec:setAction", "checkout", { "step": 4, "option": data.paymentSource });
+                        gaIntercept(userActions.checkoutStepReceipt, "send", "event", gaEventCategories.checkout, action);
+
+                    } catch (e) {
+                        try {
+                            // extra logging
+                            window.Raven.captureException(e, {
+                                extraData: {
+                                    data: JSON.stringify(data),
+                                },
+                            });
+                        } catch (e) {
+                            console.log(e);
+                        }
+                    }
+                    break;
+
+                case userActions.purchase:
+                    dataForFb = getInfoForFacebookFromProductList(data.products);
+                    dataForFb["value"] = data.orderPrice;
+                    dataForFb["currency"] = defaultCurrency;
+                    reportToFacebook("Purchase", dataForFb);
+
+                    // report to ga
+
+                    if (data.products !== null && data.products !== undefined && Array.isArray(data.products)) {
+                        data.products.forEach(function (product) {
+                            gaIntercept(userActions.purchase, "ec:addProduct", getInfoForGoogleAnalyticsFromProductInfo(product));
+                        });
+
+                        var purchaseData = {
+                            "id": data.orderId,
+                            "affiliation": data.shopCode,
+                            "revenue": data.orderPrice,
+                            "shipping": data.deliveryPrice,
+                        };
+
+                        if (data.coupon !== undefined && data.coupon !== null) {
+                            purchaseData.coupon = data.coupon;
+                        }
+
+                        gaIntercept(userActions.purchase, "ec:setAction", "purchase", purchaseData);
+
+                        gaIntercept(userActions.purchase, "send", "event", gaEventCategories.checkout, action);
+                    }
+
+                    break;
+
+                case userActions.internalPromotionClick:
+
+                    gaIntercept(userActions.internalPromotionClick, "ec:addPromo", {
+                        "id": data.id,
+                        "name": data.name,
+                        "position": data.position
+                    });
+                    gaIntercept(userActions.internalPromotionClick, "ec:setAction", "promo_click");
+                    gaIntercept(userActions.internalPromotionClick, "send", "event", "Internal Promotions", "click", data.name);
+                    break;
+
+                case userActions.impression:
+                    data.forEach(function (product) {
+                        gaIntercept(userActions.impression, "ec:addImpression", getInfoForGoogleAnalyticsFromProductInfo(product, true));
+                    });
+                    gaIntercept(userActions.impression, "send", "event", gaEventCategories.product, action);
+                    break;
+
+                case userActions.completeRegistration:
+                    gaIntercept(userActions.completeRegistration, "send", "event", gaEventCategories.customer, action);
+                    reportToFacebook(action, data);
+                    break;
+
+                default:
+                    reportToFacebook(action, data);
+            }
+        };
+    </script>
+
+    
+
+    <script>
+        var reportToAdWords = function(action, conversionData) {
+            gtag("event", action, conversionData);
+        }
+    </script>
+
+    <!-- Global site tag (gtag.js) - Google AdWords -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-798931061"></script>
+    <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            gtag('js', new Date());
+            gtag('config', 'AW-798931061');
+    </script>
+    
+    <!-- Google Tag Manager -->
+    <script>
+            (function(w,d,s,l,i) {
+                w[l]=w[l]||[];
+                w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+                var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
+                j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+                f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-M7W8FBT');
+    </script>
+    <!-- End Google Tag Manager -->
+
+
+</head>
+
+
+
+<body class=" b-page--product">
+    <script type="text/javascript">
+        // load svg icons, cached by browser
+        var ajax = new XMLHttpRequest();
+        ajax.open("GET", "/Assets/Images/svg-compiled/symbol/svg/sprite.symbol.svg" + "?v=201811141516", true);
+        ajax.send();
+        ajax.onload = function () {
+            var div = document.createElement("div");
+            div.style.display = "none";
+            div.innerHTML = ajax.responseText;
+            document.body.insertBefore(div, document.body.childNodes[0]);
+        }
+    </script>
+    
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M7W8FBT"
+                height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <div class="b-app">
+        <div class="b-app-bg">
+
+            <ul class="b-top-menu b-top-menu-mobile" id="b-mobile-sticky-menu" style="position:absolute;">
+                <li class="b-top-menu-item"><button class="b-top-menu-item-link b-trgigger-mobile-menu"></button></li>
+                <li class="b-top-menu-item"><a href="/" class="b-logo--single-letter-wrap"><svg
+    class="b-icon b-logo--single-letter"
+    
+    style="" 
+>
+    <use xlink:href="#logo-small"></use>
+</svg></a></li>
+                <li class="b-top-menu-item"><button class="b-top-menu-item-link b-search--open b-search--toggle b-top-menu-item-link--colored-bg"><svg
+    class="b-icon"
+    
+    style="" 
+>
+    <use xlink:href="#search"></use>
+</svg></button></li>
+                
+
+                <li class="b-top-menu-item b-mobile-app-download-link" style="display:none;"><a href="" class="b-top-menu-item-link b-top-menu-item-link--colored-bg"><svg
+    class="b-icon"
+    
+    style="" 
+>
+    <use xlink:href="#person"></use>
+</svg></a></li>
+                <li class="b-top-menu-item pull-right b-cart--mobile-cart-btn-placeholder"></li>
+                <li class="b-search b-search-mobile"></li>
+            </ul>
+
+            <div class="container-fluid">
+
+
+
+                <!--[if lt IE 10]>
+                    <div class="b-warning">
+                       Вы используете устаревшую версию браузера. Для корректной работы сайта рекомендуем использовать последнюю версию <a href="https://www.google.com/chrome/browser/desktop/index.html" target="blank">Google Chrome</a> или версию <a href="https://www.mozilla.org/lt/firefox/new/" target="_blank">Mozilla Firefox</a>.
+                    </div>
+                <![endif]-->
+
+                <div class="b-main-content ">
+
+                    <header class="b-header">
+
+                        
+
+
+
+<div class="clearfix">
+
+    <div class="b-login-register b-header--links pull-right">
+    
+        <div class="b-header--links--item">
+            <div class="app-promo-icons">
+                <span class="app-promo-icons--label">Скачать</span>
+                <ul>
+                    <li>
+                        <a href="https://itunes.apple.com/us/app/appname/id1339130115?ls=1&amp;mt=8" target="_blank"><img src="/Assets/Images/icons/apple-icon.png" alt="Скачать приложение для iPhone" /></a>
+                    </li>
+                    <li>
+                        <a href="https://play.google.com/store/apps/details?id=ee.barbora" target="_blank"><img src="/Assets/Images/icons/android-icon.png" alt="Скачать приложение для Android" /></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="b-header--links--item b-header--home">
+            <a class="link-gray-lighter" href="/" aria-label="Главная страница">
+                <svg
+    class="b-icon"
+    
+    style="" 
+>
+    <use xlink:href="#home"></use>
+</svg>
+            </a>
+        </div>
+
+    
+        <div class="b-header--links--item b-select-lang">
+            <svg
+    class="b-icon b-select-lang--icon"
+    
+    style="" 
+>
+    <use xlink:href="#globe"></use>
+</svg>
+            <select class="b-select-lang--input">
+                    <option value="b06b0c92-7d3d-4ac4-87df-27dfdb6ca69d" >Eesti</option>
+                    <option value="1595dc26-9ecc-4c7d-b26e-badffc19c6b5" >English</option>
+                    <option value="909b6b59-bf29-497c-80e4-1c844f1849c7" selected>Русский</option>
+            </select>
+        </div>
+    
+            <div class="b-header--links--item b-header--links--register">
+                <button type="button" class="btn btn-sm btn-link link-red-no-underline b-login-register--button b-login-register--register">
+                    Регистрация
+                </button>
+            </div>
+            <div class="b-header--links--item b-header--links--login">
+                <button type="button" class="btn btn-sm btn-link link-red-no-underline b-login-register--button b-login-register--key b-login-register--login">
+                    <svg
+    class="b-icon"
+    
+    style="" 
+>
+    <use xlink:href="#key"></use>
+</svg>
+                    Войти
+                </button>
+            </div>
+            <!-- Modal -->
+            <div class="modal b-zigzag-modal b-login-register--modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content" role="tabpanel">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Закрыть"></button>
+                            <!-- Nav tabs -->
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#b-user-login" aria-controls="b-user-login" role="tab" data-toggle="tab">Войти</a></li>
+                                <li role="presentation"><a href="#b-user-register" aria-controls="b-user-register" role="tab" data-toggle="tab">Регистрация</a></li>
+                            </ul>
+                        </div>
+                        <div class="modal-body">
+
+                            <!-- Tab panes -->
+                            <div class="tab-content">
+                                <div role="tabpanel" class="tab-pane active" id="b-user-login">
+                                    <p class="help-block">Здравствуйте, спасибо, что снова заказываете у нас!</p>
+                                    <p class="b-caps-lock-on"><p>
+	Caps Lock включен</p>
+<p>
+
+                                    <form class="form-horizontal b-login-form">
+                                        <div class="form-group">
+                                            <label for="b-login-email" class="col-sm-4 control-label">Эл. почта:</label>
+                                            <div class="col-sm-8">
+                                                <input type="email" required class="form-control" id="b-login-email" name="email">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="b-login-password" class="col-sm-4 control-label">Пароль</label>
+                                            <div class="col-sm-8">
+                                                <input type="password" required class="form-control" id="b-login-password" name="password">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-sm-8 col-sm-push-4">
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input type="checkbox" id="b-login-remember-me" checked="checked"> Не отключайтесь
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-sm-offset-4 col-sm-8">
+                                                <button type="submit" class="btn btn-default b-login-form--login-button">Войти</button>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-sm-offset-4 col-sm-8">
+                                                <a href="/parooli-meeldetuletus">Напомнить пароль</a>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div role="tabpanel" class="tab-pane ui-front" id="b-user-register">
+                                    <form class="form-horizontal b-register-form">
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label">Эл. почта:</label>
+                                            <div class="col-sm-7">
+                                                <input type="email" required class="form-control" name="email">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label">Пароль</label>
+                                            <div class="col-sm-7">
+                                                <input type="password" required class="form-control" name="password">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label">Город</label>
+                                            <div class="col-sm-7">
+                                                <select class="form-control b-register--city" name="city">
+                                                        <option value=1>Tallinn</option>
+                                                        <option value=2>Viimsi vald</option>
+                                                        <option value=3>Maardu</option>
+                                                        <option value=4>Harku vald</option>
+                                                        <option value=5>Saku vald</option>
+                                                        <option value=6>Keila vald</option>
+                                                        <option value=7>Keila linn</option>
+                                                        <option value=8>Raasiku vald</option>
+                                                        <option value=9>Rae vald</option>
+                                                        <option value=10>Saue vald</option>
+                                                        <option value=11>Kiili vald</option>
+                                                        <option value=12>J&#245;el&#228;htme vald</option>
+                                                        <option value=13>Saue linn</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                            <div class="form-group">
+                                                <div class="col-sm-5"></div>
+                                                <div class="col-sm-7">
+                                                    <a href="/info/teeninduspiirkonnad"
+                                                       target="_blank"
+                                                       style="font-size: 12px;">
+                                                        Наши доступные зоны обслуживания
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label">Улица и номер дома</label>
+                                            <div class="col-sm-7">
+                                                <div class="b-register--street-wrap">
+                                                    <div class="b-loader"></div>
+                                                    <input type="text" required class="form-control b-register--street" name="street" placeholder="Начните вводить и выберите из списка" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label">Номер квартиры</label>
+                                            <div class="col-sm-7">
+                                                <input type="text" maxlength="20" class="form-control" name="flat">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label">Имя</label>
+                                            <div class="col-sm-7">
+                                                <input type="text" required class="form-control" name="name">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label">Фамилия</label>
+                                            <div class="col-sm-7">
+                                                <input type="text" required class="form-control" name="surname">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-5 control-label">Телефон</label>
+                                            <div class="col-sm-7">
+                                                <input type="text" required class="form-control" name="phone">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-sm-offset-5 col-sm-7">
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input type="checkbox" name="profiling" /> Я согласен получать персональные предложения, на основании моих покупок 
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-sm-offset-5 col-sm-7">
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input type="checkbox" name="newslettersViaEmail" /> Я согласен получать новости по электронной почте
+
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-sm-offset-5 col-sm-7">
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input type="checkbox" name="pushNotifications" /> Я согласен получать предложения в мобильном приложении
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-sm-offset-5 col-sm-7">
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input type="checkbox" name="newslettersViaSms" /> Я согласен получать новости в СМС-сообщениях
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-sm-offset-5 col-sm-7">
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input type="checkbox" name="agreetorules" />
+                                                        Согласен с <a href="/info/termsandconditions" target="_blank"> правилами покупки</a>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-sm-offset-5 col-sm-7">
+                                                <button type="submit" class="btn btn-default">Регистрация</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        <div class="b-header--links--item b-header--links--tel">
+            <a href="tel:555 66 369">
+                <svg class="b-icon" style="top:2px;"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#phone"></use></svg> 555 66 369
+            </a>
+        </div>
+
+    </div>
+    
+</div>
+
+                        <a href="/" class="b-logo--main">
+
+<svg
+    class="b-icon"
+    style='width: 100%; height: 100%'
+    style="" 
+>
+    <use xlink:href="#barbora-logo-red-EE"></use>
+</svg>
+                        </a>
+
+                        <div class="b-search--placeholder"></div>
+
+                        <ul class="b-top-menu b-top-menu-desktop">
+                            <li class="b-top-menu-item">        <a href="/" class="b-top-menu-item-link b-top-menu-item-link-active">Товары</a>
+</li>
+                            <li class="b-top-menu-item">        <a href="/minu-lemmikud" class="b-top-menu-item-link">Мои товары</a>
+</li>
+                            <li class="b-top-menu-item">        <a href="/pakkumised" class="b-top-menu-item-link">Акции</a>
+</li>
+                                <li class="b-top-menu-item">        <a href="/oko" class="b-top-menu-item-link">Эко</a>
+</li>
+                            <li class="b-top-menu-item">        <a href="/uudistooted" class="b-top-menu-item-link">Новости</a>
+</li>
+                            <li class="b-top-menu-item">        <a href="/puhkus-vaba-aeg/lego-ehituskomplektid" class="b-top-menu-item-link b-top-menu-item-link--lego">
+            <svg
+    class="b-icon"
+    
+    style="width: 2.5em; height: 2.5em;" 
+>
+    <use xlink:href="#lego-logo"></use>
+</svg>
+        </a>
+</li>
+                        </ul>
+
+
+
+
+
+
+    <div class="b-categories">
+        <ul class="b-categories-list">
+                <li class="b-categories-root-category" data-b-cat-id="2456a910-eacb-4537-b214-17ed21682888" data-b-category-api-action-name="categories" data-b-controller="products">
+
+                    <button class="b-category-state"></button>
+
+                        <a href="/koogiviljad-puuviljad">Фрукты, овощи</a>
+
+                            <ul class="b-categories-child b-categories-child--loading">
+                                <li>
+                                    <div class="b-loader"></div>
+                                </li>
+                            </ul>
+
+                </li>
+                <li class="b-categories-root-category" data-b-cat-id="4285f7d7-5d92-4eb2-a85c-4772fed50091" data-b-category-api-action-name="categories" data-b-controller="products">
+
+                    <button class="b-category-state"></button>
+
+                        <a href="/piimatooted-rasv-munad">Молочные продукты, жиры, яйца</a>
+
+                            <ul class="b-categories-child b-categories-child--loading">
+                                <li>
+                                    <div class="b-loader"></div>
+                                </li>
+                            </ul>
+
+                </li>
+                <li class="b-categories-root-category" data-b-cat-id="770818ff-4c23-42f6-a00a-e7f58add4a10" data-b-category-api-action-name="categories" data-b-controller="products">
+
+                    <button class="b-category-state"></button>
+
+                        <a href="/leivad-saiad-kondiitritooted">Хлеб, кондитерские изделия</a>
+
+                            <ul class="b-categories-child b-categories-child--loading">
+                                <li>
+                                    <div class="b-loader"></div>
+                                </li>
+                            </ul>
+
+                </li>
+                <li class="b-categories-root-category" data-b-cat-id="1271e464-f471-4dc6-b286-7ea771a218a8" data-b-category-api-action-name="categories" data-b-controller="products">
+
+                    <button class="b-category-state"></button>
+
+                        <a href="/liha-kala-valmistoit">Мясо, рыба, кулинария</a>
+
+                            <ul class="b-categories-child b-categories-child--loading">
+                                <li>
+                                    <div class="b-loader"></div>
+                                </li>
+                            </ul>
+
+                </li>
+                <li class="b-categories-root-category" data-b-cat-id="acb55842-a24c-44d1-b948-082e2cdb596b" data-b-category-api-action-name="categories" data-b-controller="products">
+
+                    <button class="b-category-state"></button>
+
+                        <a href="/kauasailivad-toidukaubad">Бакалея</a>
+
+                            <ul class="b-categories-child b-categories-child--loading">
+                                <li>
+                                    <div class="b-loader"></div>
+                                </li>
+                            </ul>
+
+                </li>
+                <li class="b-categories-root-category" data-b-cat-id="189d9e1a-a880-4f6f-8c51-b12852ba50d4" data-b-category-api-action-name="categories" data-b-controller="products">
+
+                    <button class="b-category-state"></button>
+
+                        <a href="/kulmutatud-tooted">Продукты глубокой заморозки</a>
+
+                            <ul class="b-categories-child b-categories-child--loading">
+                                <li>
+                                    <div class="b-loader"></div>
+                                </li>
+                            </ul>
+
+                </li>
+                <li class="b-categories-root-category" data-b-cat-id="4a1f4362-1822-49c3-bdda-b8fd2d3171dc" data-b-category-api-action-name="categories" data-b-controller="products">
+
+                    <button class="b-category-state"></button>
+
+                        <a href="/joogid-tubakatooted">Напитки и табачные изделия</a>
+
+                            <ul class="b-categories-child b-categories-child--loading">
+                                <li>
+                                    <div class="b-loader"></div>
+                                </li>
+                            </ul>
+
+                </li>
+                <li class="b-categories-root-category" data-b-cat-id="5ebed6d5-9f7d-4ddf-a5bf-ab5692ae5d54" data-b-category-api-action-name="categories" data-b-controller="products">
+
+                    <button class="b-category-state"></button>
+
+                        <a href="/enesehooldustooted">Косметика и гигиена</a>
+
+                            <ul class="b-categories-child b-categories-child--loading">
+                                <li>
+                                    <div class="b-loader"></div>
+                                </li>
+                            </ul>
+
+                </li>
+                <li class="b-categories-root-category" data-b-cat-id="a70ae192-1bd4-435f-a809-b54f530b4415" data-b-category-api-action-name="categories" data-b-controller="products">
+
+                    <button class="b-category-state"></button>
+
+                        <a href="/kodukaubad-lemmikloomatooted">Бытовые товары</a>
+
+                            <ul class="b-categories-child b-categories-child--loading">
+                                <li>
+                                    <div class="b-loader"></div>
+                                </li>
+                            </ul>
+
+                </li>
+                <li class="b-categories-root-category" data-b-cat-id="850717a1-fa2c-4b5f-a8f7-bae8bf068f7e" data-b-category-api-action-name="categories" data-b-controller="products">
+
+                    <button class="b-category-state"></button>
+
+                        <a href="/lastekaubad">Детские товары</a>
+
+                            <ul class="b-categories-child b-categories-child--loading">
+                                <li>
+                                    <div class="b-loader"></div>
+                                </li>
+                            </ul>
+
+                </li>
+                <li class="b-categories-root-category" data-b-cat-id="b9e60e2e-6007-4317-862b-faffae53b082" data-b-category-api-action-name="categories" data-b-controller="products">
+
+                    <button class="b-category-state"></button>
+
+                        <a href="/puhkus-vaba-aeg">Отдых и развлечения</a>
+
+                            <ul class="b-categories-child b-categories-child--loading">
+                                <li>
+                                    <div class="b-loader"></div>
+                                </li>
+                            </ul>
+
+                </li>
+        </ul>
+    </div>
+
+                        
+    <ol class="breadcrumb" itemscope itemtype="http://schema.org/BreadcrumbList">
+            <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+                
+
+
+<a itemprop="item" href="https://www.barbora.ee/" title="Главная страница">
+    <span itemprop="name">
+        Главная страница
+    </span>
+</a> 
+            </li>
+            <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+                
+
+
+<a itemprop="item" href="https://www.barbora.ee/kauasailivad-toidukaubad" title="Бакалея">
+    <span itemprop="name">
+        Бакалея
+    </span>
+</a> 
+            </li>
+            <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+                
+
+
+<a itemprop="item" href="https://www.barbora.ee/kauasailivad-toidukaubad/sokolaadid" title="Шоколад">
+    <span itemprop="name">
+        Шоколад
+    </span>
+</a> 
+            </li>
+            <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+                
+
+
+<a itemprop="item" href="https://www.barbora.ee/kauasailivad-toidukaubad/sokolaadid/valged-sokolaadid" title="Белый шоколад">
+    <span itemprop="name">
+        Белый шоколад
+    </span>
+</a> 
+            </li>
+            <li class="active" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+                
+
+
+<a itemprop="item" href="https://www.barbora.ee/toode/valge-sok-mee-mandlitega-toblerone-100-g" title="Valge šok.mee,mandlitega TOBLERONE 100g">
+    <span itemprop="name">
+        Valge šok.mee,mandlitega TOBLERONE 100g
+    </span>
+</a> 
+            </li>
+    </ol>
+
+                    </header>
+
+                    
+
+    <div class="b-sidebar">
+
+        <div class="b-customer-service">
+	<a href="tel:555 66 369" class="b-customer-service--phone">555 66 369</a>
+    <div class="b-customer-service--text1">
+        Пн-Bo 9:00 до 21:00
+    </div>
+    <div class="b-customer-service--text2">
+        Эл. почта: <a href="mailto:info@barbora.ee" class="b-customer-service--email">info@barbora.ee</a>
+
+    </div>
+</div>
+
+
+        <div class="b-cart--placeholder"></div>
+
+    </div>
+
+
+                    <div class="b-page-specific-content">
+                        
+
+
+
+
+
+    <div class="b-page-container" style="position: relative;text-align: justify;">
+
+        <div class="b-product-info b-product--js-hook"
+             data-b-root-cat-id="acb55842-a24c-44d1-b948-082e2cdb596b"
+             data-b-item-id="000000000000123260"
+             data-b-units='{"units": [{"id":0,"price":1.4900,"retail_price":1.6900,"unit":"шт.","min":1.0,"max":30.0,"step":1.0,"defaultValue":1.0}]}'
+             data-b-for-cart='{&quot;id&quot;:&quot;000000000000123260&quot;,&quot;product_position_in_list&quot;:null,&quot;title&quot;:&quot;Valge šok.mee,mandlitega TOBLERONE 100g&quot;,&quot;category_id&quot;:&quot;a64c17c2-3f81-4c56-aa48-717d9edb378d&quot;,&quot;category_name_full_path&quot;:&quot;Kauas&#228;ilivad toidukaubad/Šokolaadid/Valged šokolaadid&quot;,&quot;root_category_id&quot;:&quot;acb55842-a24c-44d1-b948-082e2cdb596b&quot;,&quot;brand_name&quot;:&quot;&quot;,&quot;price&quot;:1.4900,&quot;image&quot;:&quot;/api/Images/GetInventoryImage?id=264458f0-ccff-4c4b-a82e-43fdd9952e2c&quot;,&quot;comparative_unit&quot;:&quot;kg&quot;,&quot;comparative_unit_price&quot;:14.90,&quot;status&quot;:&quot;active&quot;,&quot;popUpText&quot;:null,&quot;age_limitation&quot;:null,&quot;picking_actions&quot;:[],&quot;list&quot;:&quot;Prekės kortelė&quot;,&quot;quantity&quot;:1.0}'
+             itemscope itemtype="http://schema.org/Product">
+            <div class="b-products-allow-desktop-view b-products-allow-mobile-view">
+
+                <div class="b-product-promo-labels">
+
+
+
+        <div class="b-product-promo-label-primary" data-toggle='tooltip' title='Акция действует до 2018-12-03'>
+
+<svg
+    class="b-icon"
+    
+    style="" 
+>
+    <use xlink:href="#label-offer-percent"></use>
+</svg>
+        </div>
+
+    
+
+
+
+</div>
+
+
+                <div class="row" style="padding-bottom: 20px;">
+                    <div class="col-md-6">
+                        <div class="b-product-goalgroups b-product-goalgroup--product-info-vertical  clearfix">
+
+                        </div>
+
+                        
+
+
+                        
+
+                        <div class="b-product-info--pictures-wrap">
+
+                            <div class="b-carousel b-product-info--pictures" data-b-carousel-params='{}'>
+
+                                <div class="b-carousel--pager">
+                                        <button></button>
+                                </div>
+
+                                <div class="b-carousel--inner">
+<div class="b-carousel--slide">
+                                         <img itemprop="image" src="/api/Images/GetInventoryImage?id=76407be1-1fa7-48bb-bc32-99b4bdcae0ba"/>
+                                     </div>                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="position:static">
+                        <h1 class="b-product-info--title" itemprop="name">Valge šok.mee,mandlitega TOBLERONE 100g</h1>
+
+                        <hr class="b-hr-solid" />
+
+                        
+
+
+    <div class="b-product-promo-labels--mobile">
+        
+
+
+    </div>
+
+<div class="b-product-goalgroups clearfix">
+
+
+
+
+
+
+
+
+    
+            <svg
+    class="b-icon b-icon-favourite"
+    data-toggle='tooltip' title='Шаблоны корзин'
+    style="" 
+>
+    <use xlink:href="#heart"></use>
+</svg>
+    
+</div>
+
+<div class="b-product-goalgroups b-product-goalgroup--vertical clearfix">
+
+</div>
+
+
+                        <dl class="b-dl-align-left b-product-info--info1">
+                                <dt>Страна происхождения:</dt>
+                                <dd>CH</dd>
+
+                                <dt>Поставщик:</dt>
+                                <dd><img src="/Assets/Images/maxima-logo.gif" alt="maxima" /></dd>
+
+                        </dl>
+
+                        <div class="b-product-info--price-and-quantity">
+                            
+<div class="b-product-prices-block" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+    
+
+        <del class="b-product-crossed-out-price">€1.69</del>
+    <div class="b-product-price-current" itemprop="priceCurrency" content="EUR">
+
+        <span
+              class="b-product-price-current-number"
+              itemprop="price"
+              content="1.49">
+            €1.49
+        </span>
+
+        <link rel="external" itemprop="availability" href="http://schema.org/InStock"/>
+    </div>
+
+    <div class="b-product-price--extra">
+
+
+        <div>€14.90/kg</div>
+    </div>
+
+</div>
+
+
+                                <div class="b-product-info--offer-valid-to">Акция действует до 2018-12-03</div>
+
+<div class="b-product-price-cart-link clearfix">
+    <div class="b-product-cart-link clearfix">
+        <div class="b-quantity-select--placeholder clearfix"></div>
+    </div>
+</div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="b-product-info-recommendations--wrap">
+                <div id="b-product-info-recommendations--placeholder"></div>
+            </div>
+        </div>
+
+        <hr class="b-zigzag-gray hr-double-vertical-spacing" />
+        <dl class="b-product-info--info-2">
+            <dt class="b-product-info--info-3-title">Описание</dt>
+            <dd itemprop="description">Kolmnurkne Toblerone valge šokolaad mandlitega, 100g</dd>
+
+
+            <dt class="b-product-info--info-3-title">Состав</dt>
+            <dd>T&#196;ISPIIMAPULBER, suhkur, kakaov&#245;i, mesi, MANDLID, emulgaator (SOJAletsitiin), vaniliin.</dd>
+
+
+            <dt class="b-product-info--info-3-title">АЛЛЕРГЕНЫ</dt>
+            <dd>В составе есть: молока и молочных продуктов (включая лактозу), орехов и их продуктов, соевых бобов и их продуктов</dd>
+
+
+
+        </dl>
+
+        <h3 class="b-product-info--info-3-title">ПИЩЕВАЯ ЦЕННОСТЬ (100 g/ml)</h3>
+        <div class="row">
+            <div class="col-md-4">
+                <table class="table table-striped table-condensed" style="margin-bottom:0">
+                    <tbody>
+                        <tr>
+                            <td>Энергетическая ценность</td>
+                            <td class="b-text-right">2238,40 кДж / 535,00 ккал</td>
+                        </tr>
+                        <tr>
+                            <td>Жиры</td>
+                            <td class="b-text-right">28,00 g</td>
+                        </tr>
+                        <tr>
+                            <td>Насыщенные жирные кислоты</td>
+                            <td class="b-text-right">17,50 g</td>
+                        </tr>
+                        <tr>
+                            <td>Углеводы</td>
+                            <td class="b-text-right">61,50 g</td>
+                        </tr>
+                        <tr>
+                            <td>Сахара</td>
+                            <td class="b-text-right">61,50 g</td>
+                        </tr>
+                        <tr>
+                            <td>Белки</td>
+                            <td class="b-text-right">62,00 g</td>
+                        </tr>
+                        <tr>
+                            <td>Соль</td>
+                            <td class="b-text-right">0,00 g</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <h3 class="b-product-info--info-3-title">Рекомендуемая суточная норма</h3>
+        <ul class="b-nutrients row">
+
+
+
+                <li class="col-xs-6" data-toggle='tooltip' title='В соответствии с рекомендуемыми коэффициентами суточного потребления питательных веществ для среднего взрослого человека (8400 кДж/2000 ккал)'>
+                    <span class="b-nutrients--item">
+                        <span class="b-nutrients--name">Энергетическая ценность</span>
+                        <span class="b-nutrients--amount-wrap">
+                            <span class="b-nutrients--amount b-nutrients--amount-small">
+535 Kcal                                <br />
+2238,4 kJ                                <br />
+                            </span>
+                        </span>
+                        <span class="b-nutrients--gda">26,8%</span>
+                    </span>
+                </li>
+                <li class="col-xs-6" data-toggle='tooltip' title='В соответствии с рекомендуемыми коэффициентами суточного потребления питательных веществ для среднего взрослого человека (8400 кДж/2000 ккал)'>
+                    <span class="b-nutrients--item">
+                        <span class="b-nutrients--name">Жиры</span>
+                        <span class="b-nutrients--amount-wrap">
+                            <span class="b-nutrients--amount">
+28 g                                <br />
+                            </span>
+                        </span>
+                        <span class="b-nutrients--gda">40%</span>
+                    </span>
+                </li>
+                <li class="col-xs-6" data-toggle='tooltip' title='В соответствии с рекомендуемыми коэффициентами суточного потребления питательных веществ для среднего взрослого человека (8400 кДж/2000 ккал)'>
+                    <span class="b-nutrients--item">
+                        <span class="b-nutrients--name">Насыщенные жирные кислоты</span>
+                        <span class="b-nutrients--amount-wrap">
+                            <span class="b-nutrients--amount">
+17,5 g                                <br />
+                            </span>
+                        </span>
+                        <span class="b-nutrients--gda">87,5%</span>
+                    </span>
+                </li>
+                <li class="col-xs-6" data-toggle='tooltip' title='В соответствии с рекомендуемыми коэффициентами суточного потребления питательных веществ для среднего взрослого человека (8400 кДж/2000 ккал)'>
+                    <span class="b-nutrients--item">
+                        <span class="b-nutrients--name">Углеводы</span>
+                        <span class="b-nutrients--amount-wrap">
+                            <span class="b-nutrients--amount">
+61,5 g                                <br />
+                            </span>
+                        </span>
+                        <span class="b-nutrients--gda">23,7%</span>
+                    </span>
+                </li>
+                <li class="col-xs-6" data-toggle='tooltip' title='В соответствии с рекомендуемыми коэффициентами суточного потребления питательных веществ для среднего взрослого человека (8400 кДж/2000 ккал)'>
+                    <span class="b-nutrients--item">
+                        <span class="b-nutrients--name">Сахара</span>
+                        <span class="b-nutrients--amount-wrap">
+                            <span class="b-nutrients--amount">
+61,5 g                                <br />
+                            </span>
+                        </span>
+                        <span class="b-nutrients--gda">68,3%</span>
+                    </span>
+                </li>
+                <li class="col-xs-6" data-toggle='tooltip' title='В соответствии с рекомендуемыми коэффициентами суточного потребления питательных веществ для среднего взрослого человека (8400 кДж/2000 ккал)'>
+                    <span class="b-nutrients--item">
+                        <span class="b-nutrients--name">Белки</span>
+                        <span class="b-nutrients--amount-wrap">
+                            <span class="b-nutrients--amount">
+62 g                                <br />
+                            </span>
+                        </span>
+                        <span class="b-nutrients--gda">124%</span>
+                    </span>
+                </li>
+                <li class="col-xs-6" data-toggle='tooltip' title='В соответствии с рекомендуемыми коэффициентами суточного потребления питательных веществ для среднего взрослого человека (8400 кДж/2000 ккал)'>
+                    <span class="b-nutrients--item">
+                        <span class="b-nutrients--name">Соль</span>
+                        <span class="b-nutrients--amount-wrap">
+                            <span class="b-nutrients--amount">
+0 g                                <br />
+                            </span>
+                        </span>
+                        <span class="b-nutrients--gda">0%</span>
+                    </span>
+                </li>
+
+        </ul>
+
+        <div class="b-opacity50">
+            <h3 class="b-product-info--info-3-title">ИНФОРМАЦИЯ И ОПИСАНИЕ ТОВАРОВ</h3>
+
+            <p class="b-product-info--disclaimer">
+                Внешний вид товара может несколько отличаться от фотографии. Товары, которые Вы получите, могут быть в другой упаковке и отличаться по внешнему виду и форме. Информация в описании продукта, которая представлена в интернет-магазине, носит общий характер, поэтому не идентична информации, указанной на упаковке. Информация на упаковке продукта будет более подробной и может несколько отличаться от информации, предоставленной в описаниях товаров в интернет-магазине. Мы рекомендуем всегда читать и следовать информации, указанной на упаковке. Количество товаров по акции ограничено.
+            </p>
+        </div>
+
+    </div>
+
+
+    <script>/* <![CDATA[ /;var gtagData={"send_to":"AW-798931061","dynx_itemid":"000000000000123260","dynx_pagetype":"product"};/ ]]> */</script>
+
+    
+
+                    </div>
+                </div>
+
+                
+
+
+<div class="b-footer">
+
+    <hr class="b-zig-zag-fat hr-double-vertical-spacing" />
+
+    <div class="row">
+        <div class="col-xs-12 col-lg-7">
+            <div class="row b-footer--info-links-row">
+                <div class="col-xs-6 col-md-3">
+                    <ul class="b-footer--info-links">
+                        <li>
+                            <a href="/info/kkk">
+                                <svg
+    class="b-icon"
+    
+    style="" 
+>
+    <use xlink:href="#arrow-right"></use>
+</svg>
+                                ЧАВО
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/info/ostu-muugitingimused">
+                                <svg
+    class="b-icon"
+    
+    style="" 
+>
+    <use xlink:href="#arrow-right"></use>
+</svg>
+                                Правила купли-продажи
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/info/privaatsuspoliitika">
+                                <svg
+    class="b-icon"
+    
+    style="" 
+>
+    <use xlink:href="#arrow-right"></use>
+</svg>
+                                Политика конфиденциальности
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-xs-6 col-md-3">
+                    <ul class="b-footer--info-links">
+                        <li>
+                            <a href="/info/kaupade-kohaletoimetamine">
+                                <svg
+    class="b-icon"
+    
+    style="" 
+>
+    <use xlink:href="#arrow-right"></use>
+</svg>
+                                Доставка товаров
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/info/kauba-tagastamine">
+                                <svg
+    class="b-icon"
+    
+    style="" 
+>
+    <use xlink:href="#arrow-right"></use>
+</svg>
+                                Возврат товаров
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/info/tasumine">
+                                <svg
+    class="b-icon"
+    
+    style="" 
+>
+    <use xlink:href="#arrow-right"></use>
+</svg>
+                                Оплата
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-xs-6 col-md-3">
+                    <ul class="b-footer--info-links">
+                        <li>
+                            <a href="/info/aitah-konto-tingimused">
+                                <svg
+    class="b-icon"
+    
+    style="" 
+>
+    <use xlink:href="#arrow-right"></use>
+</svg>
+                                Правила учетной записи AIT&#196;H
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/info/minu-ostud">
+                                <svg
+    class="b-icon"
+    
+    style="" 
+>
+    <use xlink:href="#arrow-right"></use>
+</svg>
+                                Мои товары
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/info/teeninduspiirkonnad">
+                                <svg
+    class="b-icon"
+    
+    style="" 
+>
+    <use xlink:href="#arrow-right"></use>
+</svg>
+                                Территория обслуживания
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-xs-6 col-md-3">
+                    <ul class="b-footer--info-links">
+                        <li>
+                            <a href="/info/sarnased-tooted">
+                                <svg
+    class="b-icon"
+    
+    style="" 
+>
+    <use xlink:href="#arrow-right"></use>
+</svg>
+                                Аналогичные товары
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/info/karjaar">
+                                <svg
+    class="b-icon"
+    
+    style="" 
+>
+    <use xlink:href="#arrow-right"></use>
+</svg>
+                                Карьера
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/info/mobiilirakendus">
+                                <svg
+    class="b-icon"
+    
+    style="" 
+>
+    <use xlink:href="#arrow-right"></use>
+</svg>
+                                Мобильное приложение
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-lg-5 b-footer--newsletter-and-social">
+            <div class="row">
+                <div class="col-xs-6 b-footer-social">
+                    <h4 class="b-footer-heading">Давайте общаться</h4>
+                    <a href="https://www.facebook.com/BarboraEesti"><svg
+    class="b-icon"
+    
+    style="" 
+>
+    <use xlink:href="#fb-square"></use>
+</svg></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="b-hr-fat b-hr-solid b-hr-darker" />
+
+    <div id="footer-payment-source-placeholder"></div>
+
+    <div class="b-copyright">
+        © 2018 Supersa OÜ. Все права защищены.
+    </div>
+</div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="b-mobile-menu">
+        <div class="b-minimenu--wrap">
+            <div class="b-minimenu">
+                        <a href="/" class="b-minimenu--link b-minimenu--link-active">Товары</a>
+
+
+                        <a href="/minu-lemmikud" class="b-minimenu--link">Мои товары</a>
+
+
+                        <a href="/pakkumised" class="b-minimenu--link">Акции</a>
+
+
+        <a href="/oko" class="b-minimenu--link">Эко</a>
+
+                        <a href="/uudistooted" class="b-minimenu--link">Новости</a>
+
+                
+
+                        <a href="/puhkus-vaba-aeg/lego-ehituskomplektid" class="b-minimenu--link b-top-menu-item-link--lego">
+            <svg
+    class="b-icon"
+    style='width: 1.87em; height: 1.87em; top: 0em'
+    style="" 
+>
+    <use xlink:href="#lego-logo"></use>
+</svg>
+        </a>
+
+
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-placeholder"></div>
+
+    
+
+
+
+
+
+
+	<script type="text/javascript" src="/Assets/Libraries/raven-3.8.1.min.js" onerror="showNetworkErrorAlert()"></script>
+	<script type="text/javascript" onerror="showNetworkErrorAlert()">
+
+	    var userId = "";
+
+	    if (userId.length > 0) {
+	        window.Raven.setUserContext({
+	            id: userId
+	        });
+	    }
+
+	    window.Raven.config("http://7fca11b6f99643d6b782452509a955d9@172.31.252.8:9000/9", {
+	        release: "201811141516",
+	        environment: "PRD",
+	        logger: "EShop.Client-JavaScript",
+	        ignoreUrls: []
+	    }).install();
+	</script>
+
+        <script src="/Assets/Libraries/polyfill.min.js"></script>
+        <script type="text/javascript" src="/Assets/Libraries/jquery-2.2.0.min.js"></script>
+
+    
+
+
+
+<script type="text/javascript">
+    window.b_categories = {"categories":[{"id":"2456a910-eacb-4537-b214-17ed21682888","title":"Фрукты, овощи","product_count":127,"children_count":5,"banner":"/api/Images/GetBannerImage?id=561a0d38-4a71-45d8-b752-88d427f2a418","externalResourceUrl":"","BannerModel":{"id":"00000000-0000-0000-0000-000000000000","imgId":"00000000-0000-0000-0000-000000000000","banner_category_id":"00000000-0000-0000-0000-000000000000","no_action":false,"name":null,"img":"/api/Images/GetBannerImage?id=561a0d38-4a71-45d8-b752-88d427f2a418","search_string":"punutud karp","externalResourceUrl":"","UseForSubCategory":true,"urlType":0},"category_code":"2456a910-eacb-4537-b214-17ed21682888","rootCategory":"2456a910-eacb-4537-b214-17ed21682888","products":[],"url":"koogiviljad-puuviljad","url_parent":"","url_root":"","icon_name":"tomato","RootCategoryProducts":null},{"id":"4285f7d7-5d92-4eb2-a85c-4772fed50091","title":"Молочные продукты, жиры, яйца","product_count":698,"children_count":8,"BannerModel":null,"category_code":"4285f7d7-5d92-4eb2-a85c-4772fed50091","rootCategory":"4285f7d7-5d92-4eb2-a85c-4772fed50091","products":[],"url":"piimatooted-rasv-munad","url_parent":"","url_root":"","icon_name":"cheese2","RootCategoryProducts":null},{"id":"770818ff-4c23-42f6-a00a-e7f58add4a10","title":"Хлеб, кондитерские изделия","product_count":205,"children_count":4,"BannerModel":null,"category_code":"770818ff-4c23-42f6-a00a-e7f58add4a10","rootCategory":"770818ff-4c23-42f6-a00a-e7f58add4a10","products":[],"url":"leivad-saiad-kondiitritooted","url_parent":"","url_root":"","icon_name":"bread2","RootCategoryProducts":null},{"id":"1271e464-f471-4dc6-b286-7ea771a218a8","title":"Мясо, рыба, кулинария","product_count":604,"children_count":7,"BannerModel":null,"category_code":"1271e464-f471-4dc6-b286-7ea771a218a8","rootCategory":"1271e464-f471-4dc6-b286-7ea771a218a8","products":[],"url":"liha-kala-valmistoit","url_parent":"","url_root":"","icon_name":"steakMeat2","RootCategoryProducts":null},{"id":"acb55842-a24c-44d1-b948-082e2cdb596b","title":"Бакалея","product_count":1819,"children_count":17,"BannerModel":null,"category_code":"acb55842-a24c-44d1-b948-082e2cdb596b","rootCategory":"acb55842-a24c-44d1-b948-082e2cdb596b","products":[],"url":"kauasailivad-toidukaubad","url_parent":"","url_root":"","icon_name":"bowlAndChopstick","RootCategoryProducts":null},{"id":"189d9e1a-a880-4f6f-8c51-b12852ba50d4","title":"Продукты глубокой заморозки","product_count":315,"children_count":6,"BannerModel":null,"category_code":"189d9e1a-a880-4f6f-8c51-b12852ba50d4","rootCategory":"189d9e1a-a880-4f6f-8c51-b12852ba50d4","products":[],"url":"kulmutatud-tooted","url_parent":"","url_root":"","icon_name":"plasticBottle","RootCategoryProducts":null},{"id":"4a1f4362-1822-49c3-bdda-b8fd2d3171dc","title":"Напитки и табачные изделия","product_count":1124,"children_count":9,"BannerModel":null,"category_code":"4a1f4362-1822-49c3-bdda-b8fd2d3171dc","rootCategory":"4a1f4362-1822-49c3-bdda-b8fd2d3171dc","products":[],"url":"joogid-tubakatooted","url_parent":"","url_root":"","icon_name":null,"RootCategoryProducts":null},{"id":"5ebed6d5-9f7d-4ddf-a5bf-ab5692ae5d54","title":"Косметика и гигиена","product_count":1037,"children_count":9,"BannerModel":null,"category_code":"5ebed6d5-9f7d-4ddf-a5bf-ab5692ae5d54","rootCategory":"5ebed6d5-9f7d-4ddf-a5bf-ab5692ae5d54","products":[],"url":"enesehooldustooted","url_parent":"","url_root":"","icon_name":"toiletPaper","RootCategoryProducts":null},{"id":"a70ae192-1bd4-435f-a809-b54f530b4415","title":"Бытовые товары","product_count":806,"children_count":8,"BannerModel":null,"category_code":"a70ae192-1bd4-435f-a809-b54f530b4415","rootCategory":"a70ae192-1bd4-435f-a809-b54f530b4415","products":[],"url":"kodukaubad-lemmikloomatooted","url_parent":"","url_root":"","icon_name":"sprayBottle","RootCategoryProducts":null},{"id":"850717a1-fa2c-4b5f-a8f7-bae8bf068f7e","title":"Детские товары","product_count":432,"children_count":3,"BannerModel":null,"category_code":"850717a1-fa2c-4b5f-a8f7-bae8bf068f7e","rootCategory":"850717a1-fa2c-4b5f-a8f7-bae8bf068f7e","products":[],"url":"lastekaubad","url_parent":"","url_root":"","icon_name":"babyHead","RootCategoryProducts":null},{"id":"b9e60e2e-6007-4317-862b-faffae53b082","title":"Отдых и развлечения","product_count":273,"children_count":4,"BannerModel":null,"category_code":"b9e60e2e-6007-4317-862b-faffae53b082","rootCategory":"b9e60e2e-6007-4317-862b-faffae53b082","products":[],"url":"puhkus-vaba-aeg","url_parent":"","url_root":"","icon_name":"bottleAndGlass","RootCategoryProducts":null}]};
+    window.b_cart = null;
+</script>
+
+    
+    
+
+
+        <script type="text/javascript" src="/Assets/Scripts/main.concat.js?v=201811141516" onerror="showNetworkErrorAlert()"></script>
+
+    
+    
+    
+    <script type="text/javascript">
+        window.reportUserActionToThirdParty("detail", {"id":"000000000000123260","product_position_in_list":null,"title":"Valge šok.mee,mandlitega TOBLERONE 100g","category_id":"a64c17c2-3f81-4c56-aa48-717d9edb378d","category_name_full_path":"Kauasäilivad toidukaubad/Šokolaadid/Valged šokolaadid","root_category_id":"acb55842-a24c-44d1-b948-082e2cdb596b","brand_name":"","price":1.4900,"image":"/api/Images/GetInventoryImage?id=264458f0-ccff-4c4b-a82e-43fdd9952e2c","comparative_unit":"kg","comparative_unit_price":14.90,"status":"active","popUpText":null,"age_limitation":null,"picking_actions":[],"list":"Prekės kortelė","quantity":1.0});
+    </script>
+    
+    
+    
+    
+
+</body>
+</html>

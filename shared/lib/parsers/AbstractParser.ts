@@ -30,11 +30,11 @@ interface OfferTemplates {
 }
 
 interface PagingConfiguration {
-  first: (content: any) => number;
-  last: (content: any) => number;
+  first?: (content: any) => number;
+  last?: (content: any) => number;
   limit?: number;
   pattern: string;
-  finit: boolean;
+  finit?: boolean;
   controls?: (content: any) => any;
 }
 
@@ -84,15 +84,11 @@ class AbstractParser {
     headers: {}
   };
 
-  getPagingParameters = (body, options) => {
-    return this.compilePagingParameters(body, options);
-  };
-
   compilePagingParameters = (content, options) => {
     var pages: string[] = [];
 
-    const firstPage = this.config.paging!!.first(content) || 1;
-    var lastPage = this.config.paging!!.last(content) || 1;
+    const firstPage = this.config.paging!!.first!!(content) || 1;
+    var lastPage = this.config.paging!!.last!!(content) || 1;
 
     if (process.env.NODE_ENV === 'development' && process.env.PAGING_PAGES_LIMIT && parseInt(process.env.PAGING_PAGES_LIMIT, 10) < lastPage) {
       lastPage = parseInt(process.env.PAGING_PAGES_LIMIT, 10);
@@ -114,17 +110,27 @@ class AbstractParser {
     };
   };
 
+  compilePagingPattern = (options?: any) => {
+    var pattern = this.config.paging!!.pattern ? this.config.paging!!.pattern : this.config.indexPage;
+    return this.compilePageHref(pattern)
+  };
+
+  compileNextPageHref = (index?: number) => {
+    if (!index) {
+      index = 0;
+    }
+
+    index++;
+    
+    return this.compilePagingPattern().replace(/{paging_pagenumber}/g, index.toString())
+  };
+
   getHierarchicalIndexPages = (options, content) => {
     if (this.config.hierarchy!!.pattern) {
       return this.config.hierarchy!!.pattern(content);
     }
     
     return this.config.hierarchy!!['level-' + options.hierarchy](content);
-  }
-
-  compilePagingPattern = (options) => {
-    var pattern = this.config.paging!!.pattern ? this.config.paging!!.pattern : this.config.indexPage;
-    return this.compilePageHref(pattern)
   };
 
   getOffers = (content) => {
