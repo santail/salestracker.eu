@@ -11,6 +11,12 @@ var SessionFactory = require('../lib/services/SessionFactory');
 var numParallel = 2;
 
 var sites = [{
+    site: 'www.barbora.ee',
+    interval: 1 * 60 * 60 * 1000
+}, {
+    site: 'www.ecoop.ee',
+    interval: 1 * 60 * 60 * 1000
+}, {
     site: 'www.minuvalik.ee',
     interval: 1 * 60 * 60 * 1000
 }, {

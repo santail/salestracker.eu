@@ -20,7 +20,8 @@
     "include": [
         "lib/**/*.ts",
         "src/**/*.ts",
-        "tests/**/*.ts"
+        "tests/**/*.ts",
+        "../shared/**/*.*s"
     ],
     "exclude": [
       "node_modules"

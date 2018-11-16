@@ -20,7 +20,8 @@ class BarboraParser extends AbstractParser {
       'Connection': 'keep-alive',
       'Cache-Control': 'no-cache'
     },
-    'indexPage': 'https://www.barbora.ee/pakkumised',
+    'has_index_page': true,
+    'index_page': 'https://www.barbora.ee/pakkumised',
     'ttl': 2 * 60 * 60 * 1000,
     'languages': {
       'est': {
@@ -84,11 +85,11 @@ class BarboraParser extends AbstractParser {
   };
     
   compileImageHref = (link) => {
-    return url.resolve(this.config.indexPage, link);
+    return url.resolve(this.config.index_page, link);
   };
 
   compileOfferHref = (link) => {
-    return url.resolve(this.config.indexPage, link);
+    return url.resolve(this.config.index_page, link);
   };
 };
 

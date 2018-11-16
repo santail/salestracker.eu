@@ -91,11 +91,11 @@ class Crawler {
                     retries--;
 
                     if (err) {
-                        LOG.error(util.format('[STATUS] [Failure] [%s] Fetching href failed. Retry in %s msec. Retries left %s', options.href, timeout, retries, err));
+                        LOG.error(util.format('[STATUS] [Failure] [%s] Fetching href failed. Retry in %s msec. Retries left %s', options.url, timeout, retries, err));
                     } else if (response.statusCode !== 200) {
-                        LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Fetching href failed. Retry in %s msec. Retries left %s', options.href, response.statusCode, timeout, retries));
+                        LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Fetching href failed. Retry in %s msec. Retries left %s', options.url, response.statusCode, timeout, retries));
                     } else {
-                        LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Fetching href failed. No data received. Retry in %s msec. Retries left %s', options.href, response.statusCode, timeout, retries));
+                        LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Fetching href failed. No data received. Retry in %s msec. Retries left %s', options.url, response.statusCode, timeout, retries));
                     }
 
                     setTimeout(function () {
@@ -107,7 +107,7 @@ class Crawler {
                         request(requestOptions, handler);
                     }, timeout);
                 } else {
-                    LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Fetching href failed', options.href, response.statusCode));
+                    LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Fetching href failed', options.url, response.statusCode));
 
                     retries = 0;
                     return options.onError(new Error('Error fetching page. No retries left.'));
@@ -119,7 +119,7 @@ class Crawler {
                     data = null;
 
                     if (err) {
-                        LOG.error(util.format('[STATUS] [Failure] [%s] Parsing page body failed %s', options.href, err));
+                        LOG.error(util.format('[STATUS] [Failure] [%s] Parsing page body failed %s', options.url, err));
                         return options.onError(err);
                     }
 
@@ -149,7 +149,7 @@ class Crawler {
                 data = JSON.parse(data);
             }
         } catch (ex) {
-            LOG.error(util.format('[STATUS] [Failure] [%s] Parsing page body failed %s', options.href, ex));
+            LOG.error(util.format('[STATUS] [Failure] [%s] Parsing page body failed %s', options.url, ex));
         }
 
         try {
@@ -176,7 +176,7 @@ class Crawler {
             data = null;
 
             if (err) {
-                LOG.error(util.format('[STATUS] [Failure] [%s] Cleanup response body failed', options.href, err));
+                LOG.error(util.format('[STATUS] [Failure] [%s] Cleanup response body failed', options.url, err));
                 return callback(err);
             }
 

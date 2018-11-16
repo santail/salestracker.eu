@@ -8,7 +8,8 @@ class ZoomaailmParser extends AbstractParser {
 
     protected config: ParserConfiguration = {
         'site': 'https://www.zoomaailm.ee/',
-        'indexPage': 'https://www.zoomaailm.ee/ee/specials/',
+        'has_index_page': true,
+        'index_page': 'https://www.zoomaailm.ee/ee/specials/',
         'ttl': 2 * 60 * 60 * 1000,
         'languages': {
             'est': {
@@ -98,7 +99,7 @@ class ZoomaailmParser extends AbstractParser {
     };
 
     compileOfferHref = (link) => {
-        return url.resolve(this.config.indexPage, link);
+        return url.resolve(this.config.index_page, link);
     };
 };
 

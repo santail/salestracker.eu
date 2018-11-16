@@ -53,21 +53,8 @@ class Harvester {
   public processSite = (options) => {
     LOG.info(util.format('[STATUS] [OK] [%s] Site processing started', options.site));
 
-    var parser = parserFactory.getParser(options.site);
-    var indexPage = parser.config.indexPage;
-    var language = parser.getMainLanguage();
-
-    options = _.extend(options, {
-      'href': indexPage.replace(/{search_criteria}/g, options.search), // TODO add default paging parameters
-      'language': language
-    });
-
-    if (parser.config.hierarchy) {
-      options.hierarchy = 1;
-    }
-
     return new Promise((fulfill, reject) => {
-      IndexPageHarvester.processIndexPage(options, (err, offers) => {
+      IndexPageHarvester.processFirstPage(options, (err, offers) => {
         if (err) {
           LOG.error(util.format('[STATUS] [Failure] [%s] Gathering offers failed', options.site, err));
           return reject(err);

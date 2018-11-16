@@ -11,7 +11,45 @@ var ParserFactory = require("../../lib/services/ParserFactory");
 
 class IndexPageHarvester {
 
-    public processIndexPage = (options, processIndexPageFinished) => {
+    public processFirstPage = (options, callback) => {
+        var parser = ParserFactory.getParser(options.site);
+        var indexPage = parser.config.index_page;
+
+        options.language = parser.getMainLanguage();
+        
+        if (parser.config.hierarchy) {
+            options.hierarchy = 1;
+        }
+
+        if (parser.config.has_index_page) {
+            options.href = indexPage.replace(/{search_criteria}/g, options.search); // TODO add default paging parameters
+
+            this.processIndexPage(options, (err, offers) => {
+                if (err) {
+                    LOG.error(util.format('[STATUS] [Failure] [%s] Gathering offers failed', options.site, err));
+                    return callback(err);
+                }
+
+                LOG.info(util.format('[STATUS] [OK] [%s] Gathering offers finished', options.site));
+                return callback(null, offers);
+            });
+        } 
+        else {
+            options.href = parser.compileNextPageHref(); // TODO add default paging parameters
+
+            this._processNextPage(options, (err, offers) => {
+                if (err) {
+                    LOG.error(util.format('[STATUS] [Failure] [%s] Gathering offers failed', options.site, err));
+                    return callback(err);
+                }
+
+                LOG.info(util.format('[STATUS] [OK] [%s] Gathering offers finished', options.site));
+                return callback(null, offers);
+            });
+        }
+    };
+
+    public processIndexPage = (options, callback) => {
         LOG.info(util.format('[STATUS] [OK] [%s] [%s] Fetching index page', options.site, options.href));
 
         var parser = ParserFactory.getParser(options.site);
@@ -28,23 +66,51 @@ class IndexPageHarvester {
             payload: options.payload,
             onError: (err) => {
                 LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Fetching index page failed', options.site, options.href, err));
-                return processIndexPageFinished(err);
+                return callback(err);
             },
             onSuccess: (content) => {
                 if (options.hierarchy) { // if this is initial index page containing first level of hierarchical catalog links
-                    this._processHierarchicalIndexPage(options, content, processIndexPageFinished);
+                    this._processHierarchicalIndexPage(options, content, callback);
                 } else if (parser.config.paging) {
-                    this._startPaginatedIndexPageProcessing(options, content, processIndexPageFinished);
+                    this._startPaginatedIndexPageProcessing(options, content, callback);
                 } else {
-                    this._startSimpleIndexPageProcessing(options, content, processIndexPageFinished);
+                    this._startSimpleIndexPageProcessing(options, content, callback);
                 }
             }
         });
     };
 
-    private _processHierarchicalIndexPage = (options, content, processPaginatedIndexesFinished) => {
+    public _processNextPage = (options, callback) => {
+        LOG.info(util.format('[STATUS] [OK] [%s] [%s] Fetching next page', options.site, options.href));
+
         var parser = ParserFactory.getParser(options.site);
 
+        if (parser.config.paging) {
+            if (parser.config.paging.finit) {
+                WorkerService.schedulePageProcessing({
+                    'site': options.site,
+                    'href': parser.compileNextPageHref(),
+                    'page_index': 1
+                }, callback);
+            } 
+            else {
+                WorkerService.schedulePageProcessing({
+                    'site': options.site,
+                    'href': parser.compileNextPageHref(),
+                    'page_index': 1,
+                    'infinite_pagination': true
+                }, callback);
+            }
+        } 
+        else {
+            LOG.info(util.format('[STATUS] [OK] [%s] No paging found', options.site));
+
+            return callback();
+        }
+    };
+
+    private _processHierarchicalIndexPage = (options, content, callback) => {
+        var parser = ParserFactory.getParser(options.site);
         var hierarchicalIndexPages = parser.getHierarchicalIndexPages(options, content);
 
         if (hierarchicalIndexPages.length) {
@@ -66,19 +132,19 @@ class IndexPageHarvester {
             async.series(categorizedIndexesHandlers, function (err, results) {
                 if (err) {
                     LOG.error(util.format('[STATUS] [Failure] [%s] Pages processing not scheduled', options.site, err));
-                    return processPaginatedIndexesFinished(err);
+                    return callback(err);
                 }
 
                 LOG.info(util.format('[STATUS] [OK] [%s] Pages processing scheduled', options.site));
-                return processPaginatedIndexesFinished(null, results);
+                return callback(null, results);
             });
-        }
+        } 
         else {
             WorkerService.scheduleIndexPageProcessing({
                 'site': options.site,
                 'href': options.href
-            }, processPaginatedIndexesFinished);
-        } 
+            }, callback);
+        }
     }
 
     private _startPaginatedIndexPageProcessing = (options, content, callback) => {

@@ -42,7 +42,8 @@ export interface ParserConfiguration {
   ttl: number;
   site: string;
   paging?: PagingConfiguration;
-  indexPage: string;
+  has_index_page: boolean;
+  index_page: string;
   hierarchy?: { [level: string]: (content: any) => string[] };
   list: (content: any) => any[];
   json?: boolean
@@ -56,7 +57,8 @@ export interface ParserConfiguration {
 class AbstractParser {
 
   protected config: ParserConfiguration = {
-    indexPage: '',
+    has_index_page: false,
+    index_page: '',
     hierarchy: {
       groups: () => { return []},
       categories: () => { return []}
@@ -111,15 +113,11 @@ class AbstractParser {
   };
 
   compilePagingPattern = (options?: any) => {
-    var pattern = this.config.paging!!.pattern ? this.config.paging!!.pattern : this.config.indexPage;
+    var pattern = this.config.paging!!.pattern ? this.config.paging!!.pattern : this.config.index_page;
     return this.compilePageHref(pattern)
   };
 
-  compileNextPageHref = (index?: number) => {
-    if (!index) {
-      index = 0;
-    }
-
+  compileNextPageHref = (index: number = 0) => {
     index++;
     
     return this.compilePagingPattern().replace(/{paging_pagenumber}/g, index.toString())
@@ -203,15 +201,15 @@ class AbstractParser {
   };
 
   compilePageHref = (link) => {
-    return this.config.indexPage + link;
+    return this.config.index_page + link;
   };
 
   compileOfferHref = (link, language?: string) => {
-    return this.config.indexPage + link.replace(/&amp;/g, '&');
+    return this.config.index_page + link.replace(/&amp;/g, '&');
   };
 
   compileImageHref = (link) => {
-    return this.config.indexPage + link.replace(/&amp;/g, '&');
+    return this.config.index_page + link.replace(/&amp;/g, '&');
   };
 
   compileOffer = (data) => {

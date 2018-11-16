@@ -49,12 +49,12 @@ class OfferProcessor {
 
             SessionFactory.getDbConnection().offers.save(offer, function (err, saved) {
                 if (err) {
-                    LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Saving offer failed', data.site, data.id, err));
+                    LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Saving offer failed', data.site, data.href, err));
                     return done(err);
                 }
 
                 if (!saved) {
-                    LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Saving offer failed', data.site, data.id, err));
+                    LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Saving offer failed', data.site, data.href, err));
                     return done(new Error('DB save query failed'));
                 }
 

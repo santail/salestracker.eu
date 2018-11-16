@@ -8,7 +8,8 @@ class SelverParser extends AbstractParser {
 
   protected config: ParserConfiguration = {
     'site': 'http://www.selver.ee',
-    'indexPage': 'http://www.selver.ee/soodushinnaga-tooted?limit=96',
+    'has_index_page': true,
+    'index_page': 'http://www.selver.ee/soodushinnaga-tooted?limit=96',
     'languages': {
       'est': {
         'exists': true,
@@ -105,11 +106,11 @@ class SelverParser extends AbstractParser {
   };
 
   compilePagingPattern = () => {
-    return this.config.indexPage + this.config.paging!!.pattern;
+    return this.config.index_page + this.config.paging!!.pattern;
   };
 
   compilePageHref = (link) => {
-    return this.config.indexPage + link;
+    return this.config.index_page + link;
   };
 
   compileImageHref = (link) => {
@@ -117,7 +118,7 @@ class SelverParser extends AbstractParser {
   };
 
   compileOfferHref = (link) => {
-    return url.resolve(this.config.indexPage, link);
+    return url.resolve(this.config.index_page, link);
   };
 }
 

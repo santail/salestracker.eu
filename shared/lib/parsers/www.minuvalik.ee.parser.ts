@@ -38,7 +38,8 @@ class MinuvalikParser extends AbstractParser {
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36 Vivaldi/1.2.490.43',
     },
     'site': 'http://www.minuvalik.ee',
-    'indexPage': 'https://www.minuvalik.ee/?c=all',
+    'has_index_page': true,
+    'index_page': 'https://www.minuvalik.ee/?c=all',
     'ttl': 2 * 60 * 60 * 1000,
     'languages': {
       'est': {
@@ -110,11 +111,11 @@ class MinuvalikParser extends AbstractParser {
   };
 
   compilePagingPattern = () => {
-    return this.config.indexPage + this.config.paging!!.pattern;
+    return this.config.index_page + this.config.paging!!.pattern;
   }
   
   compileImageHref = (link) => {
-    return url.resolve(this.config.indexPage, link);
+    return url.resolve(this.config.index_page, link);
   };
   
   compileOfferHref = (link, language) => {
@@ -126,11 +127,11 @@ class MinuvalikParser extends AbstractParser {
       }
     }
   
-    return url.resolve(this.config.indexPage, link);
+    return url.resolve(this.config.index_page, link);
   };
   
   compilePageHref = (link) => {
-    return this.config.indexPage + link;
+    return this.config.index_page + link;
   };
 
 }
