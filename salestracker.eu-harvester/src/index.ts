@@ -25,6 +25,12 @@ var sites = [{
 }, {
     site: 'www.zoomaailm.ee',
     interval: 1 * 60 * 60 * 1000
+}, {
+    site: 'www.asos.com.men',
+    interval: 1 * 60 * 60 * 1000
+}, {
+    site: 'www.asos.com.women',
+    interval: 1 * 60 * 60 * 1000
 }];
 
 var worker = SessionFactory.getQueueConnection();
