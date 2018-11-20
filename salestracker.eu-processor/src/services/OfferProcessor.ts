@@ -22,6 +22,8 @@ class OfferProcessor {
             var offer = parser.compileOffer(data);
             offer.translations = translations;
             offer.origin_href = data.href;
+            offer.parsed = new Date(offer.parsed);
+            offer.expires = new Date(offer.expires);
 
             // should not process pictures if development environment and switched off
             var shouldProcessPictures = process.env.NODE_ENV !== 'development' || process.env.SHOULD_HARVEST_PICTURES !== 'false';

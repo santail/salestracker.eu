@@ -257,8 +257,8 @@ class AbstractParser {
   };
 
   priceCleanup = (price: string): number | undefined => {
-    if (price) {
-      return Number((+(price.replace(/[^0-9\.,]?/gi, '').replace(/,/gi, '.'))).toFixed(2));
+    if (!_.isUndefined(price)) {
+      return Number((+(('' + price).replace(/[^0-9\.,]?/gi, '').replace(/,/gi, '.'))).toFixed(2));
     }
 
     return undefined;

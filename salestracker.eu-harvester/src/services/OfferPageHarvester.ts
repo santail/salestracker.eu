@@ -67,7 +67,7 @@ class OfferPageHarvester {
                     'href': options.href,
                     'site': options.site,
                     'language': options.language,
-                    'parsed': runningTime,
+                    'parsed': new Date(runningTime),
                     'expires': new Date(runningTime + parser.config.ttl) // in one hour
                 });
 
@@ -104,7 +104,7 @@ class OfferPageHarvester {
             _id: mongojs.ObjectId(offerId)
         }, {
             $set: {
-                expires: expirationTime
+                expires: new Date(expirationTime)
             }
         }, (err, updatedOffer) => {
             if (err) {
