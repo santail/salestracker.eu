@@ -156,12 +156,12 @@ class AbstractParser {
     });
   };
 
-  parse = (body, parseFinished) => {
+  parse = (body, callback) => {
     if (this.config.json && typeof body === 'string') {
       body = JSON.parse(body);
     }
 
-    var offer = (function (that, body) {
+    var offer = (function (that, data) {
       var templates = _.extend({}, that.config.templates);
 
       function _parseTemplates(body, templates) {
@@ -187,17 +187,20 @@ class AbstractParser {
       }
 
       try {
-        var result = _parseTemplates(body, templates);
+        var result = _parseTemplates(data, templates);
 
-        body = null;
+        data = null;
 
         return result;
-      } catch (err) {
-        return parseFinished(new Error(util.format("Error parsing templates", err)), offer);
+      } 
+      catch (err) {
+        console.error('Error parsing offer\'s data', err);
+
+        return callback(new Error(util.format("Error parsing templates", err)), offer);
       }
     })(this, body);
 
-    return parseFinished(null, offer);
+    return callback(null, offer);
   };
 
   compilePageHref = (link) => {
@@ -253,7 +256,7 @@ class AbstractParser {
     return mainLanguage;
   };
 
-  priceCleanup = (price): number | undefined => {
+  priceCleanup = (price: string): number | undefined => {
     if (price) {
       return Number((+(price.replace(/[^0-9\.,]?/gi, '').replace(/,/gi, '.'))).toFixed(2));
     }
