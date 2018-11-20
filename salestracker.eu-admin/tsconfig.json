@@ -1,27 +1,27 @@
 {
     "compilerOptions": {
-      "target": "es2017",
-      "module": "commonjs",
-      "sourceMap": true,
-      "outDir": "./build",
-      "strict": true,
-      "noImplicitAny": false,
-      "strictNullChecks": true,
-      "noImplicitThis": true,
-      "alwaysStrict": true,
-      "noUnusedParameters": true,
-      "noImplicitReturns": true,
-      "noFallthroughCasesInSwitch": true,
-      "baseUrl": "./",
-      "experimentalDecorators": true,
-      "emitDecoratorMetadata": true,
-      "allowJs": true
+        "outDir": "./dist/",
+        "sourceMap": true,
+        "noImplicitAny": true,
+        "module": "commonjs",
+        "target": "es5",
+        "jsx": "react",
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "strictNullChecks": true,   // enable strict null checks as a best practice
+        "allowJs": true,
+        "moduleResolution": "node"
     },
+    "files": [
+        "./node_modules/@types/mocha/index.d.ts",
+        "./node_modules/@types/node/index.d.ts"
+    ],
     "include": [
-        "lib/**/*.ts",
-        "src/**/*.ts"
+        "client/src/**/*.ts",
+        "server/**/*.ts"
     ],
     "exclude": [
-      "node_modules"
-    ]
-  }
+        "node_modules"
+    ],
+    "types": ["@types/ckeditor"]
+}
