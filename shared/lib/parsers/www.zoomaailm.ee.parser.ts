@@ -64,7 +64,7 @@ class ZoomaailmParser extends AbstractParser {
             },
             'pictures': ($) => {
                 return $('div.product-essential div.product-img-box > div.more-views > ul > li > a > img').map(function (index, el) {
-                    return $(el).attr('src').replace(/\/thumbnail\/56x/, "");
+                    return $(el).attr('src').replace(/\/thumbnail\/56x/, "/image/365x");
                 }).get();
             },
             'price': ($) => {
