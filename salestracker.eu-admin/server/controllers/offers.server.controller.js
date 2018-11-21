@@ -109,6 +109,10 @@ exports.list = function (req, res) {
     var currentTime = new Date().getTime();
     var criteria = { expires: { $gt:  new Date(currentTime - 1 * 60 * 60 * 60 * 1000) }};
 
+    if (req.query.category) {
+        criteria.category = req.query.category; // TODO validate query value against real configs
+    }
+
     if (req.query.site) {
         criteria.site = req.query.site; // TODO validate query value against real configs
     }

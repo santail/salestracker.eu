@@ -1,7 +1,8 @@
 import _ = require('lodash');
 import * as React from 'react';
-import { ComponentBase } from 'resub';
+import { InputGroup, Tabs, Tab, FormGroup, FormControl } from 'react-bootstrap';
 import ReactPaginate from 'react-paginate';
+import { ComponentBase } from 'resub';
 
 import OfferStore, { IOffer } from '../../stores/OfferStore';
 
@@ -16,6 +17,7 @@ interface OffersPageState {
     activePage: number;
     pageSize: number;
     site?: string;
+    category?: string;
     pagesTotal: number;
 }
 
@@ -78,39 +80,19 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
                     <li className="col-xs-3"><a href="#" className="btn btn-default">{this.state.total}</a> <span>товаров найдено</span></li>
                 </ul>
 
-<ul className="nav nav-tabs nav-justified" id="myTab" role="tablist">
-  <li className="nav-item">
-    <a className="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">General</a>
-  </li>
-  <li className="nav-item">
-    <a className="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Cosmetics</a>
-  </li>
-  <li className="nav-item">
-    <a className="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Alcohol</a>
-  </li>
-  <li className="nav-item">
-    <a className="nav-link" id="fashion-tab" data-toggle="tab" href="#fashion" role="tab" aria-controls="fashion" aria-selected="false">Fashion</a>
-  </li>
-  <li className="nav-item">
-    <a className="nav-link" id="toys-tab" data-toggle="tab" href="#toys" role="tab" aria-controls="toys" aria-selected="false">Toys</a>
-  </li>
-  <li className="nav-item">
-    <a className="nav-link" id="pets-tab" data-toggle="tab" href="#pets" role="tab" aria-controls="pets" aria-selected="false">Pets</a>
-  </li>
-</ul>
-<div className="tab-content" id="myTabContent">
-  <div className="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">...</div>
-  <div className="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">...</div>
-  <div className="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">...</div>
-  <div className="tab-pane fade" id="fashion" role="tabpanel" aria-labelledby="fashion-tab">...</div>
-  <div className="tab-pane fade" id="toys" role="tabpanel" aria-labelledby="toys-tab">...</div>
-  <div className="tab-pane fade" id="pets" role="tabpanel" aria-labelledby="pets-tab">...</div>
-</div>
-
+<FormGroup>
+    <InputGroup>
+      <InputGroup.Addon>@</InputGroup.Addon>
+      <FormControl type="text" />
+    </InputGroup>
+  </FormGroup>
+                
                 <div className="row paging">
                     <div className="col-md-2">
                         <select className="form-control" value={this.state.site} onChange={this._onSiteChange}>
                             <option value="">All</option>
+                            <option value="www.asos.com.men">www.asos.com for men</option>
+                            <option value="www.asos.com.women">www.asos.com form women</option>
                             <option value="www.barbora.ee">www.barbora.ee</option>
                             <option value="www.ecoop.ee">www.ecoop.ee</option>
                             <option value="www.minuvalik.ee">www.minuvalik.ee</option>
@@ -139,7 +121,34 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
                     </div>
                 </div>
 
-                {widgetsRows}
+                <Tabs
+                    id={ 'offersGrid' }
+                    activeKey={this.state.category}
+                    onSelect={this._handleCategorySelect}
+                    className={ "nav nav-tabs nav-justified" }
+                >
+                    <Tab eventKey={ 'all' } title="All">
+                        {widgetsRows}
+                    </Tab>
+                    <Tab eventKey={ 'cosmetics' } title="Cosmetics">
+                        {widgetsRows}
+                    </Tab>
+                    <Tab eventKey={ 'alcohol' } title="Alcohol">
+                        {widgetsRows}
+                    </Tab>
+                    <Tab eventKey={ 'fashion' } title="Fashion">
+                        {widgetsRows}
+                    </Tab>
+                    <Tab eventKey={ 'toys' } title="Toys">
+                        {widgetsRows}
+                    </Tab>
+                    <Tab eventKey={ 'pets' } title="Pets">
+                        {widgetsRows}
+                    </Tab>
+                    <Tab eventKey={ 'children' } title="Children">
+                        {widgetsRows}
+                    </Tab>
+                </Tabs>
 
                 <div className="row paging">
                     <div className="col-md-1">
@@ -171,7 +180,7 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
         super.componentDidMount();
 
         OfferStore.loadOffers({
-            activePage:0, 
+            activePage: 0, 
             pageSize: 72
         });
     }
@@ -182,7 +191,8 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
         OfferStore.loadOffers({
             activePage: selectedItem.selected, 
             pageSize: this.state.pageSize,
-            site: this.state.site
+            site: this.state.site,
+            category: this.state.category
         });
     }
 
@@ -192,7 +202,8 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
         OfferStore.loadOffers({
             activePage: this.state.activePage, 
             pageSize: this.state.pageSize,
-            site: e.currentTarget.value
+            site: e.currentTarget.value,
+            category: this.state.category
         });
     }
 
@@ -207,9 +218,21 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
         OfferStore.loadOffers({
             activePage: this.state.activePage, 
             pageSize: pageSize,
-            site: this.state.site
+            site: this.state.site,
+            category: this.state.category
         });
     }
+
+    private _handleCategorySelect = (category: any) => {
+        this.setState({ category: category });
+
+        OfferStore.loadOffers({
+            activePage: 0, 
+            pageSize: this.state.pageSize,
+            site: this.state.site,
+            category: category
+        });
+      }
 }
 
 export default OffersPage;

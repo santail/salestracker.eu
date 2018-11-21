@@ -29,6 +29,7 @@ export interface OffersSearchOptions {
     activePage: number;
     pageSize: number;
     site?: string;
+    category?: string;
 }
 export interface IOffersRequestResult {
     offers: IOffer[];
@@ -63,6 +64,10 @@ export class OfferStore extends StoreBase {
             params.site = options.site;
         }
 
+        if (options.category && options.category !== 'all') {
+            params.category = options.category;
+        }
+
         fetch(`/api/offers/?${querystring.stringify(params)}`, {
             method: 'GET',
             headers: {
@@ -77,7 +82,15 @@ export class OfferStore extends StoreBase {
 
                 _.each(responseJson.results, function (offer: any) {
 
-                    offer.title = offer.translations.eng.title;
+                    if (offer.translations.eng) {
+                        offer.title = offer.translations.eng.title;
+                    } 
+                    else if (offer.translations.est) {
+                        offer.title = offer.translations.est.title;
+                    } 
+                    else if (offer.translations.rus) {
+                        offer.title = offer.translations.rus.title;
+                    }
 
                     offers.push(offer as IOffer);
                 });
