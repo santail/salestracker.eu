@@ -99,7 +99,7 @@ exports.list = function (req, res) {
         sortObject[sortValue] = sortKey;
     }
     else {
-        sortObject.desc = '_id';
+        sortObject._id = 1;
     }
 
     sort = {

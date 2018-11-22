@@ -38,17 +38,24 @@ var OfferSchema = new Schema({
 });
 
 OfferSchema.index({
-	'url': 1
+	'origin_href': 1
 }, {
-	name: 'idx_offer_url'
+	name: 'idx_offer_origin_href'
 });
 
 OfferSchema.index({
-	'category': "text",
-	'brand': "text",
-	'title': "text"
+	'site': "text",
+	'expires': 1,
+	'category': 1
 }, {
-	name: 'idx_offer_category_brand_title'
+	name: 'idx_offer_admin_filtering'
+});
+
+OfferSchema.index({
+	'site': "text",
+	'expires': 1
+}, {
+	name: 'idx_offer_site_expires'
 });
 
 var Offer = mongoose.model('Offer', OfferSchema);
