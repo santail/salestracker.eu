@@ -53,10 +53,10 @@ function start(config) {
         .removeOnComplete(true)
         .save(function (err) {
             if (err) {
-                LOG.error(util.format('[STATUS] [Failure] [%s] Site processing not scheduled', config.site, err));
+                LOG.error(util.format('[ERROR] [%s] Site processing not scheduled', config.site, err));
             }
 
-            LOG.info(util.format('[STATUS] [OK] [%s] Site processing scheduled', config.site));
+            LOG.info(util.format('[OK] [%s] Site processing scheduled', config.site));
         });
 };
 
@@ -66,24 +66,24 @@ worker.process('harvestSite', numParallel, function (job, done) {
     // cleanup site only if job configuration requires it
     const cleanupPromise = harvester.cleanupSite(config)
         .then(function () {
-            LOG.info(util.format('[STATUS] [OK] [%s] Site cleanup finished', config.site));
+            LOG.info(util.format('[OK] [%s] Site cleanup finished', config.site));
         }, function (err) {
-            LOG.error(util.format('[STATUS] [Failure] [%s] Site cleanup failed', config.site, err));
+            LOG.error(util.format('[ERROR] [%s] Site cleanup failed', config.site, err));
         });
 
     const processSitePromise = harvester.harvestSite(config)
         .then(function () {
-            LOG.info(util.format('[STATUS] [OK] [%s] Getting latest offers finished', config.site));
+            LOG.info(util.format('[OK] [%s] Getting latest offers finished', config.site));
         }, function (err) {
-            LOG.error(util.format('[STATUS] [Failure] [%s] Getting latest offers failed', config.site, err));
+            LOG.error(util.format('[ERROR] [%s] Getting latest offers failed', config.site, err));
         });
 
     Promise.all([cleanupPromise, processSitePromise])
         .then(function (result) {
-            LOG.info(util.format('[STATUS] [OK] Sites harvesting finished'));
+            LOG.info(util.format('[OK] Sites harvesting finished'));
             return done(null, result);
         }, function (err) {
-            LOG.error(util.format('[STATUS] [Failure] Sites harvesting failed', err));
+            LOG.error(util.format('[ERROR] Sites harvesting failed', err));
             return done(err);
         });
 });
@@ -93,11 +93,11 @@ worker.process('harvestIndexPage', numParallel, function (job, done) {
 
     harvester.harvestIndexPage(config, function (err, result) {
         if (err) {
-            LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Index page harvesting failed', config.site, config.href, err));
+            LOG.error(util.format('[ERROR] [%s] [%s] Index page harvesting failed', config.site, config.href, err));
             return done(err);
         }
 
-        LOG.info(util.format('[STATUS] [OK] [%s] [%s] Index page harvesting finished', config.site, config.href));
+        LOG.info(util.format('[OK] [%s] [%s] Index page harvesting finished', config.site, config.href));
         return done(null, result);
     });
 });
@@ -107,11 +107,11 @@ worker.process('harvestPage', numParallel, function (job, done) {
 
     harvester.harvestPage(config, function (err, result) {
         if (err) {
-            LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Page harvesting failed', config.site, config.href, err));
+            LOG.error(util.format('[ERROR] [%s] [%s] Page harvesting failed', config.site, config.href, err));
             return done(err);
         }
 
-        LOG.info(util.format('[STATUS] [OK] [%s] [%s] Page harvesting finished', config.site, config.href));
+        LOG.info(util.format('[OK] [%s] [%s] Page harvesting finished', config.site, config.href));
         return done(null, result);
     });
 });
@@ -121,11 +121,11 @@ worker.process('harvestOffer', numParallel, function (job, done) {
 
     harvester.harvestOffer(config, function (err, result) {
         if (err) {
-            LOG.error(util.format('[STATUS] [Failure] [%s] Offer harvesting failed %s', config.site, config.href, err));
+            LOG.error(util.format('[ERROR] [%s] Offer harvesting failed %s', config.site, config.href, err));
             return done(err);
         }
 
-        LOG.debug(util.format('[STATUS] [OK] [%s] Offer harvesting finished %s', config.site, config.href));
+        LOG.debug(util.format('[OK] [%s] Offer harvesting finished %s', config.site, config.href));
         return done(null, result);
     });
 });
@@ -135,11 +135,11 @@ worker.process('harvestImage', numParallel, function (job, done) {
 
     harvester.harvestImage(config)
         .then(result => {
-            LOG.info(util.format('[STATUS] [OK] [%s] Image harvesting finished %s', config.site, config.href));
+            LOG.info(util.format('[OK] [%s] Image harvesting finished %s', config.site, config.href));
             return done(null, result);
         })
         .catch(error => {
-            LOG.error(util.format('[STATUS] [Failure] [%s] Image harvesting failed %s', config.site, config.href, error));
+            LOG.error(util.format('[ERROR] [%s] Image harvesting failed %s', config.site, config.href, error));
             return done(error);
         });
 });

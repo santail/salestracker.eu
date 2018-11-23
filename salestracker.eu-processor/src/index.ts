@@ -21,7 +21,7 @@ elastic.ping({ // test
 
         ElasticIndexer.initializeIndexes()
             .then(function () {
-                LOG.info(util.format('[STATUS] [OK] Initializing indexes succeeded'));
+                LOG.info(util.format('[OK] Initializing indexes succeeded'));
 
                 worker.process('processData', 10, function (job, done) {
                     var data = job.data;
@@ -36,7 +36,7 @@ elastic.ping({ // test
                 });
             })
             .catch(function (err) {
-                LOG.error(util.format('[STATUS] [Failure] Initializing indexes failed', err));
+                LOG.error(util.format('[ERROR] Initializing indexes failed', err));
             });
     }
 });

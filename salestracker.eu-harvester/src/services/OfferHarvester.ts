@@ -22,7 +22,7 @@ class OfferHarvester {
             "origin_href": href
         }, (err, foundMainOffer) => {
             if (err) {
-                LOG.error(util.format('[STATUS] [Failure] Checking offer failed', err));
+                LOG.error(util.format('[ERROR] Checking offer failed', err));
                 return this._gatherOffer(options, callback);
             } else if (foundMainOffer) {
                 const isTranslated = !_.isUndefined(foundMainOffer.translations[options.language]);
@@ -30,14 +30,14 @@ class OfferHarvester {
                 if (isMainOffer) {
                     this._extendExpirationTime(foundMainOffer._id, new Date(runningTime + parser.config.ttl), options, callback);
                 } else if (isTranslated) {
-                    LOG.info(util.format('[STATUS] [OK] [%s] Offer already translated. Skipping.', options.site, options.href));
+                    LOG.info(util.format('[OK] [%s] Offer already translated. Skipping.', options.site, options.href));
                     return callback(null);
                 } else {
-                    LOG.info(util.format('[STATUS] [OK] [%s] Offer translation not found %s. Proceed with harvesting %s', options.site, options.origin_href, options.href));
+                    LOG.info(util.format('[OK] [%s] Offer translation not found %s. Proceed with harvesting %s', options.site, options.origin_href, options.href));
                     return this._gatherOffer(options, callback);
                 }
             } else {
-                LOG.info(util.format('[STATUS] [OK] [%s] Offer not found. Proceed with harvesting', options.site, options.href));
+                LOG.info(util.format('[OK] [%s] Offer not found. Proceed with harvesting', options.site, options.href));
                 return this._gatherOffer(options, callback);
             };
         });
@@ -57,11 +57,11 @@ class OfferHarvester {
                 body = null;
 
                 if (err) {
-                    LOG.error(util.format('[STATUS] [Failure] [%s] [%s] [%s] Parsing offer failed', options.site, options.href, err));
+                    LOG.error(util.format('[ERROR] [%s] [%s] [%s] Parsing offer failed', options.site, options.href, err));
                     return callback(err);
                 }
 
-                LOG.debug(util.format('[STATUS] [OK] [%s] Offer parsing finished %s', options.site, options.href));
+                LOG.debug(util.format('[OK] [%s] Offer parsing finished %s', options.site, options.href));
 
                 data = _.extend(data, {
                     'href': options.href,
@@ -88,7 +88,7 @@ class OfferHarvester {
                 headers: parser.config.headers,
                 onError: function (err, offer) {
                     if (err) {
-                        LOG.error(util.format('[STATUS] [Failure] [%s] Offer processing failed %s', options.site, options.href, err));
+                        LOG.error(util.format('[ERROR] [%s] Offer processing failed %s', options.site, options.href, err));
                         return callback(err);
                     }
 
@@ -109,15 +109,15 @@ class OfferHarvester {
         }, (err, updatedOffer) => {
             if (err) {
                 // TODO Mark somehow offer that was excluded from processing
-                LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Offers expiration time update failed', options.site, options.href, err));
+                LOG.error(util.format('[ERROR] [%s] [%s] Offers expiration time update failed', options.site, options.href, err));
                 return callback(err);
             }
 
             if (!updatedOffer) {
-                LOG.info(util.format('[STATUS] [OK] [%s] Offer not updated. Proceed with harvesting', options.site, options.href));
+                LOG.info(util.format('[OK] [%s] Offer not updated. Proceed with harvesting', options.site, options.href));
                 return this._gatherOffer(options, callback);
             } else {
-                LOG.info(util.format('[STATUS] [OK] [%s] Offers expiration time extended', options.site, options.href));
+                LOG.info(util.format('[OK] [%s] Offers expiration time extended', options.site, options.href));
                 return callback(null);
             }
         });

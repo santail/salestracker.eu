@@ -35,7 +35,7 @@ const performSearch = function () {
         }]
     }, function (err, foundWish) {
         if (err) {
-            LOG.error(util.format('[STATUS] [Failure] Checking wish failed', err));
+            LOG.error(util.format('[ERROR] Checking wish failed', err));
         } else if (foundWish) {
             if (!foundWish.locale) { // we use 'locale' property as 'language' is reserved for mongodb 
                 foundWish.locale = DEFAULT_LANGUAGE; // fallback to default language
@@ -76,10 +76,10 @@ const performSearch = function () {
                 }
             }, function (err, response) {
                 if (err) {
-                    LOG.error(util.format('[STATUS] [Failure] [%s] Offers search failed', foundWish.content, err));
+                    LOG.error(util.format('[ERROR] [%s] Offers search failed', foundWish.content, err));
                 } else {
                     if (!response.hits.total) {
-                        LOG.info(util.format('[STATUS] [OK] No offers containing %s found', foundWish.content, response.hits));
+                        LOG.info(util.format('[OK] No offers containing %s found', foundWish.content, response.hits));
 
                         // nothing found, postpone current wish processing for some interval
                         SessionFactory.getDbConnection().wishes.update({
@@ -91,14 +91,14 @@ const performSearch = function () {
                         }, function (err, updatedWish) {
                             if (err) {
                                 // TODO Mark somehow wish that was not marked as processed
-                                LOG.error(util.format('[STATUS] [Failure] [%s] Wish check time update failed', foundWish.content, err));
+                                LOG.error(util.format('[ERROR] [%s] Wish check time update failed', foundWish.content, err));
                                 return performSearch();
                             }
 
                             if (!updatedWish) {
-                                LOG.error(util.format('[STATUS] [Failure] [%s] Wish check time update failed', foundWish.content, err));
+                                LOG.error(util.format('[ERROR] [%s] Wish check time update failed', foundWish.content, err));
                             } else {
-                                LOG.info(util.format('[STATUS] [OK] [%s] Wish check time updated', foundWish.content));
+                                LOG.info(util.format('[OK] [%s] Wish check time updated', foundWish.content));
                                 return performSearch();
                             }
                         });
@@ -124,10 +124,10 @@ const performSearch = function () {
                             .removeOnComplete(true)
                             .save(function (err) {
                                 if (err) {
-                                    LOG.error(util.format('[STATUS] [FAILED] Notification processing schedule failed', notification, err));
+                                    LOG.error(util.format('[ERROR] Notification processing schedule failed', notification, err));
                                 }
 
-                                LOG.debug(util.format('[STATUS] [OK] Notification processing scheduled'));
+                                LOG.debug(util.format('[OK] Notification processing scheduled'));
                             });
 
                         SessionFactory.getDbConnection().wishes.update({
@@ -140,14 +140,14 @@ const performSearch = function () {
                         }, function (err, updatedWish) {
                             if (err) {
                                 // TODO Mark somehow wish that was not marked as processed
-                                LOG.error(util.format('[STATUS] [Failure] [%s] Wish check time update failed', foundWish.content, err));
+                                LOG.error(util.format('[ERROR] [%s] Wish check time update failed', foundWish.content, err));
                                 return;
                             }
 
                             if (!updatedWish) {
-                                LOG.error(util.format('[STATUS] [Failure] [%s] Wish check time update failed', foundWish.content, err));
+                                LOG.error(util.format('[ERROR] [%s] Wish check time update failed', foundWish.content, err));
                             } else {
-                                LOG.info(util.format('[STATUS] [OK] [%s] Wish check time updated', foundWish.content));
+                                LOG.info(util.format('[OK] [%s] Wish check time updated', foundWish.content));
                                 performSearch();
                             }
                         });
@@ -155,7 +155,7 @@ const performSearch = function () {
                 }
             });
         } else {
-            LOG.info(util.format('[STATUS] [OK] No unprocessed wishes found'));
+            LOG.info(util.format('[OK] No unprocessed wishes found'));
             setTimeout(function () {
                 performSearch();
             }, 10000)

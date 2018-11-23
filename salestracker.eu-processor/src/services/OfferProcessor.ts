@@ -51,16 +51,16 @@ class OfferProcessor {
 
             SessionFactory.getDbConnection().offers.save(offer, function (err, saved) {
                 if (err) {
-                    LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Saving offer failed', data.site, data.href, err));
+                    LOG.error(util.format('[ERROR] [%s] [%s] Saving offer failed', data.site, data.href, err));
                     return done(err);
                 }
 
                 if (!saved) {
-                    LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Saving offer failed', data.site, data.href, err));
+                    LOG.error(util.format('[ERROR] [%s] [%s] Saving offer failed', data.site, data.href, err));
                     return done(new Error('DB save query failed'));
                 }
 
-                LOG.info(util.format('[STATUS] [OK] [%s] Offer saved %s', data.site, data.href));
+                LOG.info(util.format('[OK] [%s] Offer saved %s', data.site, data.href));
 
                 _.each(_.keys(parser.config.languages), function (language) {
                     if (parser.config.languages[language].main || !parser.config.languages[language].exists) {
@@ -93,13 +93,13 @@ class OfferProcessor {
                 origin_href: data.origin_href
             }, function (err, foundOffer) {
                 if (err) {
-                    LOG.error(util.format('[STATUS] [Failure] Checking offer failed', err));
+                    LOG.error(util.format('[ERROR] Checking offer failed', err));
                     return done(err);
                 }
 
                 if (!foundOffer) {
                     // TODO Mark somehow failed offer and re-run harvesting
-                    LOG.error(util.format('[STATUS] [Failure] Checking offer failed. Offer not found %', data.origin_href));
+                    LOG.error(util.format('[ERROR] Checking offer failed. Offer not found %', data.origin_href));
                     return done(new Error('Offer not found for update: ' + data.origin_href));
                 }
 
@@ -111,7 +111,7 @@ class OfferProcessor {
                     }
                 }, function (err) {
                     if (err) {
-                        LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Updating offer failed', data.site, data.href, err));
+                        LOG.error(util.format('[ERROR] [%s] [%s] Updating offer failed', data.site, data.href, err));
                         return done(err);
                     }
 

@@ -25,7 +25,7 @@ class Harvester {
       return Promise.resolve();
     }
 
-    LOG.info(util.format('[STATUS] [OK] [%s] Cleanup started', options.site));
+    LOG.info(util.format('[OK] [%s] Cleanup started', options.site));
 
     return new Promise((fulfill, reject) => {
       this._db.offers.remove({
@@ -47,16 +47,16 @@ class Harvester {
    *
    */
   public harvestSite = (options) => {
-    LOG.info(util.format('[STATUS] [OK] [%s] Site processing started', options.site));
+    LOG.info(util.format('[OK] [%s] Site processing started', options.site));
 
     return new Promise((fulfill, reject) => {
       IndexPageHarvester.processFirstPage(options, (err, offers) => {
         if (err) {
-          LOG.error(util.format('[STATUS] [Failure] [%s] Gathering offers failed', options.site, err));
+          LOG.error(util.format('[ERROR] [%s] Gathering offers failed', options.site, err));
           return reject(err);
         }
 
-        LOG.info(util.format('[STATUS] [OK] [%s] Gathering offers finished', options.site));
+        LOG.info(util.format('[OK] [%s] Gathering offers finished', options.site));
         return fulfill(offers);
       });
     });
@@ -66,15 +66,15 @@ class Harvester {
    *
    */
   public harvestIndexPage = (options, callback) => {
-    LOG.info(util.format('[STATUS] [OK] [%s] [%s] Index page processing started', options.site, options.href));
+    LOG.info(util.format('[OK] [%s] [%s] Index page processing started', options.site, options.href));
 
     IndexPageHarvester.harvestIndexPage(options, (err, offers) => {
       if (err) {
-        LOG.error(util.format('[STATUS] [Failure] [%s] Index page processing failed', options.site, err));
+        LOG.error(util.format('[ERROR] [%s] Index page processing failed', options.site, err));
         return callback(err);
       }
 
-      LOG.info(util.format('[STATUS] [OK] [%s] Index page processing finished', options.site));
+      LOG.info(util.format('[OK] [%s] Index page processing finished', options.site));
       return callback(null, offers);
     });
   }
@@ -83,7 +83,7 @@ class Harvester {
    *
    */
   public harvestPage = (options, callback) => {
-    LOG.info(util.format('[STATUS] [OK] [%s] Page processing %s of %s started', options.site, options.page_index, options.total_pages));
+    LOG.info(util.format('[OK] [%s] Page processing %s of %s started', options.site, options.page_index, options.total_pages));
 
     return PagingHarvester.harvestPage(options, callback);
   };
@@ -92,7 +92,7 @@ class Harvester {
    *
    */
   public harvestOffer = (options, callback) => {
-    LOG.info(util.format('[STATUS] [OK] [%s] Offer processing started %s', options.site, options.href));
+    LOG.info(util.format('[OK] [%s] Offer processing started %s', options.site, options.href));
 
     return OfferHarvester.harvestOffer(options, callback);
   };
@@ -101,7 +101,7 @@ class Harvester {
    *
    */
   public harvestImage = (options) => {
-    LOG.info(util.format('[STATUS] [OK] [%s] Image processing started %s', options.site, options.href));
+    LOG.info(util.format('[OK] [%s] Image processing started %s', options.site, options.href));
 
     return ImageHarvester.harvestImage(options);
   };

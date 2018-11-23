@@ -20,7 +20,7 @@ class PagingHarvester {
           headers: parser.config.headers,
           payload: options.payload,
           onError: (err) => {
-            LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Fetching page failed', options.site, options.href, err));
+            LOG.error(util.format('[ERROR] [%s] [%s] Fetching page failed', options.site, options.href, err));
             return callback(err);
           },
           onSuccess: (content) => {
@@ -31,7 +31,7 @@ class PagingHarvester {
             } catch (err) {
               content = null;
     
-              LOG.error(util.format('[STATUS] [Failure] [%s] Offers processing not scheduled', options.site, err));
+              LOG.error(util.format('[ERROR] [%s] Offers processing not scheduled', options.site, err));
               return callback(new Error('Offers processing not scheduled: ' + err.message));
             }
     
@@ -48,11 +48,11 @@ class PagingHarvester {
     
             async.series(offersHandlers, function (err, results) {
               if (err) {
-                LOG.error(util.format('[STATUS] [Failure] [%s] Offers processing not scheduled', options.site, err));
+                LOG.error(util.format('[ERROR] [%s] Offers processing not scheduled', options.site, err));
                 return callback(err);
               }
     
-              LOG.info(util.format('[STATUS] [OK] [%s] Offers processing scheduled', options.site));
+              LOG.info(util.format('[OK] [%s] Offers processing scheduled', options.site));
               return callback(null, results);
             });
     
@@ -61,16 +61,16 @@ class PagingHarvester {
                 return callback(null);
               }
     
-              LOG.info(util.format('[STATUS] [OK] [%s] Proccessing next infinite paging page', options.site));
+              LOG.info(util.format('[OK] [%s] Proccessing next infinite paging page', options.site));
     
               if (_.isEmpty(offers) || _.last(offers).href === options.last_processed_offer) {
-                LOG.info(util.format('[STATUS] [OK] [%s] Last infinite paging page found. Stop processing.', options.site));
+                LOG.info(util.format('[OK] [%s] Last infinite paging page found. Stop processing.', options.site));
                 return callback(null);
               }
     
               var href = parser.compileNextPageHref(options.page_index);
     
-              LOG.info(util.format('[STATUS] [OK] [%s] Next infinite paging page processing scheduled', options.site));
+              LOG.info(util.format('[OK] [%s] Next infinite paging page processing scheduled', options.site));
     
               WorkerService.schedulePageProcessing({
                 'site': options.site,

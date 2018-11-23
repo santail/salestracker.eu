@@ -24,14 +24,14 @@ class ElasticIndexer {
             })
             .then(function (exists) {
                 if (!exists) {
-                    LOG.info(util.format('[STATUS] [OK] [%s] Index missing. Initializing index.'));
+                    LOG.info(util.format('[OK] [%s] Index missing. Initializing index.'));
 
                     return elastic.indices.create({
                         index: indexName
                     });
                 }
 
-                LOG.info(util.format('[STATUS] [OK] [%s] Index exists. Skip index creation.', indexName));
+                LOG.info(util.format('[OK] [%s] Index exists. Skip index creation.', indexName));
                 return Promise.resolve(false);
             })
             // .then(function () {
@@ -45,11 +45,11 @@ class ElasticIndexer {
             // })
             .then(function (nextStep) {
                 if (!nextStep) {
-                    LOG.info(util.format('[STATUS] [OK] [%s] Index exists. Skip initialize mapping.', indexName));
+                    LOG.info(util.format('[OK] [%s] Index exists. Skip initialize mapping.', indexName));
                     return Promise.resolve();
                 }
 
-                LOG.info(util.format('[STATUS] [OK] [%s] Index missing. Initialize mapping.', indexName));
+                LOG.info(util.format('[OK] [%s] Index missing. Initialize mapping.', indexName));
                 return elastic.indices.putMapping({
                     index: indexName,
                     type: "offers",
@@ -132,11 +132,11 @@ class ElasticIndexer {
             body: offer
         }, function (err, resp) {
             if (err) {
-                LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Indexing offer failed', offer.site, offer.id, err));
+                LOG.error(util.format('[ERROR] [%s] [%s] Indexing offer failed', offer.site, offer.id, err));
                 return done(err);
             }
 
-            LOG.info(util.format('[STATUS] [OK] [%s] Offer indexed %s', offer.site, offer.href));
+            LOG.info(util.format('[OK] [%s] Offer indexed %s', offer.site, offer.href));
             return done(null, resp);
         });
     }

@@ -5,7 +5,7 @@ var LOG = require("../../lib/services/Logger");
 class ImageProcessor {
 
     process(data, done) {
-        LOG.info(util.format('[STATUS] [OK] [%s] Image processed %s', data.site, data.href));
+        LOG.info(util.format('[OK] [%s] Image processed %s', data.site, data.href));
 
         return done();
     }

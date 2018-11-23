@@ -46,18 +46,18 @@ class ImageHarvester {
                                 }, fulfill)
                             })
                             .catch(err => {
-                                LOG.error(util.format('[STATUS] [Failure] [%s] Image storing failed %s', options.site, options.href, err));
+                                LOG.error(util.format('[ERROR] [%s] Image storing failed %s', options.site, options.href, err));
                                 return reject(err);
                             });
                     });
                 } 
                 else if (res.statusCode === 404) {
-                    LOG.error(util.format('[STATUS] [Failure] [%s] Image was not found %s', options.site, options.href));
+                    LOG.error(util.format('[ERROR] [%s] Image was not found %s', options.site, options.href));
                     return fulfill(); // no image found, just log and complete job
                 } 
             })
             .catch(err => {
-                LOG.error(util.format('[STATUS] [Failure] [%s] Image retrieving failed %s', options.site, options.href));
+                LOG.error(util.format('[ERROR] [%s] Image retrieving failed %s', options.site, options.href));
                 return reject(err);
             });
         });
@@ -73,12 +73,12 @@ class ImageHarvester {
                         var filePath = uploadsPath + file;
                         fs.stat(filePath, function (err, stats) {
                             if (err) {
-                                LOG.error(util.format('[STATUS] [FAILED] Error reading uploaded file', err));
+                                LOG.error(util.format('[ERROR] Error reading uploaded file', err));
                             } else {
                                 if (stats.isFile()) {
                                     fs.unlink(filePath, function (err) {
                                         if (err) {
-                                            LOG.error(util.format('[STATUS] [FAILED] Error deleting uploaded file', err));
+                                            LOG.error(util.format('[ERROR] Error deleting uploaded file', err));
                                         }
                                     });
                                 }
@@ -88,7 +88,7 @@ class ImageHarvester {
                 }
             })
             .catch(err => {
-                LOG.error(util.format('[STATUS] [FAILED] Error reading uploads directory', err));
+                LOG.error(util.format('[ERROR] Error reading uploads directory', err));
             });
     };
 }

@@ -26,11 +26,11 @@ class IndexPageHarvester {
 
             this.harvestIndexPage(options, (err, offers) => {
                 if (err) {
-                    LOG.error(util.format('[STATUS] [Failure] [%s] Gathering offers failed', options.site, err));
+                    LOG.error(util.format('[ERROR] [%s] Gathering offers failed', options.site, err));
                     return callback(err);
                 }
 
-                LOG.info(util.format('[STATUS] [OK] [%s] Gathering offers finished', options.site));
+                LOG.info(util.format('[OK] [%s] Gathering offers finished', options.site));
                 return callback(null, offers);
             });
         } 
@@ -39,18 +39,18 @@ class IndexPageHarvester {
 
             this._processNextPage(options, (err, offers) => {
                 if (err) {
-                    LOG.error(util.format('[STATUS] [Failure] [%s] Gathering offers failed', options.site, err));
+                    LOG.error(util.format('[ERROR] [%s] Gathering offers failed', options.site, err));
                     return callback(err);
                 }
 
-                LOG.info(util.format('[STATUS] [OK] [%s] Gathering offers finished', options.site));
+                LOG.info(util.format('[OK] [%s] Gathering offers finished', options.site));
                 return callback(null, offers);
             });
         }
     };
 
     public harvestIndexPage = (options, callback) => {
-        LOG.info(util.format('[STATUS] [OK] [%s] [%s] Fetching index page', options.site, options.href));
+        LOG.info(util.format('[OK] [%s] [%s] Fetching index page', options.site, options.href));
 
         var parser = ParserFactory.getParser(options.site);
 
@@ -65,7 +65,7 @@ class IndexPageHarvester {
             headers: parser.config.headers,
             payload: options.payload,
             onError: (err) => {
-                LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Fetching index page failed', options.site, options.href, err));
+                LOG.error(util.format('[ERROR] [%s] [%s] Fetching index page failed', options.site, options.href, err));
                 return callback(err);
             },
             onSuccess: (content) => {
@@ -81,7 +81,7 @@ class IndexPageHarvester {
     };
 
     public _processNextPage = (options, callback) => {
-        LOG.info(util.format('[STATUS] [OK] [%s] [%s] Fetching next page', options.site, options.href));
+        LOG.info(util.format('[OK] [%s] [%s] Fetching next page', options.site, options.href));
 
         var parser = ParserFactory.getParser(options.site);
 
@@ -103,7 +103,7 @@ class IndexPageHarvester {
             }
         } 
         else {
-            LOG.info(util.format('[STATUS] [OK] [%s] No paging found', options.site));
+            LOG.info(util.format('[OK] [%s] No paging found', options.site));
 
             return callback();
         }
@@ -131,11 +131,11 @@ class IndexPageHarvester {
 
             async.series(categorizedIndexesHandlers, function (err, results) {
                 if (err) {
-                    LOG.error(util.format('[STATUS] [Failure] [%s] Pages processing not scheduled', options.site, err));
+                    LOG.error(util.format('[ERROR] [%s] Pages processing not scheduled', options.site, err));
                     return callback(err);
                 }
 
-                LOG.info(util.format('[STATUS] [OK] [%s] Pages processing scheduled', options.site));
+                LOG.info(util.format('[OK] [%s] Pages processing scheduled', options.site));
                 return callback(null, results);
             });
         } 
@@ -150,7 +150,7 @@ class IndexPageHarvester {
     private _startPaginatedIndexPageProcessing = (options, content, callback) => {
         var parser = ParserFactory.getParser(options.site);
 
-        LOG.info(util.format('[STATUS] [OK] [%s] Paging found', options.site));
+        LOG.info(util.format('[OK] [%s] Paging found', options.site));
 
         if (parser.config.paging.finit) {
             this._processFinitePagination(options, content, callback);
@@ -191,11 +191,11 @@ class IndexPageHarvester {
 
         async.series(paginatedIndexesHandlers, function (err, results) {
             if (err) {
-                LOG.error(util.format('[STATUS] [Failure] [%s] Pages processing not scheduled', options.site, err));
+                LOG.error(util.format('[ERROR] [%s] Pages processing not scheduled', options.site, err));
                 return callback(err);
             }
 
-            LOG.info(util.format('[STATUS] [OK] [%s] Pages processing scheduled', options.site));
+            LOG.info(util.format('[OK] [%s] Pages processing scheduled', options.site));
             return callback(null, results);
         });
     };
@@ -204,7 +204,7 @@ class IndexPageHarvester {
         var parser = ParserFactory.getParser(options.site);
         var href = parser.compileNextPageHref();
 
-        LOG.info(util.format('[STATUS] [OK] [%s] Next page processing scheduled', options.site));
+        LOG.info(util.format('[OK] [%s] Next page processing scheduled', options.site));
 
         WorkerService.schedulePageProcessing({
             'site': options.site,
@@ -215,8 +215,8 @@ class IndexPageHarvester {
     };
 
     private _startSimpleIndexPageProcessing = function (options, content, processSimpleIndexesFinished) {
-        LOG.info(util.format('[STATUS] [OK] [%s] No paging found', options.site));
-        LOG.info(util.format('[STATUS] [OK] [%s] Processing offers', options.site));
+        LOG.info(util.format('[OK] [%s] No paging found', options.site));
+        LOG.info(util.format('[OK] [%s] Processing offers', options.site));
 
         return processSimpleIndexesFinished(null, content);
     };

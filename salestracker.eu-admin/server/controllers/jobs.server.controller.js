@@ -38,11 +38,11 @@ exports.create = function (req, res) {
         .removeOnComplete(true)
         .save(function (err) {
             if (err) {
-                console.error(util.format('[STATUS] [FAILED] [%s] Job not scheduled', JSON.stringify(job), err));
+                console.error(util.format('[ERROR] [%s] Job not scheduled', JSON.stringify(job), err));
                 return;
             }
 
-            console.info(util.format('[STATUS] [OK] [%s] Job scheduled', JSON.stringify(job)));
+            console.info(util.format('[OK] [%s] Job scheduled', JSON.stringify(job)));
         });
 };
 

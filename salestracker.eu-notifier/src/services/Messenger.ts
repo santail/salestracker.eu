@@ -52,7 +52,7 @@ class Messenger {
       domain: config.notifier.mailgun.domain
     });
   
-    LOG.debug(util.format('[STATUS] [Sending] [email] [%s] Sending email', email));
+    LOG.debug(util.format('[Sending] [email] [%s] Sending email', email));
   
     var data = {
       from: 'notifier-robot@salestracker.eu',
@@ -63,18 +63,18 @@ class Messenger {
   
     mailgun.messages().send(data, function (err) {
       if (err) {
-        LOG.error(util.format('[STATUS] [Failure] [%s] Sending email failed', email, err));
+        LOG.error(util.format('[ERROR] [%s] Sending email failed', email, err));
         return;
       }
   
-      LOG.info(util.format('[STATUS] [OK] [%s] Sending email completed', email));
+      LOG.info(util.format('[OK] [%s] Sending email completed', email));
     });
   };
 
   sendSms(notification: Notification) {
     var phone = notification.contacts.phone;
   
-    LOG.debug(util.format('[STATUS] [Sending] [SMS] [%s] Sending SMS', phone));
+    LOG.debug(util.format('[Sending] [SMS] [%s] Sending SMS', phone));
   
     twilio.sendMessage({
         to: phone,
@@ -84,14 +84,14 @@ class Messenger {
       function (err) {
         if (err) {
           LOG.error({
-            'message': util.format('[STATUS] [Failed] [SMS] [%s] Sending sms', phone),
+            'message': util.format('[ERROR] [SMS] [%s] Sending sms', phone),
             'error': err.message
           });
   
           return;
         }
   
-        LOG.info(util.format('[STATUS] [OK] [SMS] [%s] Succesfully sent.', phone));
+        LOG.info(util.format('[OK] [SMS] [%s] Succesfully sent.', phone));
       });
   };
 

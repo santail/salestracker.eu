@@ -15,7 +15,7 @@ worker.process('sendNotification', 10, function (job, done) {
     const offers = data.offers;
 
     if (!wish.contacts) {
-        LOG.info(util.format('[STATUS] [OK] No contacts. Notification not sent.'));
+        LOG.info(util.format('[OK] No contacts. Notification not sent.'));
         return done();
     }
 
@@ -34,11 +34,11 @@ worker.process('sendNotification', 10, function (job, done) {
 
     Messenger.send(notification, function (err) {
         if (err) {
-            LOG.error(util.format('[STATUS] [Failure] Notification failed', err));
+            LOG.error(util.format('[ERROR] Notification failed', err));
             return done(err);
         }
     
-        LOG.info(util.format('[STATUS] [OK] Notification sent'));
+        LOG.info(util.format('[OK] Notification sent'));
         return done();
     });
 

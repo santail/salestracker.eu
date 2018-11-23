@@ -18,10 +18,10 @@ class WorkerService {
         .removeOnComplete(true)
         .save(function (err) {
             if (err) {
-                LOG.error(util.format('[STATUS] [FAILED] [%s] %s Offer processing schedule failed', options.site, options.href, err));
+                LOG.error(util.format('[ERROR] [%s] %s Offer processing schedule failed', options.site, options.href, err));
             }
 
-            LOG.debug(util.format('[STATUS] [OK] [%s] %s Offer processing scheduled', options.site, options.href));
+            LOG.debug(util.format('[OK] [%s] %s Offer processing scheduled', options.site, options.href));
         });
     }
 
@@ -34,10 +34,10 @@ class WorkerService {
         .removeOnComplete(true)
         .save(function (err) {
             if (err) {
-                LOG.error(util.format('[STATUS] [FAILED] [%s] %s Image processing schedule failed', options.site, options.href, err));
+                LOG.error(util.format('[ERROR] [%s] %s Image processing schedule failed', options.site, options.href, err));
             }
 
-            LOG.debug(util.format('[STATUS] [OK] [%s] %s Image processing scheduled', options.site, options.href));
+            LOG.debug(util.format('[OK] [%s] %s Image processing scheduled', options.site, options.href));
         });
     }
 };

@@ -14,11 +14,11 @@ class WorkerService {
             .removeOnComplete(true)
             .save(function (err) {
                 if (err) {
-                    LOG.error(util.format('[STATUS] [FAILED] [%s] %s Offer processing schedule failed', options.site, options.href, err));
+                    LOG.error(util.format('[ERROR] [%s] %s Offer processing schedule failed', options.site, options.href, err));
                     return callback(err);
                 }
 
-                LOG.debug(util.format('[STATUS] [OK] [%s] %s Offer processing scheduled', options.site, options.href));
+                LOG.debug(util.format('[OK] [%s] %s Offer processing scheduled', options.site, options.href));
                 return callback(null);
             });
     }
@@ -32,11 +32,11 @@ class WorkerService {
             .removeOnComplete(true)
             .save(function (err) {
                 if (err) {
-                    LOG.error(util.format('[STATUS] [FAILED] [%s] %s Index page processing schedule failed', options.site, options.href, err));
+                    LOG.error(util.format('[ERROR] [%s] %s Index page processing schedule failed', options.site, options.href, err));
                     return callback(err);
                 }
 
-                LOG.debug(util.format('[STATUS] [OK] [%s] %s Index page processing scheduled', options.site, options.href));
+                LOG.debug(util.format('[OK] [%s] %s Index page processing scheduled', options.site, options.href));
                 return callback(null);
             });
     }
@@ -50,11 +50,11 @@ class WorkerService {
             .removeOnComplete(true)
             .save(function (err) {
                 if (err) {
-                    LOG.error(util.format('[STATUS] [FAILED] [%s] %s Page processing schedule failed', options.site, options.href, err));
+                    LOG.error(util.format('[ERROR] [%s] %s Page processing schedule failed', options.site, options.href, err));
                     return callback(err);
                 }
 
-                LOG.debug(util.format('[STATUS] [OK] [%s] %s Page processing scheduled', options.site, options.href));
+                LOG.debug(util.format('[OK] [%s] %s Page processing scheduled', options.site, options.href));
                 return callback();
             });
     }
@@ -68,11 +68,11 @@ class WorkerService {
             .removeOnComplete(true)
             .save(function (err) {
                 if (err) {
-                    LOG.error(util.format('[STATUS] [FAILED] [%s] %s Offer data processing schedule failed', data.site, data.href, err));
+                    LOG.error(util.format('[ERROR] [%s] %s Offer data processing schedule failed', data.site, data.href, err));
                     return callback(err);
                 }
 
-                LOG.debug(util.format('[STATUS] [OK] [%s] %s Offer data processing scheduled', data.site, data.href));
+                LOG.debug(util.format('[OK] [%s] %s Offer data processing scheduled', data.site, data.href));
                 return callback(null);
             });
     }
@@ -86,11 +86,11 @@ class WorkerService {
             .removeOnComplete(true)
             .save(function (err) {
                 if (err) {
-                    LOG.error(util.format('[STATUS] [FAILED] [%s] %s Image processing schedule failed', options.site, options.dest, err));
+                    LOG.error(util.format('[ERROR] [%s] %s Image processing schedule failed', options.site, options.dest, err));
                     return callback(err);
                 }
 
-                LOG.debug(util.format('[STATUS] [OK] [%s] %s Image processing scheduled', options.site, options.dest));
+                LOG.debug(util.format('[OK] [%s] %s Image processing scheduled', options.site, options.dest));
                 return callback(null);
             });
     }
