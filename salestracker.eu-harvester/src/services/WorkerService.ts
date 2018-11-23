@@ -6,7 +6,7 @@ var SessionFactory = require('../../lib/services/SessionFactory');
 
 class WorkerService {
     scheduleOfferProcessing = (options, callback) => {
-        SessionFactory.getQueueConnection().create('processOffer', options)
+        SessionFactory.getQueueConnection().create('harvestOffer', options)
             .attempts(3).backoff({
                 delay: 60 * 1000,
                 type: 'exponential'
@@ -24,7 +24,7 @@ class WorkerService {
     }
 
     scheduleIndexPageProcessing = (options, callback) => {
-        SessionFactory.getQueueConnection().create('processIndexPage', options)
+        SessionFactory.getQueueConnection().create('harvestIndexPage', options)
             .attempts(3).backoff({
                 delay: 60 * 1000,
                 type: 'exponential'
@@ -42,7 +42,7 @@ class WorkerService {
     }
 
     schedulePageProcessing = (options, callback) => {
-        SessionFactory.getQueueConnection().create('processPage', options)
+        SessionFactory.getQueueConnection().create('harvestPage', options)
             .attempts(3).backoff({
                 delay: 60 * 1000,
                 type: 'exponential'
@@ -55,7 +55,7 @@ class WorkerService {
                 }
 
                 LOG.debug(util.format('[STATUS] [OK] [%s] %s Page processing scheduled', options.site, options.href));
-                return callback(null);
+                return callback();
             });
     }
 
@@ -73,6 +73,24 @@ class WorkerService {
                 }
 
                 LOG.debug(util.format('[STATUS] [OK] [%s] %s Offer data processing scheduled', data.site, data.href));
+                return callback(null);
+            });
+    }
+
+    scheduleImageProcessing(options: any, callback): any {
+        SessionFactory.getQueueConnection().create('processImage', options)
+            .attempts(3).backoff({
+                delay: 60 * 1000,
+                type: 'exponential'
+            })
+            .removeOnComplete(true)
+            .save(function (err) {
+                if (err) {
+                    LOG.error(util.format('[STATUS] [FAILED] [%s] %s Image processing schedule failed', options.site, options.dest, err));
+                    return callback(err);
+                }
+
+                LOG.debug(util.format('[STATUS] [OK] [%s] %s Image processing scheduled', options.site, options.dest));
                 return callback(null);
             });
     }

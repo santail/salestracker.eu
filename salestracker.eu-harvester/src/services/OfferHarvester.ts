@@ -11,7 +11,7 @@ var sessionFactory = require("../../lib/services/SessionFactory");
 
 
 class OfferHarvester {
-    public processOfferPage = (options, processOfferFinished) => {
+    public harvestOffer = (options, callback) => {
         var runningTime = new Date();
         var parser = parserFactory.getParser(options.site);
 
@@ -23,27 +23,27 @@ class OfferHarvester {
         }, (err, foundMainOffer) => {
             if (err) {
                 LOG.error(util.format('[STATUS] [Failure] Checking offer failed', err));
-                return this._gatherOffer(options, processOfferFinished);
+                return this._gatherOffer(options, callback);
             } else if (foundMainOffer) {
                 const isTranslated = !_.isUndefined(foundMainOffer.translations[options.language]);
 
                 if (isMainOffer) {
-                    this._extendExpirationTime(foundMainOffer._id, new Date(runningTime + parser.config.ttl), options, processOfferFinished);
+                    this._extendExpirationTime(foundMainOffer._id, new Date(runningTime + parser.config.ttl), options, callback);
                 } else if (isTranslated) {
                     LOG.info(util.format('[STATUS] [OK] [%s] Offer already translated. Skipping.', options.site, options.href));
-                    return processOfferFinished(null);
+                    return callback(null);
                 } else {
                     LOG.info(util.format('[STATUS] [OK] [%s] Offer translation not found %s. Proceed with harvesting %s', options.site, options.origin_href, options.href));
-                    return this._gatherOffer(options, processOfferFinished);
+                    return this._gatherOffer(options, callback);
                 }
             } else {
                 LOG.info(util.format('[STATUS] [OK] [%s] Offer not found. Proceed with harvesting', options.site, options.href));
-                return this._gatherOffer(options, processOfferFinished);
+                return this._gatherOffer(options, callback);
             };
         });
     }
 
-    private _gatherOffer = (options, processOfferFinished) => {
+    private _gatherOffer = (options, callback) => {
         var runningTime = new Date();
         var parser = parserFactory.getParser(options.site);
 
@@ -58,7 +58,7 @@ class OfferHarvester {
 
                 if (err) {
                     LOG.error(util.format('[STATUS] [Failure] [%s] [%s] [%s] Parsing offer failed', options.site, options.href, err));
-                    return processOfferFinished(err);
+                    return callback(err);
                 }
 
                 LOG.debug(util.format('[STATUS] [OK] [%s] Offer parsing finished %s', options.site, options.href));
@@ -75,7 +75,7 @@ class OfferHarvester {
                     data.origin_href = options.origin_href;
                 }
 
-                WorkerService.scheduleDataProcessing(data, processOfferFinished);
+                WorkerService.scheduleDataProcessing(data, callback);
             });
         };
 
@@ -89,10 +89,10 @@ class OfferHarvester {
                 onError: function (err, offer) {
                     if (err) {
                         LOG.error(util.format('[STATUS] [Failure] [%s] Offer processing failed %s', options.site, options.href, err));
-                        return processOfferFinished(err);
+                        return callback(err);
                     }
 
-                    return processOfferFinished(null, offer);
+                    return callback(null, offer);
                 },
                 onSuccess: parseResponseData
             });

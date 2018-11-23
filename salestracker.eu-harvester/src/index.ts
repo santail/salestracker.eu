@@ -44,7 +44,7 @@ _.each(sites, function (config) {
 });
 
 function start(config) {
-    worker.createJob('processSite', config)
+    worker.createJob('harvestSite', config)
         .attempts(3)
         .backoff({
             delay: 60 * 1000,
@@ -60,7 +60,7 @@ function start(config) {
         });
 };
 
-worker.process('processSite', numParallel, function (job, done) {
+worker.process('harvestSite', numParallel, function (job, done) {
     var config = job.data;
 
     // cleanup site only if job configuration requires it
@@ -71,7 +71,7 @@ worker.process('processSite', numParallel, function (job, done) {
             LOG.error(util.format('[STATUS] [Failure] [%s] Site cleanup failed', config.site, err));
         });
 
-    const processSitePromise = harvester.processSite(config)
+    const processSitePromise = harvester.harvestSite(config)
         .then(function () {
             LOG.info(util.format('[STATUS] [OK] [%s] Getting latest offers finished', config.site));
         }, function (err) {
@@ -88,10 +88,10 @@ worker.process('processSite', numParallel, function (job, done) {
         });
 });
 
-worker.process('processIndexPage', numParallel, function (job, done) {
+worker.process('harvestIndexPage', numParallel, function (job, done) {
     var config = job.data;
 
-    harvester.processIndexPage(config, function (err, result) {
+    harvester.harvestIndexPage(config, function (err, result) {
         if (err) {
             LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Index page harvesting failed', config.site, config.href, err));
             return done(err);
@@ -102,10 +102,10 @@ worker.process('processIndexPage', numParallel, function (job, done) {
     });
 });
 
-worker.process('processPage', numParallel, function (job, done) {
+worker.process('harvestPage', numParallel, function (job, done) {
     var config = job.data;
 
-    harvester.processPage(config, function (err, result) {
+    harvester.harvestPage(config, function (err, result) {
         if (err) {
             LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Page harvesting failed', config.site, config.href, err));
             return done(err);
@@ -116,10 +116,10 @@ worker.process('processPage', numParallel, function (job, done) {
     });
 });
 
-worker.process('processOffer', numParallel, function (job, done) {
+worker.process('harvestOffer', numParallel, function (job, done) {
     var config = job.data;
 
-    harvester.processOffer(config, function (err, result) {
+    harvester.harvestOffer(config, function (err, result) {
         if (err) {
             LOG.error(util.format('[STATUS] [Failure] [%s] Offer harvesting failed %s', config.site, config.href, err));
             return done(err);
@@ -130,17 +130,16 @@ worker.process('processOffer', numParallel, function (job, done) {
     });
 });
 
-worker.process('processImage', numParallel, function (job, done) {
+worker.process('harvestImage', numParallel, function (job, done) {
     var config = job.data;
 
-    harvester.processImage(config, function (err, result) {
-        if (err) {
-            LOG.error(util.format('[STATUS] [Failure] [%s] Image harvesting failed %s', config.site, config.href, err));
-            return done(err);
-        }
-
-        LOG.info(util.format('[STATUS] [OK] [%s] Image harvesting finished %s', config.site, config.href));
-        return done(null, result);
-    });
+    harvester.harvestImage(config)
+        .then(result => {
+            LOG.info(util.format('[STATUS] [OK] [%s] Image harvesting finished %s', config.site, config.href));
+            return done(null, result);
+        })
+        .catch(error => {
+            LOG.error(util.format('[STATUS] [Failure] [%s] Image harvesting failed %s', config.site, config.href, error));
+            return done(error);
+        });
 });
-

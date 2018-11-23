@@ -24,7 +24,7 @@ class IndexPageHarvester {
         if (parser.config.has_index_page) {
             options.href = indexPage.replace(/{search_criteria}/g, options.search); // TODO add default paging parameters
 
-            this.processIndexPage(options, (err, offers) => {
+            this.harvestIndexPage(options, (err, offers) => {
                 if (err) {
                     LOG.error(util.format('[STATUS] [Failure] [%s] Gathering offers failed', options.site, err));
                     return callback(err);
@@ -49,7 +49,7 @@ class IndexPageHarvester {
         }
     };
 
-    public processIndexPage = (options, callback) => {
+    public harvestIndexPage = (options, callback) => {
         LOG.info(util.format('[STATUS] [OK] [%s] [%s] Fetching index page', options.site, options.href));
 
         var parser = ParserFactory.getParser(options.site);

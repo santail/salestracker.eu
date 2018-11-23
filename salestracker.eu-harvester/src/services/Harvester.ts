@@ -46,7 +46,7 @@ class Harvester {
   /*
    *
    */
-  public processSite = (options) => {
+  public harvestSite = (options) => {
     LOG.info(util.format('[STATUS] [OK] [%s] Site processing started', options.site));
 
     return new Promise((fulfill, reject) => {
@@ -57,7 +57,7 @@ class Harvester {
         }
 
         LOG.info(util.format('[STATUS] [OK] [%s] Gathering offers finished', options.site));
-        return fulfill(null, offers);
+        return fulfill(offers);
       });
     });
   };
@@ -65,10 +65,10 @@ class Harvester {
   /*
    *
    */
-  public processIndexPage = (options, callback) => {
+  public harvestIndexPage = (options, callback) => {
     LOG.info(util.format('[STATUS] [OK] [%s] [%s] Index page processing started', options.site, options.href));
 
-    IndexPageHarvester.processIndexPage(options, (err, offers) => {
+    IndexPageHarvester.harvestIndexPage(options, (err, offers) => {
       if (err) {
         LOG.error(util.format('[STATUS] [Failure] [%s] Index page processing failed', options.site, err));
         return callback(err);
@@ -82,28 +82,28 @@ class Harvester {
   /*
    *
    */
-  public processPage = (options, callback) => {
+  public harvestPage = (options, callback) => {
     LOG.info(util.format('[STATUS] [OK] [%s] Page processing %s of %s started', options.site, options.page_index, options.total_pages));
 
-    return PagingHarvester.processPage(options, callback);
+    return PagingHarvester.harvestPage(options, callback);
   };
 
   /*
    *
    */
-  public processOffer = (options, callback) => {
-    LOG.debug(util.format('[STATUS] [OK] [%s] Offer processing started %s', options.site, options.href));
+  public harvestOffer = (options, callback) => {
+    LOG.info(util.format('[STATUS] [OK] [%s] Offer processing started %s', options.site, options.href));
 
-    return OfferHarvester.processOfferPage(options, callback);
+    return OfferHarvester.harvestOffer(options, callback);
   };
 
   /*
    *
    */
-  public processImage = (options, callback) => {
-    LOG.debug(util.format('[STATUS] [OK] [%s] Image processing started %s', options.site, options.href));
+  public harvestImage = (options) => {
+    LOG.info(util.format('[STATUS] [OK] [%s] Image processing started %s', options.site, options.href));
 
-    return ImageHarvester.processImage(options, callback);
+    return ImageHarvester.harvestImage(options);
   };
 
 };

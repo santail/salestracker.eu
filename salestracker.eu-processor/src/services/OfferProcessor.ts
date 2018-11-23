@@ -12,6 +12,9 @@ import ElasticIndexer from './ElasticIndexer';
 import WorkerService from './WorkerService';
 
 
+// should not process pictures if development environment and switched off
+var SHOULD_HARVEST_PICTURES = process.env.NODE_ENV !== 'development' || process.env.SHOULD_HARVEST_PICTURES !== 'false';
+
 class OfferProcessor {
 
     process = (data, done): any => {
@@ -25,15 +28,12 @@ class OfferProcessor {
             offer.parsed = new Date(offer.parsed);
             offer.expires = new Date(offer.expires);
 
-            // should not process pictures if development environment and switched off
-            var shouldProcessPictures = process.env.NODE_ENV !== 'development' || process.env.SHOULD_HARVEST_PICTURES !== 'false';
-
             if (data.pictures && data.pictures.length > 0) {
                 var pictures: string[] = [];
 
                 _.each(data.pictures, function (picture) {
-                    if (shouldProcessPictures) {
-                        WorkerService.scheduleImageProcessing({
+                    if (SHOULD_HARVEST_PICTURES) {
+                        WorkerService.scheduleImageHarvesting({
                             'site': data.site,
                             'offerHref': data.href,
                             'href': picture

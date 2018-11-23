@@ -10,7 +10,7 @@ var worker = SessionFactory.getQueueConnection();
 class WorkerService {
 
     scheduleOfferProcessing(options) {
-        worker.create('processOffer', options)
+        worker.create('harvestOffer', options)
         .attempts(3).backoff({
             delay: 60 * 1000,
             type: 'exponential'
@@ -25,8 +25,8 @@ class WorkerService {
         });
     }
 
-    scheduleImageProcessing(options) {
-        worker.create('processImage', options)
+    scheduleImageHarvesting(options) {
+        worker.create('harvestImage', options)
         .attempts(3).backoff({
             delay: 60 * 1000,
             type: 'exponential'

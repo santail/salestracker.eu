@@ -10,7 +10,7 @@ var parserFactory = require("../../lib/services/ParserFactory");
 
 
 class PagingHarvester {
-    public processPage = (options, processPageFinished) => {
+    public harvestPage = (options, callback) => {
         var parser = parserFactory.getParser(options.site);
 
         var crawler = new Crawler();
@@ -21,7 +21,7 @@ class PagingHarvester {
           payload: options.payload,
           onError: (err) => {
             LOG.error(util.format('[STATUS] [Failure] [%s] [%s] Fetching page failed', options.site, options.href, err));
-            return processPageFinished(err);
+            return callback(err);
           },
           onSuccess: (content) => {
             var offers = [];
@@ -32,7 +32,7 @@ class PagingHarvester {
               content = null;
     
               LOG.error(util.format('[STATUS] [Failure] [%s] Offers processing not scheduled', options.site, err));
-              return processPageFinished(new Error('Offers processing not scheduled: ' + err.message));
+              return callback(new Error('Offers processing not scheduled: ' + err.message));
             }
     
             var offersHandlers = _.map(offers, function (offer) {
@@ -49,23 +49,23 @@ class PagingHarvester {
             async.series(offersHandlers, function (err, results) {
               if (err) {
                 LOG.error(util.format('[STATUS] [Failure] [%s] Offers processing not scheduled', options.site, err));
-                return processPageFinished(err);
+                return callback(err);
               }
     
               LOG.info(util.format('[STATUS] [OK] [%s] Offers processing scheduled', options.site));
-              return processPageFinished(null, results);
+              return callback(null, results);
             });
     
             if (options.infinite_pagination) {
               if (process.env.NODE_ENV === 'development' && process.env.PAGING_PAGES_LIMIT && parseInt(process.env.PAGING_PAGES_LIMIT, 10) === options.page_index) {
-                return processPageFinished(null);
+                return callback(null);
               }
     
               LOG.info(util.format('[STATUS] [OK] [%s] Proccessing next infinite paging page', options.site));
     
               if (_.isEmpty(offers) || _.last(offers).href === options.last_processed_offer) {
                 LOG.info(util.format('[STATUS] [OK] [%s] Last infinite paging page found. Stop processing.', options.site));
-                return processPageFinished(null);
+                return callback(null);
               }
     
               var href = parser.compileNextPageHref(options.page_index);
@@ -78,7 +78,7 @@ class PagingHarvester {
                 'page_index': options.page_index + 1,
                 'infinite_pagination': true,
                 'last_processed_offer': _.last(offers).href
-              }, processPageFinished);
+              }, callback);
             }
           }
         });
