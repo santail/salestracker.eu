@@ -27,8 +27,6 @@ module.exports = {
   // for obsecurity reasons
   sessionKey: 'sessionId',
   sessionCollection: 'sessions',
-  logo: 'client/public/images/logo.png',
-  favicon: 'client/public/images/favicon.ico',
   uploads: {
     profileUpload: {
       dest: './uploads/profile', // Profile upload destination path
