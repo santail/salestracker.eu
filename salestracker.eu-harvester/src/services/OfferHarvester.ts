@@ -10,7 +10,7 @@ var parserFactory = require("../../lib/services/ParserFactory");
 var sessionFactory = require("../../lib/services/SessionFactory");
 
 
-class OfferPageHarvester {
+class OfferHarvester {
     public processOfferPage = (options, processOfferFinished) => {
         var runningTime = new Date();
         var parser = parserFactory.getParser(options.site);
@@ -142,4 +142,4 @@ class OfferPageHarvester {
     }
 }
 
-export default new OfferPageHarvester();
+export default new OfferHarvester();
