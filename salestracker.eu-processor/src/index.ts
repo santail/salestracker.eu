@@ -7,6 +7,7 @@ var SessionFactory = require('../lib/services/SessionFactory');
 import ElasticIndexer from './services/ElasticIndexer';
 import OfferProcessor from './services/OfferProcessor';
 import ImageProcessor from './services/ImageProcessor';
+import CategoryProcessor from './services/CategoryProcessor';
 
 var worker = SessionFactory.getQueueConnection();
 var elastic = SessionFactory.getElasticsearchConnection();
@@ -33,6 +34,12 @@ elastic.ping({ // test
                     var data = job.data;
 
                     ImageProcessor.process(data, done);
+                });
+
+                worker.process('processCategories', 10, function (job, done) {
+                    var data = job.data;
+
+                    CategoryProcessor.process(data, done);
                 });
             })
             .catch(function (err) {

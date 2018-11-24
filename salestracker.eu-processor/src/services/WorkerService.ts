@@ -9,7 +9,7 @@ var worker = SessionFactory.getQueueConnection();
 
 class WorkerService {
 
-    scheduleOfferProcessing(options) {
+    scheduleOfferTranslationsHarvesting(options) {
         worker.create('harvestOffer', options)
         .attempts(3).backoff({
             delay: 60 * 1000,
@@ -38,6 +38,22 @@ class WorkerService {
             }
 
             LOG.debug(util.format('[OK] [%s] %s Image processing scheduled', options.site, options.href));
+        });
+    }
+
+    scheduleCategoriesProcessing(options) {
+        worker.create('processCategories', options)
+        .attempts(3).backoff({
+            delay: 60 * 1000,
+            type: 'exponential'
+        })
+        .removeOnComplete(true)
+        .save(function (err) {
+            if (err) {
+                LOG.error(util.format('[ERROR] [%s] %s Offer categories processing schedule failed', options.site, options.href, err));
+            }
+
+            LOG.debug(util.format('[OK] [%s] %s Offer categories processing scheduled', options.site, options.href));
         });
     }
 };

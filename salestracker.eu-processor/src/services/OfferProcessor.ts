@@ -62,6 +62,12 @@ class OfferProcessor {
 
                 LOG.info(util.format('[OK] [%s] Offer saved %s', data.site, data.href));
 
+                WorkerService.scheduleCategoriesProcessing({
+                    'site': data.site,
+                    'language': data.language,
+                    'origin_href': offer.origin_href
+                });
+
                 _.each(_.keys(parser.config.languages), function (language) {
                     if (parser.config.languages[language].main || !parser.config.languages[language].exists) {
                         return;
@@ -75,7 +81,7 @@ class OfferProcessor {
                         href = parser.compileOfferHref(data.href, language);
                     }
 
-                    WorkerService.scheduleOfferProcessing({
+                    WorkerService.scheduleOfferTranslationsHarvesting({
                         'site': data.site,
                         'language': language,
                         'href': href,

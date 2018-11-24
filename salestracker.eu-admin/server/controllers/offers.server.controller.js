@@ -112,6 +112,9 @@ exports.list = function (req, res) {
     if (req.query.category) {
         criteria.category = req.query.category; // TODO validate query value against real configs
     }
+    else {
+        criteria.category = { "$exists" : false };
+    }
 
     if (req.query.site) {
         criteria.site = req.query.site; // TODO validate query value against real configs
