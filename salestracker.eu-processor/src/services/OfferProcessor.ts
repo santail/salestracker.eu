@@ -31,19 +31,23 @@ class OfferProcessor {
             if (data.pictures && data.pictures.length > 0) {
                 var pictures: string[] = [];
 
-                _.each(data.pictures, function (picture) {
+                _.each(data.pictures, function (pictureHref) {
                     if (SHOULD_HARVEST_PICTURES) {
                         WorkerService.scheduleImageHarvesting({
                             'site': data.site,
                             'offerHref': data.href,
-                            'href': picture
+                            'href': pictureHref
                         });
                     }
 
                     const offerHref = new URL(data.href);
-                    picture = path.join(data.site + '/' + slugify(offerHref.pathname), path.basename(picture));
+                    pictureHref = path.join(data.site + '/' + slugify(offerHref.pathname), path.basename(pictureHref));
 
-                    pictures.push(picture)
+                    if (data.site === 'www.barbora.ee') {
+                        pictureHref = pictureHref.replace('GetInventoryImage?id=', '') + '.jpg';
+                    }
+
+                    pictures.push(pictureHref)
                 });
 
                 offer.pictures = pictures;

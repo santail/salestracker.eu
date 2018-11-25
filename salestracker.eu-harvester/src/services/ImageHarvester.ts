@@ -37,6 +37,9 @@ class ImageHarvester {
                         }
 
                         options.dest = path.join(options.dest, path.basename(options.href));
+                        if (options.site === 'www.barbora.ee') {
+                            options.dest = options.dest.replace('GetInventoryImage?id=', '') + '.jpg';
+                        }
 
                         return writeFile(options.dest, res.body, 'binary')
                             .then(() => {

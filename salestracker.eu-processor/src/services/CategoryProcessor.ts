@@ -5,11 +5,23 @@ var LOG = require("../../lib/services/Logger");
 var SessionFactory = require('../../lib/services/SessionFactory');
 
 const CATEGORIES = {
-    'alcohol': ['Sauvignon', 'Bordeaux', 'Pinot', 'Mojito', 'Captain Morgan', 'Bacardi', 'Beefeater', 'Fresita', 'Veuve du Vernay', 'A.LE COQ'],
-    'cosmetics': [],
+    'alcohol': [
+        'Sauvignon', 'Bordeaux', 'Pinot', 'Mojito', 'Captain Morgan', 'Bacardi', 
+        'Beefeater', 'Fresita', 'Veuve du Vernay', 'St. Remy', 'Moet & Chandon', 'Shiraz',
+        'A.LE COQ', 'Vana Tallinn', 'Riesling', 'Cabernet', 'Chardonnay', 'Merlot', 'Hennessy', 'Cognac',
+        'Liviko Liköör', 'Caribba Blanco', 'Freixenet Cordon', 'Caribba Negro', 'Larsen V.S', 'Saaremaa Vodka', 
+        'Russian Standart', 'Baileys', 'Calvados Coquerel', 'Ballantine\'s', 'Scotch Whisky', 'Pinot Grigio', 
+        'Jack Daniel\'s', 'Jim Beam', 'Jägermeister', 'Leffe Blonde', 'Tullamore Dew', 'Törley', 'Krusovice',
+        'Pipra Naps', 'Gran Reserva', 'Nederburg Winemasters', 'Somersby Orchard', 'J. P. Chenet', 'Metsis Handcrafted',
+        'Prosecco', 'Cointreau', 'Veuve Clicquot', 'St.Remy', 'Martell V.S', 'J.P.Chenet', 'Ibis brändi X.O.',
+        'Sierra Tequila', 'Russian Standard', 'Beluga Noble', 'Carlsberg ', 'Aramis V', 'Gran Castillo',
+        'Old Tbilisi', 'Rigol Cava', 'Torres', 'Napoleon VS', 'Rigol Cava', 'Torres'
+    ],
+    'cosmetics': ['Himalaya', 'Dove', 'Garnier', 'Vuokkoset'],
     'children': ['Pampers', 'HUGGIES'],
     'toys': ['LEGO FRIENDS'],
-    'fashion': []
+    'fashion': [],
+    'pets': ['KITEKAT']
 }
 
 class CategoryProcessor {
@@ -31,7 +43,7 @@ class CategoryProcessor {
                 return done(new Error('Offer not found for update: ' + data.origin_href));
             }
 
-            let categories = this._findCategories(foundOffer.translations.est.title);
+            let categories = this._findCategories(foundOffer);
 
             if (!categories.length) {
                 return done();
@@ -54,24 +66,16 @@ class CategoryProcessor {
         });
     }
 
-    private _findCategories = (title: string) => {
-        LOG.info(util.format('[OK] [%s] Offer categories search', title));
+    private _findCategories = (offer: any) => {
+        let title = offer.translations.est ? offer.translations.est.title : offer.translations.eng.title;
 
-        let categories = _.filter(_.keys(CATEGORIES), (category) => {
-            LOG.info(util.format('[OK] [%s] Offer categories search', category));
-
+        return _.filter(_.keys(CATEGORIES), (category) => {
             let tags = CATEGORIES[category];
 
             return _.some(tags, tag => {
-                LOG.info(util.format('[OK] [%s] Offer categories search', tag));
-
                 return title.toLowerCase().indexOf(tag.toLowerCase()) >= 0;
             });
         });
-
-        LOG.info(util.format('[OK] [%s] Offer categories search', categories));
-
-        return categories;
     }
 }
 
