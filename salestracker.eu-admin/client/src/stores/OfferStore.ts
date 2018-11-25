@@ -80,8 +80,7 @@ export class OfferStore extends StoreBase {
                 const total = responseJson.total;
                 let offers: IOffer[] = [];
 
-                _.each(responseJson.results, function (offer: any) {
-
+                _.each(responseJson.results, (offer: any) => {
                     if (offer.translations.eng) {
                         offer.title = offer.translations.eng.title;
                     } 

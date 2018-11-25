@@ -200,7 +200,7 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
         this.setState({ site: e.currentTarget.value });
 
         OfferStore.loadOffers({
-            activePage: this.state.activePage, 
+            activePage: 0, 
             pageSize: this.state.pageSize,
             site: e.currentTarget.value,
             category: this.state.category
