@@ -11,12 +11,13 @@ interface LanguageConfiguration {
 }
 
 interface OfferTemplates {
-  title: (content: any) => string;
-  pictures: (content: any) => string[];
-  additional?: (content: any) => string;
-  description: (content: any) => string;
-  details?: (content: any) => string;
-  price: (content: any) => {
+  content: (data: any) => string;
+  title: (data: any) => string;
+  pictures: (data: any) => string[];
+  additional?: (data: any) => string;
+  description: (data: any) => string;
+  details?: (data: any) => string;
+  price: (data: any) => {
     current: number | undefined;
     original: number | undefined;
     discount: {
@@ -24,9 +25,9 @@ interface OfferTemplates {
       percents: number | undefined;
     }
   };
-  currency: (content: any) => string;
-  vendor?: (content: any) => string;
-  client_card_required?: (content: any) => boolean;
+  currency: (data: any) => string;
+  vendor?: (data: any) => string;
+  client_card_required?: (data: any) => boolean;
 }
 
 interface PagingConfiguration {
@@ -65,6 +66,7 @@ class AbstractParser {
     },
     list: () => [],
     templates: {
+      content: () => { return ''},
       title: () => { return ''},
       pictures: () => { return []},
       currency: () => { return ''},
@@ -140,7 +142,6 @@ class AbstractParser {
 
     var metadata = _.map(dataItems, (item) => {
       var metadata = {
-        'id': this.compileOfferHref(item),
         'href': this.compileOfferHref(item)
       }
 
@@ -155,6 +156,14 @@ class AbstractParser {
       return item.href;
     });
   };
+
+  content = (body) => {
+    if (this.config.json && typeof body === 'string') {
+      body = JSON.parse(body);
+    }
+
+    return this.config.templates.content.call(this, body);
+  }
 
   parse = (body, callback) => {
     if (this.config.json && typeof body === 'string') {
@@ -215,30 +224,30 @@ class AbstractParser {
     return this.config.index_page + link.replace(/&amp;/g, '&');
   };
 
-  compileOffer = (data) => {
+  filterOfferProperties = (data) => {
     var offer = {};
 
-    _.each(_.keys(data), (property) => {
-      if (!_.includes(this.config.translations, property)) {
-        if (!_.includes(['language', 'href'], property)) {
-          offer[property] = data[property];
-        }
+    const filteredFields = ['language', 'href', 'content'];
+
+    _.each(_.keys(data), property => {
+      if (!_.includes(this.config.translations, property) && !_.includes(filteredFields, property)) {
+        offer[property] = data[property];
       }
     });
 
     return offer;
   };
 
-  compileTranslations = (data) => {
+  compileTranslations = (options, data) => {
     var translations = {};
-    translations[data.language] = {};
+    translations[options.language] = {};
 
     _.each(_.keys(data), (property) => {
       if (data.hasOwnProperty(property) && _.includes(this.config.translations, property)) {
-        translations[data.language][property] = data[property];
+        translations[options.language][property] = data[property];
       }
 
-      translations[data.language].href = data.href;
+      translations[options.language].href = options.href;
     });
 
     return translations;

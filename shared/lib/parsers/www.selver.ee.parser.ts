@@ -34,6 +34,9 @@ class SelverParser extends AbstractParser {
       }).get();
     },
     'templates': {
+      'content': function ($) {
+        return $('div.product-essential.row').html();
+      },
       'vendor': function ($) {
         var header = $('#product-attribute-specs-table > tbody > tr').filter(function (index, el) {
           return $(el).find('th.label').text() === 'Tootja';
@@ -42,10 +45,10 @@ class SelverParser extends AbstractParser {
         return header.find('td.data').text().replace(/Määramata/g, '');
       },
       'title': function ($) {
-        return $('div.product-essential.row div.page-title > h1').text();
+        return $('div.page-title > h1').text();
       },
       'description': function ($) {
-        return $('div.product-essential.row div > span[itemprop="description"]').text();
+        return $('div > span[itemprop="description"]').text();
       },
       'pictures': ($) => {
         return [this.compileImageHref($('#main-image-default > a').attr('href'))];

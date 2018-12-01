@@ -5,22 +5,24 @@ var SessionFactory = require('../../lib/services/SessionFactory');
 
 
 class WorkerService {
-    scheduleOfferProcessing = (options, callback) => {
-        SessionFactory.getQueueConnection().create('harvestOffer', options)
-            .attempts(3).backoff({
-                delay: 60 * 1000,
-                type: 'exponential'
-            })
-            .removeOnComplete(true)
-            .save(function (err) {
-                if (err) {
-                    LOG.error(util.format('[ERROR] [%s] %s Offer processing schedule failed', options.site, options.href, err));
-                    return callback(err);
-                }
+    scheduleOfferHarvesting = (options) => {
+        return new Promise((fulfill, reject) => {
+            SessionFactory.getQueueConnection().create('harvestOffer', options)
+                .attempts(3).backoff({
+                    delay: 60 * 1000,
+                    type: 'exponential'
+                })
+                .removeOnComplete(true)
+                .save(function (err) {
+                    if (err) {
+                        LOG.error(util.format('[ERROR] [%s] %s Offer processing schedule failed', options.site, options.href, err));
+                        return reject(err);
+                    }
 
-                LOG.debug(util.format('[OK] [%s] %s Offer processing scheduled', options.site, options.href));
-                return callback(null);
-            });
+                    LOG.debug(util.format('[OK] [%s] %s Offer processing scheduled', options.site, options.href));
+                    return fulfill();
+                });
+        });
     }
 
     scheduleIndexPageProcessing = (options, callback) => {
@@ -37,7 +39,7 @@ class WorkerService {
                 }
 
                 LOG.debug(util.format('[OK] [%s] %s Index page processing scheduled', options.site, options.href));
-                return callback(null);
+                return callback();
             });
     }
 
@@ -59,40 +61,44 @@ class WorkerService {
             });
     }
 
-    scheduleDataProcessing(data: any, callback): any {
-        SessionFactory.getQueueConnection().create('processData', data)
-            .attempts(3).backoff({
-                delay: 60 * 1000,
-                type: 'exponential'
-            })
-            .removeOnComplete(true)
-            .save(function (err) {
-                if (err) {
-                    LOG.error(util.format('[ERROR] [%s] %s Offer data processing schedule failed', data.site, data.href, err));
-                    return callback(err);
-                }
+    scheduleContentProcessing(data: any): any {
+        return new Promise((fulfill, reject) => {
+            SessionFactory.getQueueConnection().create('processContent', data)
+                .attempts(3).backoff({
+                    delay: 60 * 1000,
+                    type: 'exponential'
+                })
+                .removeOnComplete(true)
+                .save(function (err) {
+                    if (err) {
+                        LOG.error(util.format('[ERROR] [%s] %s Offer content processing schedule failed', data.site, data.href, err));
+                        return reject(err);
+                    }
 
-                LOG.debug(util.format('[OK] [%s] %s Offer data processing scheduled', data.site, data.href));
-                return callback(null);
-            });
+                    LOG.debug(util.format('[OK] [%s] %s Offer content processing scheduled', data.site, data.href));
+                    return fulfill();
+                });
+        });
     }
 
-    scheduleImageProcessing(options: any, callback): any {
-        SessionFactory.getQueueConnection().create('processImage', options)
-            .attempts(3).backoff({
-                delay: 60 * 1000,
-                type: 'exponential'
-            })
-            .removeOnComplete(true)
-            .save(function (err) {
-                if (err) {
-                    LOG.error(util.format('[ERROR] [%s] %s Image processing schedule failed', options.site, options.dest, err));
-                    return callback(err);
-                }
+    scheduleImageProcessing(options: any): any {
+        return new Promise((fulfill, reject) => {
+            SessionFactory.getQueueConnection().create('processImage', options)
+                .attempts(3).backoff({
+                    delay: 60 * 1000,
+                    type: 'exponential'
+                })
+                .removeOnComplete(true)
+                .save(function (err) {
+                    if (err) {
+                        LOG.error(util.format('[ERROR] [%s] %s Image processing schedule failed', options.site, options.dest, err));
+                        return reject(err);
+                    }
 
-                LOG.debug(util.format('[OK] [%s] %s Image processing scheduled', options.site, options.dest));
-                return callback(null);
-            });
+                    LOG.debug(util.format('[OK] [%s] %s Image processing scheduled', options.site, options.dest));
+                    return fulfill();
+                });
+        });
     }
 
 };

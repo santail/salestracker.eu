@@ -20,63 +20,51 @@ class OfferHarvester {
 
         sessionFactory.getDbConnection().offers.findOne({
             "origin_href": href
-        }, (err, foundMainOffer) => {
+        }, (err, foundOffer) => {
             if (err) {
+                // TODO reclaim event processing
                 LOG.error(util.format('[ERROR] Checking offer failed', err));
-                return this._gatherOffer(options, callback);
-            } else if (foundMainOffer) {
-                const isTranslated = !_.isUndefined(foundMainOffer.translations[options.language]);
+                return this._harvestOfferContent(options, callback);
+            } else if (foundOffer) {
+                const isTranslated = !_.isUndefined(foundOffer.translations[options.language]);
 
                 if (isMainOffer) {
-                    this._extendExpirationTime(foundMainOffer._id, new Date(runningTime + parser.config.ttl), options, callback);
+                    this._extendExpirationTime(foundOffer._id, new Date(runningTime + parser.config.ttl), options, callback);
                 } else if (isTranslated) {
                     LOG.info(util.format('[OK] [%s] Offer already translated. Skipping.', options.site, options.href));
                     return callback(null);
                 } else {
                     LOG.info(util.format('[OK] [%s] Offer translation not found %s. Proceed with harvesting %s', options.site, options.origin_href, options.href));
-                    return this._gatherOffer(options, callback);
+                    return this._harvestOfferContent(options, callback, foundOffer);
                 }
             } else {
                 LOG.info(util.format('[OK] [%s] Offer not found. Proceed with harvesting', options.site, options.href));
-                return this._gatherOffer(options, callback);
+                return this._harvestOfferContent(options, callback);
             };
         });
     }
 
-    private _gatherOffer = (options, callback) => {
-        var runningTime = new Date();
+    private _harvestOfferContent = (options, callback, foundOffer?) => {
         var parser = parserFactory.getParser(options.site);
 
         var parseResponseData = (body) => {
-            parser.parse(body, (err, data) => {
-                var translations = this._findTranslationHrefs(options, body);
-                if (translations) {
-                    data.translations = translations;
-                }
+            const content = parser.content(body);
 
-                body = null;
-
-                if (err) {
-                    LOG.error(util.format('[ERROR] [%s] [%s] [%s] Parsing offer failed', options.site, options.href, err));
-                    return callback(err);
-                }
-
-                LOG.debug(util.format('[OK] [%s] Offer parsing finished %s', options.site, options.href));
-
-                data = _.extend(data, {
-                    'href': options.href,
-                    'site': options.site,
-                    'language': options.language,
-                    'parsed': new Date(runningTime),
-                    'expires': new Date(runningTime + parser.config.ttl) // in one hour
-                });
-
-                if (options.origin_href) {
-                    data.origin_href = options.origin_href;
-                }
-
-                WorkerService.scheduleDataProcessing(data, callback);
-            });
+            if (!foundOffer) {
+                this._storeOfferContent(options, content)
+                    .then(() => {                        
+                        return this._requestTranslations(options, body);
+                    })
+                    .then(() => {
+                        return callback();
+                    })
+                    .catch(err => {
+                        return callback(err);
+                    });
+            }
+            else {
+                this._updateOfferWithTranslatedContent(options, content, foundOffer, callback);
+            }
         };
 
         if (parser.config.json) {
@@ -88,7 +76,7 @@ class OfferHarvester {
                 headers: parser.config.headers,
                 onError: function (err, offer) {
                     if (err) {
-                        LOG.error(util.format('[ERROR] [%s] Offer processing failed %s', options.site, options.href, err));
+                        LOG.error(util.format('[ERROR] [%s] Getting offer\'s content failed %s', options.site, options.href, err));
                         return callback(err);
                     }
 
@@ -98,6 +86,124 @@ class OfferHarvester {
             });
         }
     };
+
+    private _updateOfferWithTranslatedContent = (options, content, foundOffer, callback) => {
+        foundOffer.translations[options.language] = {
+            'content': content,
+            'href': options.href
+        };
+
+        sessionFactory.getDbConnection().offers.update({
+            origin_href: options.origin_href
+        }, {
+            $set: {
+                translations: foundOffer.translations
+            }
+        }, (err) => {
+            if (err) {
+                LOG.error(util.format('[ERROR] [%s] [%s] Updating offer failed', options.site, options.href, err));
+                return callback(err);
+            }
+
+            return WorkerService.scheduleContentProcessing(options)
+                .then(() => {
+                    return callback();
+                });
+        });
+    };
+
+    private _storeOfferContent = (options, content) => {
+        var parser = parserFactory.getParser(options.site);
+        var runningTime = new Date();
+
+        const offer = {
+            'site': options.site,
+            'parsed': new Date(runningTime),
+            'expires': new Date(runningTime + parser.config.ttl), // in one hour
+            'origin_href': options.href,
+            'translations': {}
+        } as any;
+        
+        offer.translations[options.language] = {
+            'content': content,
+            'href': options.href
+        };
+
+        return new Promise((fulfill, reject) => {
+            sessionFactory.getDbConnection().offers.save(offer, (err, savedOffer) => {
+                if (err) {
+                    LOG.error(util.format('[ERROR] [%s] [%s] Saving offer content failed', options.site, options.href, err));
+                    return reject(err);
+                }
+
+                if (!savedOffer) {
+                    LOG.error(util.format('[ERROR] [%s] [%s] Saving offer content failed', options.site, options.href, err));
+                    return reject(new Error('DB save query failed'));
+                }
+
+                LOG.info(util.format('[OK] [%s] Offer content saved %s', options.site, options.href));
+                return fulfill(savedOffer);
+            });
+        })
+        .then(() => {
+            return WorkerService.scheduleContentProcessing({
+                site: options.site,
+                language: options.language,
+                href: options.href,
+                origin_href: options.origin_href ? options.origin_href : options.href
+            });
+        });
+    }
+
+    private _requestTranslations = (options, body) => {
+        var translations = this._findTranslationHrefs(options, body);
+
+        const translationsRequestPromises = _.map(_.keys(translations), language => {
+            let config = {
+                'site': options.site,
+                'language': language,
+                'href': translations[language],
+                'origin_href': options.href,
+            };
+
+            return WorkerService.scheduleOfferHarvesting(config)
+                .catch(err => {
+                    // TODO Mark offer as failed due to missing translation
+                });
+        });
+
+        return Promise.all(translationsRequestPromises)
+            .then(() => {
+                LOG.info(util.format('[OK] [%s] Offer translations scheduled', options.site, options.href));
+                return Promise.resolve();
+            })
+            .catch(err => {
+                LOG.error(util.format('[ERROR] [%s] Offer translations not scheduled %s', options.site, options.href));
+                return Promise.reject(err);
+            }) 
+    };
+
+    private _findTranslationHrefs = (options, body): { [language: string]: string } => {
+        var parser = parserFactory.getParser(options.site);
+
+        var translations = {};
+
+        _.each(_.keys(parser.config.languages), language => {
+            if (parser.config.languages[language].main || !parser.config.languages[language].exists) {
+                return;
+            }
+
+            if (parser.config.languages[language].findHref) {
+                const link = parser.config.languages[language].findHref(body);
+                translations[language] = parser.compileOfferHref(link);
+            }
+            else {
+                translations[language] = parser.compileOfferHref(options.href, language)
+            }
+        });
+
+        return translations;
+    }
 
     private _extendExpirationTime(offerId, expirationTime, options, callback) {
         sessionFactory.getDbConnection().offers.update({
@@ -115,30 +221,12 @@ class OfferHarvester {
 
             if (!updatedOffer) {
                 LOG.info(util.format('[OK] [%s] Offer not updated. Proceed with harvesting', options.site, options.href));
-                return this._gatherOffer(options, callback);
+                return this._harvestOfferContent(options, callback);
             } else {
                 LOG.info(util.format('[OK] [%s] Offers expiration time extended', options.site, options.href));
                 return callback(null);
             }
         });
-    }
-
-    private _findTranslationHrefs = (options, body): { [language: string]: string } => {
-        var parser = parserFactory.getParser(options.site);
-
-        var translations = {};
-
-        _.each(_.keys(parser.config.languages), function (language) {
-            if (parser.config.languages[language].main || !parser.config.languages[language].exists) {
-                return;
-            }
-
-            if (parser.config.languages[language].findHref) {
-                translations[language] = parser.config.languages[language].findHref(body);
-            }
-        });
-
-        return translations;
     }
 }
 

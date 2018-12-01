@@ -41,17 +41,20 @@ class BarboraParser extends AbstractParser {
       }).get();
     },
     'templates': {
+      'content': ($) => {
+        return $('div.b-page-container').html();
+      },
       'title': ($) => {
-        return $('div.b-page-container > div.b-product-info h1.b-product-info--title').text().trim();
+        return $('div.b-product-info h1.b-product-info--title').text().trim();
       },
       'pictures': ($) => {
-        return $('div.b-page-container > div.b-product-info div.b-product-info--pictures-wrap div.b-carousel--slide > img').map((index, el) => {
+        return $('div.b-product-info div.b-product-info--pictures-wrap div.b-carousel--slide > img').map((index, el) => {
           return this.compileImageHref($(el).attr('src'));
         }).get();
       },
       'price': ($) => {
-        var current = this.priceCleanup($('div.b-page-container > div.b-product-info div.b-product-info--price-and-quantity > div.b-product-prices-block > div.b-product-price-current > span.b-product-price-current-number').text());
-        var original = this.priceCleanup($('div.b-page-container > div.b-product-info div.b-product-info--price-and-quantity > div.b-product-prices-block > del.b-product-crossed-out-price').text());
+        var current = this.priceCleanup($('div.b-product-info div.b-product-info--price-and-quantity > div.b-product-prices-block > div.b-product-price-current > span.b-product-price-current-number').text());
+        var original = this.priceCleanup($('div.b-product-info div.b-product-info--price-and-quantity > div.b-product-prices-block > del.b-product-crossed-out-price').text());
 
         return {
           current: current,
@@ -63,10 +66,10 @@ class BarboraParser extends AbstractParser {
         return 'EUR';
       },
       'description': ($) => {
-        return $('div.b-page-container > dl.b-product-info--info-2').html();
+        return $('dl.b-product-info--info-2').html();
       },
       'vendor': ($) => {
-        var descriptionSection = $('div.b-page-container > dl.b-product-info--info-2');
+        var descriptionSection = $('dl.b-product-info--info-2');
 
         if (descriptionSection.length) {
           var vendorHeader = descriptionSection.find('dt.b-product-info--info-3-title').filter(function (index, el) {

@@ -39,10 +39,16 @@ class PagingHarvester {
               return function (offerHandlerFinished) {
                 content = null;
     
-                WorkerService.scheduleOfferProcessing(_.extend({
+                WorkerService.scheduleOfferHarvesting(_.extend(offer, {
                   'site': options.site,
                   'language': parser.getMainLanguage()
-                }, offer), offerHandlerFinished);
+                }))
+                  .then(() => {
+                    return offerHandlerFinished();
+                  })
+                  .catch(err => {
+                    return offerHandlerFinished(err);
+                  });
               };
             });
     

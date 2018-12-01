@@ -44,6 +44,9 @@ class AsosWomanParser extends AbstractParser {
       return data.products;
     },
     'templates': {
+      'content': (data) => {
+        return data;
+      },
       'title': (data) => {
         return data.name;
       },

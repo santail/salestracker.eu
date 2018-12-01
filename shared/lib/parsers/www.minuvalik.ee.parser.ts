@@ -15,16 +15,6 @@ class MinuvalikParser extends AbstractParser {
     return url.format(parsed);
   };
 
-  private _picturesParser = ($) => {
-    return $('.deal_rules_td .dd_video_photo > a').map((index, el) => {
-      return this.compileImageHref($(el).attr('href'));
-    }).get();
-  }
-
-  private _titleParser = ($) => {
-    return $('.deal_rules_td > h1.title_deal').text();
-  };
-
   protected config: ParserConfiguration = {
     'headers': {
       'proxy': '95.24.130.71:8888',
@@ -73,20 +63,29 @@ class MinuvalikParser extends AbstractParser {
       }).get();
     },
     'templates': {
-      'title': this._titleParser,
-      'pictures': this._picturesParser,
-      'additional': ($) => {
-        return $('.deal_rules_td .dd_lead').html();
+      'content': ($) => {
+        return $('table.deal_table').html();
+      },
+      'title': ($) => {
+        return $('h1.title_deal').text();
+      },
+      'pictures': ($) => {
+        return $('div.dd_video_photo > a').map((index, el) => {
+          return this.compileImageHref($(el).attr('href'));
+        }).get();
       },
       'description': ($) => {
-        return $('.deal_rules_td .dd_descr').eq(1).html();
+        return $('ul.dd_descr').first().html();
       },
       'details': ($) => {
-        return $('.deal_rules_td .dd_descr').first().html();
+        return $('ul.dd_descr').eq(1).html();
+      },
+      'additional': ($) => {
+        return $('ul.dd_descr').eq(2).html();
       },
       'price': ($) => {
-        var current = this.priceCleanup($('.deal_rules_td > div#parent_div > div> div.dd_table_price').text());
-        var original = this.priceCleanup($('.deal_rules_td > div#parent_div div.dd_table_discount_info > span.dd_basic_price').text());
+        var current = this.priceCleanup($('div#parent_div > div> div.dd_table_price').text());
+        var original = this.priceCleanup($('div#parent_div div.dd_table_discount_info > span.dd_basic_price').text());
         
         return {
           'current': current,

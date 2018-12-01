@@ -45,6 +45,9 @@ class EcoopParser extends AbstractParser {
       return data.results;
     },
     'templates': {
+      'content': (data) => {
+        return data;
+      },
       'title': (data) => {
         return data.name;
       },

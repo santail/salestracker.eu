@@ -59,17 +59,20 @@ class ZoomaailmParser extends AbstractParser {
             }).get();
         },
         'templates': {
+            'content': ($) => {
+                return $('div.product-essential').html();
+            },
             'title': ($) => {
-                return $('div.product-essential div.product-shop div.product-name > h1').text().trim();
+                return $('div.product-shop div.product-name > h1').text().trim();
             },
             'pictures': ($) => {
-                return $('div.product-essential div.product-img-box > div.more-views > ul > li > a > img').map(function (index, el) {
+                return $('div.product-img-box > div.more-views > ul > li > a > img').map(function (index, el) {
                     return $(el).attr('src').replace(/\/thumbnail\/56x/, "/image/365x");
                 }).get();
             },
             'price': ($) => {
-                var current = this.priceCleanup($('div.product-essential div.product-shop div.price-box > p.special-price > span.price').text());
-                var original = this.priceCleanup($('div.product-essential div.product-shop div.price-box > p.old-price > span.price').text());
+                var current = this.priceCleanup($('div.product-shop div.price-box > p.special-price > span.price').text());
+                var original = this.priceCleanup($('div.product-shop div.price-box > p.old-price > span.price').text());
 
                 return {
                     current: current,
@@ -81,7 +84,7 @@ class ZoomaailmParser extends AbstractParser {
                 return 'EUR';
             },
             'description': ($) => {
-                return $('div.product-essential div.description > div.std').text();
+                return $('div.description > div.std').text();
             },
             'vendor': ($) => {
                 return $('#product-attribute-specs-table tbody tr.manufacturer td.data').text();
