@@ -26,11 +26,11 @@ const CATEGORIES = {
 
 class CategoryProcessor {
 
-    process(data, done) {
-        LOG.info(util.format('[OK] [%s] Offer category processing started %s', data.site, data.origin_href));
+    process(options, done) {
+        LOG.info(util.format('[OK] [%s] Offer category processing started %s', options.site, options.origin_href));
 
         SessionFactory.getDbConnection().offers.findOne({
-            origin_href: data.origin_href
+            origin_href: options.origin_href
         }, (err, foundOffer) => {
             if (err) {
                 LOG.error(util.format('[ERROR] Checking offer failed', err));
@@ -39,8 +39,8 @@ class CategoryProcessor {
 
             if (!foundOffer) {
                 // TODO Mark somehow failed offer and re-run harvesting
-                LOG.error(util.format('[ERROR] Offer category processing failed. Offer not found %', data.origin_href));
-                return done(new Error('Offer not found for update: ' + data.origin_href));
+                LOG.error(util.format('[ERROR] Offer category processing failed. Offer not found %', options.origin_href));
+                return done(new Error('Offer not found for update: ' + options.origin_href));
             }
 
             let categories = this._findCategories(foundOffer);
@@ -50,14 +50,14 @@ class CategoryProcessor {
             }
 
             SessionFactory.getDbConnection().offers.update({
-                origin_href: data.origin_href
+                origin_href: options.origin_href
             }, {
                 $set: {
                     category: categories
                 }
             }, function (err) {
                 if (err) {
-                    LOG.error(util.format('[ERROR] [%s] [%s] Offer category processing failed', data.site, data.href, err));
+                    LOG.error(util.format('[ERROR] [%s] [%s] Offer category processing failed', options.site, options.href, err));
                     return done(err);
                 }
 

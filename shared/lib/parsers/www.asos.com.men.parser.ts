@@ -63,17 +63,16 @@ class AsosManParser extends AbstractParser {
         return {
           current: current,
           original: original,
-          discount: this.compileDiscount(current, original)
+          discount: this.compileDiscount(current, original),
+          currency: 'EUR'
         }
       },
-      'currency': () => { 
-        return 'EUR';
-      },
       'description': ($) => {
-        return '';
+        return ''; // TODO find proper description
       }
     },
-    'translations': ['title', 'description']
+    'translations': ['title', 'description'],
+    'required_properties': ['price', 'pictures', 'title']
   };
 
   compilePagingParameters = (content, options) => {

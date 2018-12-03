@@ -90,17 +90,16 @@ class MinuvalikParser extends AbstractParser {
         return {
           'current': current,
           'original': original,
-          'discount': this.compileDiscount(current, original)
+          'discount': this.compileDiscount(current, original),
+          currency: 'EUR'
         }
-      },
-      'currency': () => {
-        return 'EUR';
       },
       'vendor': () => {
         return '';
       }
     },
-    'translations': ['title', 'description', 'details', 'additional']
+    'translations': ['title', 'description', 'details', 'additional'],
+    'required_properties': ['description', 'price', 'pictures', 'title']
   };
 
   constructor() {

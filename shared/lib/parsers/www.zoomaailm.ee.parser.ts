@@ -77,11 +77,9 @@ class ZoomaailmParser extends AbstractParser {
                 return {
                     current: current,
                     original: original,
-                    discount: this.compileDiscount(current, original)
+                    discount: this.compileDiscount(current, original),
+                    currency: 'EUR'
                 }
-            },
-            'currency': () => {
-                return 'EUR';
             },
             'description': ($) => {
                 return $('div.description > div.std').text();
@@ -90,7 +88,8 @@ class ZoomaailmParser extends AbstractParser {
                 return $('#product-attribute-specs-table tbody tr.manufacturer td.data').text();
             }
         },
-        'translations': ['title', 'description']
+        'translations': ['title', 'description'],
+        'required_properties': ['description', 'price', 'pictures', 'title']
     };
 
     compilePagingPattern = (options) => {

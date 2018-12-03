@@ -59,11 +59,9 @@ class BarboraParser extends AbstractParser {
         return {
           current: current,
           original: original,
-          discount: this.compileDiscount(current, original)
+          discount: this.compileDiscount(current, original),
+          currency: 'EUR'
         }
-      },
-      'currency': () => { 
-        return 'EUR';
       },
       'description': ($) => {
         return $('dl.b-product-info--info-2').html();
@@ -84,7 +82,8 @@ class BarboraParser extends AbstractParser {
         return '';
       }
     },
-    'translations': ['title', 'description']
+    'translations': ['title', 'description'],
+    'required_properties': ['price', 'pictures', 'title']
   };
     
   compileImageHref = (link) => {

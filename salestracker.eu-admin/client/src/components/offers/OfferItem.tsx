@@ -32,7 +32,7 @@ class OfferItem extends ComponentBase<OfferItemProps, OfferItemState> {
             </div>
         ) : undefined;
 
-        const imagePath = '/img/offers/' + offer.pictures[0];
+        const imagePath = '/img/offers/' + offer.downloads.pictures[0];
 
         return (
             <div className="widget">
@@ -45,7 +45,7 @@ class OfferItem extends ComponentBase<OfferItemProps, OfferItemState> {
                     </div>
                     <div className="caption">
                         <a href="#" title="" className="caption-title" onClick={this._onAddToBasket}>{offer.title}</a>
-                        { offer.price.current }&nbsp;{offer.price.original}&nbsp;({offer.price.discount.amount}&nbsp;{offer.price.discount.percents}%)
+                        { offer.price.current }&nbsp;{offer.price.original}%)
                     </div>
                 </div>
             </div>

@@ -48,6 +48,12 @@ elastic.ping({ // test
 
                     ContentProcessor.process(data, done);
                 });
+
+                worker.process('processIndexing', 10, function (job, done) {
+                    var data = job.data;
+
+                    ElasticIndexer.indexOffer(data, done);
+                });
             })
             .catch(function (err) {
                 LOG.error(util.format('[ERROR] Initializing indexes failed', err));

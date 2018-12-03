@@ -66,17 +66,16 @@ class EcoopParser extends AbstractParser {
         return {
           current: current,
           original: original,
-          discount: this.compileDiscount(current, original)
+          discount: this.compileDiscount(current, original),
+          currency: 'EUR'
         }
-      },
-      'currency': () => {
-        return 'EUR';
       },
       'vendor': (data) => {
         return data.meta.producer;
       }
     },
-    'translations': ['title', 'description']
+    'translations': ['title', 'description'],
+    'required_properties': ['description', 'price', 'pictures', 'title']
   };
 
   compileImageHref = (link) => {

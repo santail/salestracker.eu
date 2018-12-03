@@ -25,7 +25,7 @@ class OfferItem extends ComponentBase<OfferItemProps, OfferItemState> {
     render() {
         const offer = this.props.item.offer;
 
-        const imagePath = '/img/offers/' + path.basename(offer.pictures[0]);
+        const imagePath = '/img/offers/' + path.basename(offer.downloads.pictures[0]);
 
         return (
             <div className="widget">

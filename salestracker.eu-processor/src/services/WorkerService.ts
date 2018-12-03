@@ -8,20 +8,24 @@ var SessionFactory = require('../../lib/services/SessionFactory');
 
 class WorkerService {
 
-    scheduleImageHarvesting(options) {
-        SessionFactory.getQueueConnection().create('harvestImage', options)
-            .attempts(3).backoff({
-                delay: 60 * 1000,
-                type: 'exponential'
-            })
-            .removeOnComplete(true)
-            .save(function (err) {
-                if (err) {
-                    LOG.error(util.format('[ERROR] [%s] %s Image processing schedule failed', options.site, options.href, err));
-                }
+    schedulePictureHarvesting(options) {
+        return new Promise((fulfill, reject) => {
+            SessionFactory.getQueueConnection().create('harvestPicture', options)
+                .attempts(3).backoff({
+                    delay: 60 * 1000,
+                    type: 'exponential'
+                })
+                .removeOnComplete(true)
+                .save(function (err) {
+                    if (err) {
+                        LOG.error(util.format('[ERROR] [%s] %s Image processing schedule failed', options.site, options.href, err));
+                        return reject(err);
+                    }
 
-                LOG.debug(util.format('[OK] [%s] %s Image processing scheduled', options.site, options.href));
-            });
+                    LOG.debug(util.format('[OK] [%s] %s Image processing scheduled', options.site, options.href));
+                    return fulfill(err);
+                });
+        });
     }
 
     scheduleCategoriesProcessing(options) {
@@ -39,6 +43,26 @@ class WorkerService {
                     }
 
                     LOG.debug(util.format('[OK] [%s] %s Offer categories processing scheduled', options.site, options.href));
+                    return fulfill(err);
+                });
+        });
+    }
+
+    scheduleIndexing(options) {
+        return new Promise((fulfill, reject) => {
+            SessionFactory.getQueueConnection().create('processIndexing', options)
+                .attempts(3).backoff({
+                    delay: 60 * 1000,
+                    type: 'exponential'
+                })
+                .removeOnComplete(true)
+                .save(function (err) {
+                    if (err) {
+                        LOG.error(util.format('[ERROR] [%s] %s Offer indexes processing schedule failed', options.site, options.href, err));
+                        return reject(err);
+                    }
+
+                    LOG.debug(util.format('[OK] [%s] %s Offer indexes processing scheduled', options.site, options.href));
                     return fulfill(err);
                 });
         });

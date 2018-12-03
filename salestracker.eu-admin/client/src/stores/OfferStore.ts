@@ -8,7 +8,9 @@ export interface IOffer {
     category: string;
     title: string;
     origin_href: string;
-    pictures: string[];
+    downloads: {
+        pictures: string[];
+    },
     price: {
         current: Number,
         original: Number,

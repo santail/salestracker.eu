@@ -23,9 +23,9 @@ interface OfferTemplates {
     discount: {
       amount: number | undefined;
       percents: number | undefined;
-    }
+    },
+    currency: string;
   };
-  currency: (data: any) => string;
   vendor?: (data: any) => string;
   client_card_required?: (data: any) => boolean;
 }
@@ -52,6 +52,7 @@ export interface ParserConfiguration {
   languages: { [language: string]: LanguageConfiguration };
   headers?: { [header: string]: string };
   translations: string[];
+  required_properties: string[];
 }
 
 
@@ -69,20 +70,21 @@ class AbstractParser {
       content: () => { return ''},
       title: () => { return ''},
       pictures: () => { return []},
-      currency: () => { return ''},
       price: () => { return {
         current: 0,
         original: 0,
         discount: {
           amount: 0,
           percents:  0
-        }
+        },
+        currency: ''
       }},
       vendor: () => { return ''},
       description: () => { return ''}
     },
     languages: {},
     translations: [],
+    required_properties: [],
     ttl: 0,
     site: '',
     headers: {}
@@ -287,6 +289,14 @@ class AbstractParser {
       percents: Number((+percents).toFixed(2)), 
     };
   };
+
+  validateOfferProperties = (offer) => {
+    const isValid = !_.some(this.config.required_properties, property => {
+      return _.isUndefined(offer[property]) || _.isNil(offer[property]) || _.isEmpty(offer[property]);
+    });
+
+    offer.is_valid = isValid;
+  }
 };
 
 export default AbstractParser;

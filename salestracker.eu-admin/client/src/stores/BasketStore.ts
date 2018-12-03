@@ -61,7 +61,7 @@ export class BasketStore extends StoreBase {
         let offerWidgetsHTML: string = '';
 
         this._bundle.items.map((item, i) => {
-            const imagePath = '/img/offers/' + path.basename(item.offer.pictures[0]);
+            const imagePath = '/img/offers/' + path.basename(item.offer.downloads.pictures[0]);
             let optionalImage: string = '';
 
             if (this._withImages) {

@@ -19,48 +19,54 @@ class ImageHarvester {
     public harvestImage = (options) => {
         return new Promise((fulfill, reject) => {
             request({
-                url: options.href,
+                url: options.picture_href,
                 encoding: 'binary',
                 resolveWithFullResponse: true,
                 simple: false 
             })
             .then(res => {
                 if (res.body && res.statusCode === 200) {
-                    const offerHref = new URL(options.offerHref);
-                    options.dest = path.join(process.cwd(), './uploads/offers/' + options.site + '/' + slugify(offerHref.pathname));
-
-                    fs.ensureDir(options.dest, '0777', (err) => {
+                    fs.ensureDir(options.picture_path, '0777', (err) => {
                         if (err) {
                             if (err.code == 'EEXIST') {
                                 // do nothing 
                             }
                         }
 
-                        options.dest = path.join(options.dest, path.basename(options.href));
-                        if (options.site === 'www.barbora.ee') {
-                            options.dest = options.dest.replace('GetInventoryImage?id=', '') + '.jpg';
-                        }
+                        let picturePath = path.join(options.picture_path, path.basename(options.picture_href));
 
-                        return writeFile(options.dest, res.body, 'binary')
+                        if (options.site === 'www.barbora.ee') {
+                            picturePath = picturePath.replace('GetInventoryImage?id=', '') + '.jpg';
+                        }
+        
+                        return writeFile(picturePath, res.body, 'binary')
                             .then(() => {
-                                WorkerService.scheduleImageProcessing({
+                                return WorkerService.scheduleImageProcessing({
                                     site: options.site,
-                                    dest: options.dest
-                                }, fulfill)
+                                    href: options.href,
+                                    origin_href: options.origin_href,
+                                    picture_path: picturePath
+                                });
+                            })
+                            .then(() => {
+                                return fulfill();
                             })
                             .catch(err => {
-                                LOG.error(util.format('[ERROR] [%s] Image storing failed %s', options.site, options.href, err));
+                                LOG.error(util.format('[ERROR] [%s] Image storing failed %s', options.site, options.picture_href, err));
                                 return reject(err);
                             });
                     });
                 } 
                 else if (res.statusCode === 404) {
-                    LOG.error(util.format('[ERROR] [%s] Image was not found %s', options.site, options.href));
+                    LOG.error(util.format('[ERROR] [%s] Image was not found %s', options.site, options.picture_href));
                     return fulfill(); // no image found, just log and complete job
                 } 
+                else {
+                    return reject();
+                }
             })
             .catch(err => {
-                LOG.error(util.format('[ERROR] [%s] Image retrieving failed %s', options.site, options.href));
+                LOG.error(util.format('[ERROR] [%s] Image retrieving failed %s', options.site, options.picture_href));
                 return reject(err);
             });
         });

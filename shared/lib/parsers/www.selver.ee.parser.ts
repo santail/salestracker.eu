@@ -73,7 +73,7 @@ class SelverParser extends AbstractParser {
           if (priceContainer.length) {
             current = this.priceCleanup(priceContainer.find('span:first-child').text());
           } else {
-            current = this.priceCleanup($('div.product-essential div.price-box:first-child p.special-price > span.price > span[itemprop=price]').text());
+            current = this.priceCleanup($('#product_addtocart_form div.price-box:first-child p.special-price > span.price > span[itemprop=price]').text());
           }
 
           var oldPriceContainer = $('#product_addtocart_form div.product p.old-price > span.price > span:first-child');
@@ -81,14 +81,15 @@ class SelverParser extends AbstractParser {
             original = this.priceCleanup(oldPriceContainer.text());
           } else {
 
-            original = this.priceCleanup($('div.product-essential div.price-box:first-child p.old-price > span.price > span:first-child').text());
+            original = this.priceCleanup($('#product_addtocart_form div.price-box:first-child p.old-price > span.price > span:first-child').text());
           }
         }
 
         return {
-          'current': current,
-          'original': original,
-          'discount': this.compileDiscount(current, original)
+          current: current,
+          original: original,
+          discount: this.compileDiscount(current, original),
+          currency: 'EUR'
         }
       },
       'client_card_required': function ($) {
@@ -100,12 +101,10 @@ class SelverParser extends AbstractParser {
         }
 
         return false;
-      },
-      'currency': () => {
-        return 'EUR';
       }
     },
-    'translations': ['title', 'description']
+    'translations': ['title', 'description'],
+    'required_properties': ['client_card_required', 'description', 'price', 'pictures', 'title']
   };
 
   compilePagingPattern = () => {

@@ -11,7 +11,6 @@ var SessionFactory = require('../../lib/services/SessionFactory');
 
 import WorkerService from "./WorkerService";
 
-var SHOULD_HARVEST_PICTURES = process.env.NODE_ENV !== 'development' || process.env.SHOULD_HARVEST_PICTURES !== 'false';
 
 class ContentProcessor {
 
@@ -72,6 +71,8 @@ class ContentProcessor {
                 if (isMainOffer) {
                     var offer = parser.filterOfferProperties(data);
                     foundOffer = _.extend(foundOffer, offer);
+
+                    parser.validateOfferProperties(foundOffer); // TODO check translations
                 }
 
                 SessionFactory.getDbConnection().offers.update({
@@ -84,37 +85,21 @@ class ContentProcessor {
                         return reject(err);
                     }
     
-                    return fulfill();
+                    WorkerService.scheduleDataProcessing({
+                        'site': options.site,
+                        'language': options.language,
+                        'href': options.href,
+                        'origin_href': options.origin_href ? options.origin_href : options.href
+                    })
+                    .then(() => {
+                        return fulfill();
+                    })
+                    .catch(err => {
+                        return fulfill(); // TODO Mark to re-schedule data processing
+                    });
                 });
             });
         });
-    }
-
-    private _processParsedData = (options, data) => {
-        var pictures: string[] = [];
-
-        _.each(data.pictures, pictureHref => {
-            if (SHOULD_HARVEST_PICTURES) {
-                WorkerService.scheduleImageHarvesting({
-                    'site': options.site,
-                    'offerHref': options.href,
-                    'href': pictureHref
-                });
-            }
-
-            const offerHref = new URL(options.href);
-            pictureHref = path.join(options.site + '/' + slugify(offerHref.pathname), path.basename(pictureHref));
-
-            if (options.site === 'www.barbora.ee') {
-                pictureHref = pictureHref.replace('GetInventoryImage?id=', '') + '.jpg';
-            }
-
-            pictures.push(pictureHref)
-        });
-
-        return {
-            pictures: pictures
-        };
     }
 }
 

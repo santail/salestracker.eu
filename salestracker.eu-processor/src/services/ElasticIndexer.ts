@@ -24,7 +24,7 @@ class ElasticIndexer {
             })
             .then(function (exists) {
                 if (!exists) {
-                    LOG.info(util.format('[OK] [%s] Index missing. Initializing index.'));
+                    LOG.info(util.format('[OK] [%s] Index missing. Initializing index.', indexName));
 
                     return elastic.indices.create({
                         index: indexName
@@ -117,27 +117,50 @@ class ElasticIndexer {
             })
     }
 
-    indexOffer = (offer, done) => {
-        var language = offer.language;
-
-        delete offer._id;
-        delete offer.pictures;
-        delete offer.currency;
-        delete offer.translations;
-        delete offer.language;
-
-        elastic.index({
-            index: 'salestracker-' + language,
-            type: 'offers',
-            body: offer
-        }, function (err, resp) {
+    indexOffer = (options, callback) => {
+        SessionFactory.getDbConnection().offers.findOne({
+            "origin_href": options.origin_href
+        }, (err, foundOffer) => {
             if (err) {
-                LOG.error(util.format('[ERROR] [%s] [%s] Indexing offer failed', offer.site, offer.id, err));
-                return done(err);
-            }
+                // TODO reclaim event processing
+                LOG.error(util.format('[ERROR] Checking offer failed', err));
+                return callback(err);
+            } 
+            
+            if (foundOffer) {
+                LOG.info(util.format('[OK] [%s] Offer content found %s. Proceed with parsing content.', options.site, options.origin_href));
+                
+                let offer = _.clone(foundOffer);
+                let translations = offer.translations[options.language];
 
-            LOG.info(util.format('[OK] [%s] Offer indexed %s', offer.site, offer.href));
-            return done(null, resp);
+                delete translations.href;
+                delete translations.content;
+
+                offer = _.extend(offer, translations);
+
+                delete offer._id;
+                delete offer.pictures;
+                delete offer.translations;
+                delete offer.language;
+
+                elastic.index({
+                    index: 'salestracker-' + options.language,
+                    type: 'offers',
+                    body: offer
+                }, function (err, resp) {
+                    if (err) {
+                        LOG.error(util.format('[ERROR] [%s] [%s] Indexing offer failed', offer.site, offer.id, err));
+                        return callback(err);
+                    }
+        
+                    LOG.info(util.format('[OK] [%s] Offer indexed %s', offer.site, offer.href));
+                    return callback(null, resp);
+                });
+            }
+            else {
+                LOG.error(util.format('[ERROR] [%s] Offer not found. Parsing content failed.', options.site, options.origin_href));
+                return callback(err);
+            };
         });
     }
 }
