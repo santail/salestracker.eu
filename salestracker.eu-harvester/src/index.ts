@@ -130,10 +130,10 @@ worker.process('harvestOffer', numParallel, function (job, done) {
     });
 });
 
-worker.process('harvestImage', numParallel, function (job, done) {
+worker.process('harvestPicture', numParallel, function (job, done) {
     var config = job.data;
 
-    harvester.harvestImage(config)
+    harvester.harvestPicture(config)
         .then(result => {
             LOG.info(util.format('[OK] [%s] Image harvesting finished %s', config.site, config.href));
             return done(null, result);
