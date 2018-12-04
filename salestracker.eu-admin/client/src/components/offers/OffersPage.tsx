@@ -96,6 +96,7 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
                             <option value="www.barbora.ee">www.barbora.ee</option>
                             <option value="www.ecoop.ee">www.ecoop.ee</option>
                             <option value="www.minuvalik.ee">www.minuvalik.ee</option>
+                            <option value="www.rimi.ee">www.rimi.ee</option>
                             <option value="www.selver.ee">www.selver.ee</option>
                             <option value="www.zoomaailm.ee">www.zoomaailm.ee</option>
                         </select>
