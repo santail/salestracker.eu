@@ -214,11 +214,48 @@ class IndexPageHarvester {
         }, callback);
     };
 
-    private _startSimpleIndexPageProcessing = function (options, content, processSimpleIndexesFinished) {
+    private _startSimpleIndexPageProcessing = function (options, content, callback) {
         LOG.info(util.format('[OK] [%s] No paging found', options.site));
-        LOG.info(util.format('[OK] [%s] Processing offers', options.site));
 
-        return processSimpleIndexesFinished(null, content);
+        var parser = ParserFactory.getParser(options.site);
+
+        var offers = [];
+    
+        try {
+          offers = parser.getOffers(content);
+        } catch (err) {
+          content = null;
+
+          LOG.error(util.format('[ERROR] [%s] Offers processing not scheduled', options.site, err));
+          return callback(new Error('Offers processing not scheduled: ' + err.message));
+        }
+
+        var offersHandlers = _.map(offers, function (offer) {
+          return function (offerHandlerFinished) {
+            content = null;
+
+            WorkerService.scheduleOfferHarvesting(_.extend(offer, {
+              'site': options.site,
+              'language': parser.getMainLanguage()
+            }))
+              .then(() => {
+                return offerHandlerFinished();
+              })
+              .catch(err => {
+                return offerHandlerFinished(err);
+              });
+          };
+        });
+
+        async.series(offersHandlers, function (err, results) {
+            if (err) {
+                LOG.error(util.format('[ERROR] [%s] Offers processing not scheduled', options.site, err));
+                return callback(err);
+            }
+
+            LOG.info(util.format('[OK] [%s] Offers processing scheduled', options.site));
+            return callback(null, results);
+        });
     };
 }
 

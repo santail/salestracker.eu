@@ -30,6 +30,9 @@ var OfferSchema = new Schema({
 			details: { 'type': String, 'trim': true }
 		}
 	},
+	downloads: {
+		pictures: []
+	},
     parsed: { 'type': Date, 'default': Date.now },
     expires: { 'type': Date, 'default': Date.now },
 	user: { type: Schema.ObjectId, ref: 'User' }
@@ -44,7 +47,7 @@ OfferSchema.index({
 });
 
 OfferSchema.index({
-	'site': "text",
+	'site': 1,
 	'expires': 1,
 	'category': 1
 }, {

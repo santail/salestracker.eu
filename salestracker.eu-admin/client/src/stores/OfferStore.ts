@@ -93,6 +93,10 @@ export class OfferStore extends StoreBase {
                         offer.title = offer.translations.rus.title;
                     }
 
+                    if (!offer.downloads || !offer.downloads.pictures) {
+                        offer.downloads = { pictures: []}
+                    }
+
                     offers.push(offer as IOffer);
                 });
 

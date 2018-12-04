@@ -112,7 +112,12 @@ class Crawler {
                     retries = 0;
                     return options.onError(new Error('Error fetching page. No retries left.'));
                 }
-            } else {
+            } 
+            else if (response.statusCode === 404) {
+                LOG.error(util.format('[ERROR] [%s] Parsing page body failed %s', options.url, err));
+                return options.onError(err);
+            }
+            else {
                 response = null;
 
                 var parsingFinishedCallback = function (err, result) {

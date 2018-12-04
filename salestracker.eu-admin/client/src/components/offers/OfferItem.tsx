@@ -32,24 +32,52 @@ class OfferItem extends ComponentBase<OfferItemProps, OfferItemState> {
             </div>
         ) : undefined;
 
-        const imagePath = '/img/offers/' + offer.downloads.pictures[0];
+        let optionalImage = offer.downloads && offer.downloads.pictures ? (
+            <a href="#" title="" className="caption-title" onClick={this._onAddToBasket}>
+                <img alt="" src={ '/img/offers/' + offer.downloads.pictures[0] } />
+            </a>
+        ) : undefined;
+
+        let optionalPrice = this._compileOfferPrice(offer);
 
         return (
             <div className="widget">
                 <div className="thumbnail">
                     <div className="thumb">
-                        <a href="#" title="" className="caption-title" onClick={this._onAddToBasket}>
-                            <img alt="" src={imagePath} />
-                        </a>
-                        {optionalControls}
+                        { optionalImage }
+                        { optionalControls }
                     </div>
                     <div className="caption">
                         <a href="#" title="" className="caption-title" onClick={this._onAddToBasket}>{offer.title}</a>
-                        { offer.price.current }&nbsp;{offer.price.original}%)
+                        { optionalPrice }
                     </div>
                 </div>
             </div>
         );
+    }
+
+    private _compileOfferPrice = (offer: IOffer) => {
+        let price = '';
+
+        if (offer.price) {
+            if (offer.price.current) {
+                price += offer.price.current;
+            }
+            
+            if (offer.price.original) {
+                price += " " + offer.price.original;
+            }
+
+            if (offer.price.discount.amount) {
+                price += " " + offer.price.discount.amount;
+            }
+
+            if (offer.price.discount.percents) {
+                price += " " + offer.price.discount.percents + '%';
+            }
+        }
+
+        return price;
     }
 
     private _onRemoveFromBasket = (event: React.MouseEvent<HTMLAnchorElement>): void => {

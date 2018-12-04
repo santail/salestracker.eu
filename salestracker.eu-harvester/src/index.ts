@@ -31,6 +31,9 @@ var sites = [{
 }, {
     site: 'www.asos.com.women',
     interval: 1 * 60 * 60 * 1000
+}, {
+    site: 'www.rimi.ee',
+    interval: 1 * 60 * 60 * 1000
 }];
 
 var worker = SessionFactory.getQueueConnection();

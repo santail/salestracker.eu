@@ -17,7 +17,7 @@ const CATEGORIES = {
         'Sierra Tequila', 'Russian Standard', 'Beluga Noble', 'Carlsberg ', 'Aramis V', 'Gran Castillo',
         'Old Tbilisi', 'Rigol Cava', 'Torres', 'Napoleon VS', 'Rigol Cava', 'Torres'
     ],
-    'cosmetics': ['Himalaya', 'Garnier', 'Vuokkoset'],
+    'cosmetics': ['Himalaya', 'Garnier', 'Vuokkoset', 'L\'Oreal Paris'],
     'children': ['Pampers', 'HUGGIES'],
     'toys': ['LEGO FRIENDS'],
     'fashion': [],

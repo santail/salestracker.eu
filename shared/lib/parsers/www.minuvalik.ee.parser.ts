@@ -8,13 +8,6 @@ import AbstractParser, { ParserConfiguration } from "./AbstractParser";
 
 class MinuvalikParser extends AbstractParser {
 
-  private _offerTranslationHrefCompiler = (href) => {
-    var parsed = url.parse(href);
-    parsed.pathname = parsed.pathname.replace(/^\/ee\//gi, "/ru/");
-
-    return url.format(parsed);
-  };
-
   protected config: ParserConfiguration = {
     'headers': {
       'proxy': '95.24.130.71:8888',
@@ -41,7 +34,12 @@ class MinuvalikParser extends AbstractParser {
       },
       'rus': {
         'exists': true,
-        'compileHref': this._offerTranslationHrefCompiler
+        'compileHref': (href) => {
+          var parsed = url.parse(href);
+          parsed.pathname = parsed.pathname.replace(/^\/ee\//gi, "/ru/");
+      
+          return url.format(parsed);
+        }
       }
     },
     'paging': {

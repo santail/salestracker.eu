@@ -28,6 +28,7 @@ interface OfferTemplates {
   };
   vendor?: (data: any) => string;
   client_card_required?: (data: any) => boolean;
+  offers_group?: (data: any) => boolean;
 }
 
 interface PagingConfiguration {
