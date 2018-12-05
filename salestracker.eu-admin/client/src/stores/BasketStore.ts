@@ -75,8 +75,8 @@ export class BasketStore extends StoreBase {
 
             offerWidgetsHTML += '<div>' + "\r\n" +
                 optionalImage + "\r\n" +
-                '<p><a href=' + item.offer.origin_href + ' title=' + item.offer.category + ' class="caption-title">' + item.offer.brand + '</a></p>' + "\r\n" +
-                '<p>' + item.offer.category + '</p>' + "\r\n" +
+                '<p><a href=' + item.offer.origin_href + ' title=' + item.offer.title + ' class="caption-title">' + item.offer.title + '</a></p>' + "\r\n" +
+                '<p>' + item.offer.title + '</p>' + "\r\n" +
                 '</div>';
         });
 

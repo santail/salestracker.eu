@@ -41,8 +41,7 @@ class OfferItem extends ComponentBase<OfferItemProps, OfferItemState> {
                         </div>
                     </div>
                     <div className="caption">
-                        <a href="#" title="" className="caption-title" onClick={this._onOfferClick(offer)}>{offer.brand}</a>
-                        {offer.category}
+                        <a href="#" title="" className="caption-title" onClick={this._onOfferClick(offer)}>{offer.title}</a>
                     </div>
                     <div className="form-group">
                         <label className="col-sm-2 control-label text-right">Описание: </label>

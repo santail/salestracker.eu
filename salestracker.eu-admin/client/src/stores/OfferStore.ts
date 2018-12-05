@@ -4,9 +4,10 @@ const querystring = require('querystring');
 import { StoreBase, AutoSubscribeStore, autoSubscribe } from 'resub';
 
 export interface IOffer {
-    brand: string;
-    category: string;
+    site: string;
     title: string;
+    language: string;
+    href: string;
     origin_href: string;
     downloads: {
         pictures: string[];
@@ -85,12 +86,18 @@ export class OfferStore extends StoreBase {
                 _.each(responseJson.results, (offer: any) => {
                     if (offer.translations.eng) {
                         offer.title = offer.translations.eng.title;
+                        offer.href = offer.translations.eng.href;
+                        offer.language = 'eng';
                     } 
                     else if (offer.translations.est) {
                         offer.title = offer.translations.est.title;
+                        offer.href = offer.translations.est.href;
+                        offer.language = 'est';
                     } 
                     else if (offer.translations.rus) {
                         offer.title = offer.translations.rus.title;
+                        offer.href = offer.translations.rus.href;
+                        offer.language = 'rus';
                     }
 
                     if (!offer.downloads || !offer.downloads.pictures) {

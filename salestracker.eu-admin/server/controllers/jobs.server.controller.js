@@ -18,18 +18,12 @@ const jobs = kue.createQueue({
 /**
  * Create a Offer
  */
-exports.create = function (req, res) {
-    let job = {
-        search: req.body.searchCriterion
+exports.processSite = function (req, res) {
+    const job = {
+        'site': req.body.site,
+        'should_cleanup': req.body.should_cleanup,
+        'cleanup_uploads': req.body.cleanup_uploads
     };
-
-    if (req.body.limit) {
-        job.limit = req.body.limit;
-    }
-
-    if (req.body.site) {
-        job.site = req.body.site;
-    }
 
     jobs
         .create('harvestSite', job)
@@ -39,10 +33,152 @@ exports.create = function (req, res) {
         .save(function (err) {
             if (err) {
                 console.error(util.format('[ERROR] [%s] Job not scheduled', JSON.stringify(job), err));
+                res.json({ status: 'failed' })
                 return;
             }
 
             console.info(util.format('[OK] [%s] Job scheduled', JSON.stringify(job)));
+            res.json( {status: 'ok' } );
+        });
+};
+
+/**
+ * Create a Offer
+ */
+exports.processContent = function (req, res) {
+    const job = {
+        'site': req.body.site,
+        'language': req.body.language,
+        'href': req.body.href,
+        'origin_href': req.body.origin_href
+    };
+
+    jobs
+        .create('processContent', job)
+        .attempts(3)
+        .backoff({ delay: 60 * 1000, type: 'exponential' })
+        .removeOnComplete(true)
+        .save(function (err) {
+            if (err) {
+                console.error(util.format('[ERROR] [%s] Job not scheduled', JSON.stringify(job), err));
+                res.json({ status: 'failed' })
+                return;
+            }
+
+            console.info(util.format('[OK] [%s] Job scheduled', JSON.stringify(job)));
+            res.json( {status: 'ok' } );
+        });
+};
+
+/**
+ * Create a Offer
+ */
+exports.processData = function (req, res) {
+    const job = {
+        'site': req.body.site,
+        'language': req.body.language,
+        'href': req.body.href,
+        'origin_href': req.body.origin_href
+    };
+
+    jobs
+        .create('processData', job)
+        .attempts(3)
+        .backoff({ delay: 60 * 1000, type: 'exponential' })
+        .removeOnComplete(true)
+        .save(function (err) {
+            if (err) {
+                console.error(util.format('[ERROR] [%s] Job not scheduled', JSON.stringify(job), err));
+                res.json({ status: 'failed' })
+                return;
+            }
+
+            console.info(util.format('[OK] [%s] Job scheduled', JSON.stringify(job)));
+            res.json( {status: 'ok' } );
+        });
+};
+
+/**
+ * Create a Offer
+ */
+exports.processPictures = function (req, res) {
+    const job = {
+        'site': req.body.site,
+        'language': req.body.language,
+        'href': req.body.href,
+        'origin_href': req.body.origin_href
+    };
+
+    jobs
+        .create('processPictures', job)
+        .attempts(3)
+        .backoff({ delay: 60 * 1000, type: 'exponential' })
+        .removeOnComplete(true)
+        .save(function (err) {
+            if (err) {
+                console.error(util.format('[ERROR] [%s] Job not scheduled', JSON.stringify(job), err));
+                res.json({ status: 'failed' })
+                return;
+            }
+
+            console.info(util.format('[OK] [%s] Job scheduled', JSON.stringify(job)));
+            res.json( { status: 'ok' } );
+        });
+};
+
+/**
+ * Create a Offer
+ */
+exports.processCategories = function (req, res) {
+    const job = {
+        'site': req.body.site,
+        'language': req.body.language,
+        'href': req.body.href,
+        'origin_href': req.body.origin_href
+    };
+
+    jobs
+        .create('processCategories', job)
+        .attempts(3)
+        .backoff({ delay: 60 * 1000, type: 'exponential' })
+        .removeOnComplete(true)
+        .save(function (err) {
+            if (err) {
+                console.error(util.format('[ERROR] [%s] Job not scheduled', JSON.stringify(job), err));
+                res.json({ status: 'failed' })
+                return;
+            }
+
+            console.info(util.format('[OK] [%s] Job scheduled', JSON.stringify(job)));
+            res.json( {status: 'ok' } );
+        });
+};
+
+/**
+ * Create a Offer
+ */
+exports.processIndexing = function (req, res) {
+    const job = {
+        'site': req.body.site,
+        'language': req.body.language,
+        'href': req.body.href,
+        'origin_href': req.body.origin_href
+    };
+
+    jobs
+        .create('processIndexing', job)
+        .attempts(3)
+        .backoff({ delay: 60 * 1000, type: 'exponential' })
+        .removeOnComplete(true)
+        .save(function (err) {
+            if (err) {
+                console.error(util.format('[ERROR] [%s] Job not scheduled', JSON.stringify(job), err));
+                res.json({ status: 'failed' })
+                return;
+            }
+
+            console.info(util.format('[OK] [%s] Job scheduled', JSON.stringify(job)));
+            res.json( {status: 'ok' } );
         });
 };
 

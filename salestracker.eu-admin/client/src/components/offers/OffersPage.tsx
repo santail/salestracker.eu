@@ -7,6 +7,7 @@ import { ComponentBase } from 'resub';
 import OfferStore, { IOffer } from '../../stores/OfferStore';
 
 import OfferItem = require('./OfferItem');
+import JobsStore from '../../stores/JobsStore';
 
 interface OffersPageProps extends React.Props<any> {
 }
@@ -78,6 +79,9 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
 
                 <ul className="row stats">
                     <li className="col-xs-3"><a href="#" className="btn btn-default">{this.state.total}</a> <span>товаров найдено</span></li>
+                    <li className="col-xs-3">
+                        <button className="btn btn-sm btn-info" type="button" onClick={ this._onProcessSite }><i className="fa fa-tasks"></i> Small button</button>
+                    </li>
                 </ul>
 
 <FormGroup>
@@ -95,6 +99,7 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
                             <option value="www.asos.com.women">www.asos.com form women</option>
                             <option value="www.barbora.ee">www.barbora.ee</option>
                             <option value="www.ecoop.ee">www.ecoop.ee</option>
+                            <option value="www.euronics.ee">www.euronics.ee</option>
                             <option value="www.minuvalik.ee">www.minuvalik.ee</option>
                             <option value="www.rimi.ee">www.rimi.ee</option>
                             <option value="www.selver.ee">www.selver.ee</option>
@@ -183,6 +188,15 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
         OfferStore.loadOffers({
             activePage: 0, 
             pageSize: 72
+        });
+    }
+
+    private _onProcessSite = (e: React.MouseEvent<HTMLButtonElement>): void => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        JobsStore.processSite({
+            site: this.state.site
         });
     }
 

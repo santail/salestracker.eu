@@ -5,6 +5,7 @@ import { ComponentBase } from 'resub';
 
 import { IOffer } from '../../stores/OfferStore';
 import BasketStore from '../../stores/BasketStore';
+import JobsStore from '../../stores/JobsStore';
 
 interface OfferItemProps extends React.Props<any> {
     offer: IOffer;
@@ -25,16 +26,12 @@ class OfferItem extends ComponentBase<OfferItemProps, OfferItemState> {
         const offer = this.props.offer;
 
         const optionalControls = this.state.offerInBasket ? (
-            <div className="thumb-options">
-                <span>
-                    <a href="#" className="btn btn-icon btn-default" onClick={this._onRemoveFromBasket}><i className="fa fa-times"></i></a>
-                </span>
-            </div>
+            <a href="#" className="btn btn-icon btn-default" onClick={this._onRemoveFromBasket}><i className="fa fa-times"></i></a>
         ) : undefined;
 
         let optionalImage = offer.downloads && offer.downloads.pictures ? (
             <a href="#" title="" className="caption-title" onClick={this._onAddToBasket}>
-                <img alt="" src={ '/img/offers/' + offer.downloads.pictures[0] } />
+                <img alt="" src={'/img/offers/' + offer.downloads.pictures[0]} />
             </a>
         ) : undefined;
 
@@ -44,12 +41,22 @@ class OfferItem extends ComponentBase<OfferItemProps, OfferItemState> {
             <div className="widget">
                 <div className="thumbnail">
                     <div className="thumb">
-                        { optionalImage }
-                        { optionalControls }
+                        {optionalImage}
+                        
+                        <div className="thumb-options">
+                            <span>
+                                { optionalControls }
+                                <a href="#" className="btn btn-icon btn-default" onClick={this._onProcessContent}><i className="fa fa-edit"></i></a>
+                                <a href="#" className="btn btn-icon btn-default" onClick={this._onProcessData}><i className="fa fa-th"></i></a>
+                                <a href="#" className="btn btn-icon btn-default" onClick={this._onProcessPictures}><i className="fa fa-picture-o"></i></a>
+                                <a href="#" className="btn btn-icon btn-default" onClick={this._onProcessCategories}><i className="fa fa-bars"></i></a>
+                                <a href="#" className="btn btn-icon btn-default" onClick={this._onProcessIndex}><i className="fa fa-inbox"></i></a>
+                            </span>
+                        </div>
                     </div>
                     <div className="caption">
                         <a href="#" title="" className="caption-title" onClick={this._onAddToBasket}>{offer.title}</a>
-                        { optionalPrice }
+                        {optionalPrice}
                     </div>
                 </div>
             </div>
@@ -63,7 +70,7 @@ class OfferItem extends ComponentBase<OfferItemProps, OfferItemState> {
             if (offer.price.current) {
                 price += offer.price.current;
             }
-            
+
             if (offer.price.original) {
                 price += " " + offer.price.original;
             }
@@ -82,20 +89,55 @@ class OfferItem extends ComponentBase<OfferItemProps, OfferItemState> {
         return price;
     }
 
-    private _onRemoveFromBasket = (event: React.MouseEvent<HTMLAnchorElement>): void => {
-        BasketStore.removeOffer(this.props.offer);
+    private _onRemoveFromBasket = (e: React.MouseEvent<HTMLAnchorElement>): void => {
+        e.preventDefault();
+        e.stopPropagation();
 
-        event.preventDefault();
-        event.stopPropagation();
+        BasketStore.removeOffer(this.props.offer);
     }
 
-    private _onAddToBasket = (event: React.MouseEvent<HTMLAnchorElement>): void => {
+    private _onProcessContent = (e: React.MouseEvent<HTMLAnchorElement>): void => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        JobsStore.processOfferContent(this.props.offer);
+    }
+
+    private _onProcessData = (e: React.MouseEvent<HTMLAnchorElement>): void => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        JobsStore.processOfferData(this.props.offer);
+    }
+
+    private _onProcessPictures = (e: React.MouseEvent<HTMLAnchorElement>): void => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        JobsStore.processOfferPictures(this.props.offer);
+    }
+
+    private _onProcessCategories = (e: React.MouseEvent<HTMLAnchorElement>): void => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        JobsStore.processOfferCategories(this.props.offer);
+    }
+
+    private _onProcessIndex = (e: React.MouseEvent<HTMLAnchorElement>): void => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        JobsStore.processOfferIndex(this.props.offer);
+    }
+
+    private _onAddToBasket = (e: React.MouseEvent<HTMLAnchorElement>): void => {
+        e.preventDefault();
+        e.stopPropagation();
+
         BasketStore.addOffer(this.props.offer);
 
         window.open(this.props.offer.origin_href, '_blank');
-
-        event.preventDefault();
-        event.stopPropagation();
     }
 }
 
