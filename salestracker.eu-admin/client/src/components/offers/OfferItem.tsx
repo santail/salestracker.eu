@@ -68,12 +68,14 @@ class OfferItem extends ComponentBase<OfferItemProps, OfferItemState> {
                 price += " " + offer.price.original;
             }
 
-            if (offer.price.discount.amount) {
-                price += " " + offer.price.discount.amount;
-            }
+            if (offer.price.discount) {
+                if (offer.price.discount.amount) {
+                    price += " " + offer.price.discount.amount;
+                }
 
-            if (offer.price.discount.percents) {
-                price += " " + offer.price.discount.percents + '%';
+                if (offer.price.discount.percents) {
+                    price += " " + offer.price.discount.percents + '%';
+                }
             }
         }
 

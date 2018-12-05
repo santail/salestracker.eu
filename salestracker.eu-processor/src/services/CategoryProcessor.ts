@@ -21,7 +21,7 @@ const CATEGORIES = {
     'children': ['Pampers', 'HUGGIES'],
     'toys': ['LEGO FRIENDS'],
     'fashion': [],
-    'pets': ['KITEKAT']
+    'pets': ['KITEKAT', 'PURINA ONE']
 }
 
 class CategoryProcessor {

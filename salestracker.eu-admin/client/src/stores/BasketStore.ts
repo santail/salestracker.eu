@@ -61,17 +61,17 @@ export class BasketStore extends StoreBase {
         let offerWidgetsHTML: string = '';
 
         this._bundle.items.map((item, i) => {
-            const imagePath = '/img/offers/' + path.basename(item.offer.downloads.pictures[0]);
+            const offer = item.offer;
+
             let optionalImage: string = '';
 
-            if (this._withImages) {
-                optionalImage = '<p><img alt="' + item.offer.category + '" src="' + imagePath + '" /></p>';
+            if (offer.downloads && offer.downloads.pictures) {
+                offerWidgetsPlain += '​​​​​​​​​​​[​​​​​​​​​​​](http://159.89.24.202:8000/img/offers/' + offer.downloads.pictures[0] + ') ' + offer.title;
             }
 
-            offerWidgetsPlain += optionalImage + "\r\n" + "\r\n" +
-                item.offer.origin_href + "\r\n" +
-                item.offer.brand + "\r\n" +
-                item.offer.category;
+            if (item.comment) {
+                offerWidgetsPlain += "\r\n\r\n" + item.comment;
+            }
 
             offerWidgetsHTML += '<div>' + "\r\n" +
                 optionalImage + "\r\n" +

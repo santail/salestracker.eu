@@ -25,13 +25,15 @@ class OfferItem extends ComponentBase<OfferItemProps, OfferItemState> {
     render() {
         const offer = this.props.item.offer;
 
-        const imagePath = '/img/offers/' + path.basename(offer.downloads.pictures[0]);
+        let optionalImage = offer.downloads && offer.downloads.pictures ? (
+            <img alt="" src={ '/img/offers/' + offer.downloads.pictures[0] } />
+        ) : undefined;
 
         return (
             <div className="widget">
                 <div className="thumbnail">
                     <div className="thumb">
-                        <img alt="" src={imagePath} />
+                        { optionalImage }
                         <div className="thumb-options">
                             <span>
                                 <a href="#" className="btn btn-icon btn-default" onClick={this._onRemoveFromBundle(offer)}><i className="fa fa-times"></i></a>
