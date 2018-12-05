@@ -128,39 +128,48 @@ class ElasticIndexer {
             } 
             
             if (foundOffer) {
-                LOG.info(util.format('[OK] [%s] Offer content found %s. Proceed with parsing content.', options.site, options.origin_href));
+                LOG.info(util.format('[OK] [%s] Offer content found %s. Proceed with indexing.', options.site, options.origin_href));
                 
-                let offer = _.clone(foundOffer);
-                let translations = offer.translations[options.language];
-
-                delete translations.href;
-                delete translations.content;
-
-                offer = _.extend(offer, translations);
-
-                delete offer._id;
-                delete offer.pictures;
-                delete offer.translations;
-                delete offer.language;
-
-                elastic.index({
-                    index: 'salestracker-' + options.language,
-                    type: 'offers',
-                    body: offer
-                }, function (err, resp) {
-                    if (err) {
-                        LOG.error(util.format('[ERROR] [%s] [%s] Indexing offer failed', offer.site, offer.id, err));
-                        return callback(err);
-                    }
-        
-                    LOG.info(util.format('[OK] [%s] Offer indexed %s', offer.site, offer.href));
-                    return callback(null, resp);
-                });
+                try {
+                    this._processFoundOffer(options, foundOffer, callback);
+                }
+                catch (ex) {
+                    callback(ex);
+                }
             }
             else {
-                LOG.error(util.format('[ERROR] [%s] Offer not found. Parsing content failed.', options.site, options.origin_href));
-                return callback(err);
+                LOG.error(util.format('[ERROR] [%s] Offer not found. Indexing failed.', options.site, options.origin_href));
+                return callback();
             };
+        });
+    }
+
+    private _processFoundOffer(options, foundOffer, callback) {
+        let offer = _.clone(foundOffer);
+        let translations = offer.translations[options.language];
+
+        delete translations.href;
+        delete translations.content;
+
+        offer = _.extend(offer, translations);
+
+        delete offer._id;
+        delete offer.pictures;
+        delete offer.translations;
+        delete offer.language;
+
+        elastic.index({
+            index: 'salestracker-' + options.language,
+            type: 'offers',
+            body: offer
+        }, function (err, resp) {
+            if (err) {
+                LOG.error(util.format('[ERROR] [%s] [%s] Indexing offer failed', offer.site, offer.id, err));
+                return callback(err);
+            }
+
+            LOG.info(util.format('[OK] [%s] Offer indexed %s', offer.site, offer.href));
+            return callback();
         });
     }
 }

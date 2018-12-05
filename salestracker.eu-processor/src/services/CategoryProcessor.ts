@@ -26,7 +26,7 @@ const CATEGORIES = {
 
 class CategoryProcessor {
 
-    process(options, done) {
+    process(options, callback) {
         LOG.info(util.format('[OK] [%s] Offer category processing started %s', options.site, options.origin_href));
 
         SessionFactory.getDbConnection().offers.findOne({
@@ -34,35 +34,44 @@ class CategoryProcessor {
         }, (err, foundOffer) => {
             if (err) {
                 LOG.error(util.format('[ERROR] Checking offer failed', err));
-                return done(err);
+                return callback(err);
             }
 
             if (!foundOffer) {
                 // TODO Mark somehow failed offer and re-run harvesting
                 LOG.error(util.format('[ERROR] Offer category processing failed. Offer not found %', options.origin_href));
-                return done(new Error('Offer not found for update: ' + options.origin_href));
+                return callback(new Error('Offer not found for update: ' + options.origin_href));
             }
 
-            let categories = this._findCategories(foundOffer);
+            try {
+                this._processFoundOffer(options, foundOffer, callback);
+            }
+            catch (ex) {
+                callback();
+            }
+        });
+    }
 
-            if (!categories.length) {
-                return done();
+    private _processFoundOffer(options, foundOffer, callback) {
+        let categories = this._findCategories(foundOffer);
+
+        if (!categories.length) {
+            return callback();
+        }
+
+        SessionFactory.getDbConnection().offers.update({
+            origin_href: options.origin_href
+        }, {
+            $set: {
+                category: categories
+            }
+        }, function (err) {
+            if (err) {
+                LOG.error(util.format('[ERROR] [%s] [%s] Offer category processing failed', options.site, options.href, err));
+                return callback(err);
             }
 
-            SessionFactory.getDbConnection().offers.update({
-                origin_href: options.origin_href
-            }, {
-                $set: {
-                    category: categories
-                }
-            }, function (err) {
-                if (err) {
-                    LOG.error(util.format('[ERROR] [%s] [%s] Offer category processing failed', options.site, options.href, err));
-                    return done(err);
-                }
-
-                return done();
-            });
+            return callback();
         });
     }
 

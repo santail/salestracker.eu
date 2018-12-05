@@ -21,7 +21,7 @@ class Harvester {
    *
    */
   public cleanupSite = (options) => {
-    if (!options.shouldCleanup) {
+    if (!options.should_cleanup) {
       return Promise.resolve();
     }
 
@@ -33,7 +33,7 @@ class Harvester {
       }, (err) => {
         if (err) reject(err);
         else {
-          if (options.cleanupUploads) {
+          if (options.cleanup_uploads) {
             ImageHarvester.cleanUploadedImages(options.site); // TODO Wrap to promise
           }
 

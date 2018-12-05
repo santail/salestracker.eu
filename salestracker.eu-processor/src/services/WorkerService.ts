@@ -23,7 +23,7 @@ class WorkerService {
                     }
 
                     LOG.debug(util.format('[OK] [%s] %s Image processing scheduled', options.site, options.href));
-                    return fulfill(err);
+                    return fulfill();
                 });
         });
     }
@@ -43,7 +43,7 @@ class WorkerService {
                     }
 
                     LOG.debug(util.format('[OK] [%s] %s Offer categories processing scheduled', options.site, options.href));
-                    return fulfill(err);
+                    return fulfill();
                 });
         });
     }
@@ -63,7 +63,7 @@ class WorkerService {
                     }
 
                     LOG.debug(util.format('[OK] [%s] %s Offer indexes processing scheduled', options.site, options.href));
-                    return fulfill(err);
+                    return fulfill();
                 });
         });
     }
@@ -83,7 +83,7 @@ class WorkerService {
                     }
 
                     LOG.debug(util.format('[OK] [%s] %s Offer parsed data processing scheduled', options.site, options.href));
-                    return fulfill(err);
+                    return fulfill();
                 });
         });
     }
