@@ -34,6 +34,9 @@ var sites = [{
 }, {
     site: 'www.rimi.ee',
     interval: 1 * 60 * 60 * 1000
+}, {
+    site: 'www.euronics.ee',
+    interval: 1 * 60 * 60 * 1000
 }];
 
 var worker = SessionFactory.getQueueConnection();
@@ -65,6 +68,14 @@ function start(config) {
 
 worker.process('harvestSite', numParallel, function (job, done) {
     var config = job.data;
+
+    if (!config.site || !config.site.length) {
+        _.each(sites, site => {
+            start(site);
+        });
+
+        return done();
+    }
 
     // cleanup site only if job configuration requires it
     const cleanupPromise = harvester.cleanupSite(config)
