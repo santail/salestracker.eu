@@ -25,37 +25,62 @@ class DataProcessor {
                 LOG.error(util.format('[ERROR] Checking offer failed', err));
                 return callback(err);
             } 
-            
-            if (foundOffer) {
-                LOG.info(util.format('[OK] [%s] Offer found %s. Proceed with processing data.', options.site, options.origin_href));
-                
-                this._processPictures(options, foundOffer);
-                this._processCategories(options)
-                this._processIndexes(options);
-                
-                return callback();
+
+            try {
+                this._processFoundOffer(options, foundOffer, callback);
             }
-            else {
-                LOG.error(util.format('[ERROR] [%s] Offer not found. Processing data failed.', options.site, options.origin_href));
-                return callback(err);
-            };
+            catch (ex) {
+                callback();
+            }
         });
     };
 
-    private _processPictures = (options, offer) => {    
+    private _processFoundOffer(options, foundOffer, callback) {
+        if (foundOffer) {
+            LOG.info(util.format('[OK] [%s] Offer found %s. Proceed with processing data.', options.site, options.origin_href));
+            
+            let promises: Promise<void | {}>[] = [];
+
+            if (options.process_pictures) {
+                promises.push(this.processPictures(options, foundOffer));
+            }
+
+            if (options.process_categories) {
+                promises.push(this.processCategories(options));
+            }
+
+            if (options.process_index) {
+                promises.push(this.processIndexes(options));
+            }
+
+            Promise.all(promises)
+                .then(() => {
+                    return callback();
+                })
+                .catch(() => {
+                    return callback();
+                })
+        }
+        else {
+            LOG.error(util.format('[ERROR] [%s] Offer not found. Processing data failed.', options.site, options.origin_href));
+            return callback(new Error('No offer found'));
+        };
+    }
+
+    processPictures = (options, offer) => {    
         var parser = parserFactory.getParser(options.site);
 
         if (!parser.config.languages[options.language].main) {
             return;
         }
 
-        _.each(offer.pictures, pictureHref => {
+        return _.map(offer.pictures, pictureHref => {
             if (SHOULD_HARVEST_PICTURES) {
                 const offerHref = new URL(options.href);
                 
                 let picturePath = path.join(process.cwd(), './uploads/offers/' + options.site + '/' + slugify(offerHref.pathname));
 
-                WorkerService.schedulePictureHarvesting({
+                return WorkerService.schedulePictureHarvesting({
                     'site': options.site,
                     'href': options.href,
                     'origin_href': options.origin_href,
@@ -66,14 +91,16 @@ class DataProcessor {
                     LOG.error(util.format('[ERROR] [%s] Picture harvesting not scheduled.', options.picture_href, err));
                 });
             }
+
+            return Promise.resolve();
         });
     };
 
-    private _processCategories = (options) => {
+    processCategories = (options) => {
         var parser = parserFactory.getParser(options.site);
 
         if (parser.config.languages[options.language].main) {
-            WorkerService.scheduleCategoriesProcessing({
+            return WorkerService.scheduleCategoriesProcessing({
                 'site': options.site,
                 'language': options.language,
                 'href': options.href,
@@ -83,10 +110,12 @@ class DataProcessor {
                 LOG.error(util.format('[ERROR] [%s] Categories processing not scheduled.', options.origin_href, err));
             });
         }
+
+        return Promise.resolve();
     };
 
-    private _processIndexes = (options) => {
-        WorkerService.scheduleIndexing({
+    processIndexes = (options) => {
+        return WorkerService.scheduleIndexing({
             'site': options.site,
             'language': options.language,
             'href': options.href,

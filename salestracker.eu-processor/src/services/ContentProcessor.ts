@@ -30,8 +30,11 @@ class ContentProcessor {
                 LOG.info(util.format('[OK] [%s] Offer content found %s. Proceed with parsing content.', options.site, options.origin_href));
                 
                 this._processOfferContent(options, foundOffer)
-                    .then(data => {
-                        return callback(data);
+                    .then(() => {
+                        return callback();
+                    })
+                    .catch(() => {
+                        return callback();
                     });
             }
             else {
@@ -77,9 +80,7 @@ class ContentProcessor {
 
                 SessionFactory.getDbConnection().offers.update({
                     origin_href: options.origin_href
-                }, {
-                    $set: foundOffer
-                }, function (err) {
+                }, foundOffer, function (err) {
                     if (err) {
                         LOG.error(util.format('[ERROR] [%s] [%s] Updating offer failed', data.site, data.href, err));
                         return reject(err);
