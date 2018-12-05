@@ -94,7 +94,7 @@ class AsosManParser extends AbstractParser {
     for (var pageNumber = 0; pageNumber < lastPage; pageNumber++) {
       var offset = pageNumber * pageSize;
   
-      pages.push(this.compilePageUrl(this.config.paging!!.pattern
+      pages.push(this.compilePageHref(this.config.paging!!.pattern
         .replace(/{paging_pagenumber}/g, '' + pageNumber)
         .replace(/{paging_offset}/g, '' + offset)
         .replace(/{paging_pagesize}/g, '' + pageSize)
@@ -106,7 +106,7 @@ class AsosManParser extends AbstractParser {
     };
   };
 
-  compilePageUrl = (link) => {
+  compilePageHref = (link) => {
     return url.resolve(this.config.index_page, link);
   };
 

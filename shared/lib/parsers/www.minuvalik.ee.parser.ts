@@ -89,7 +89,7 @@ class MinuvalikParser extends AbstractParser {
           'current': current,
           'original': original,
           'discount': this.compileDiscount(current, original),
-          currency: 'EUR'
+          'currency': 'EUR'
         }
       },
       'vendor': () => {
@@ -106,6 +106,10 @@ class MinuvalikParser extends AbstractParser {
     this.config = _.extend(this.config, this.config);
   };
 
+  compilePageHref = (link) => {
+    return this.config.index_page + link;
+  };
+  
   compilePagingPattern = () => {
     return this.config.index_page + this.config.paging!!.pattern;
   }
@@ -124,10 +128,6 @@ class MinuvalikParser extends AbstractParser {
     }
   
     return url.resolve(this.config.index_page, link);
-  };
-  
-  compilePageHref = (link) => {
-    return this.config.index_page + link;
   };
 
 }

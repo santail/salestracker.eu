@@ -107,7 +107,7 @@ class AbstractParser {
 
     for (var pageNumber: number = firstPage; pageNumber <= lastPage; pageNumber++) {
       pages.push(this.compilePagingPattern(options)
-        .replace(/{paging_pagenumber}/g, pageNumber.toString())
+        .replace(/{paging_pagenumber}/g, '' + pageNumber)
         .replace(/{search_criteria}/g, options.search)
       );
     }
@@ -125,7 +125,7 @@ class AbstractParser {
   compileNextPageHref = (index: number = 0) => {
     index++;
     
-    return this.compilePagingPattern().replace(/{paging_pagenumber}/g, index.toString())
+    return this.compilePagingPattern().replace(/{paging_pagenumber}/g, '' + index);
   };
 
   getHierarchicalIndexPages = (options, content) => {
@@ -277,8 +277,8 @@ class AbstractParser {
   };
 
   compileDiscount = (current, original) => {
-    var amount;
-    var percents;
+    var amount = 0;
+    var percents = 0;
     
     if (current && original) {
       amount = original - current;
