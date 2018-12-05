@@ -39,7 +39,7 @@ class ImageHarvester {
                             picturePath = picturePath.replace('GetInventoryImage?id=', '') + '.jpg';
                         }
         
-                        return writeFile(picturePath, res.body, 'binary')
+                        writeFile(picturePath, res.body, 'binary')
                             .then(() => {
                                 return WorkerService.scheduleImageProcessing({
                                     site: options.site,
