@@ -40,14 +40,7 @@ var sites = [{
 }];
 
 var worker = SessionFactory.getQueueConnection();
-
-_.each(sites, function (config) {
-    setInterval(function () {
-        start(config);
-    }, config.interval);
-
-    start(config);
-});
+var harvestingJobs: {[site: string]: NodeJS.Timer} = {};
 
 function start(config) {
     worker.createJob('harvestSite', config)
@@ -70,12 +63,30 @@ worker.process('harvestSite', numParallel, function (job, done) {
     var config = job.data;
 
     if (!config.site || !config.site.length) {
-        _.each(sites, site => {
-            start(site);
+        _.each(_.keys(harvestingJobs), site => {
+            clearInterval(harvestingJobs[site]);
+        })
+
+        _.each(sites, config => {
+            let job = setInterval(() => {
+                start(config);
+            }, config.interval);
+        
+            harvestingJobs[config.site] = job;
+
+            start(config);
         });
 
         return done();
     }
+
+    clearInterval(harvestingJobs[config.site]);
+
+    let interval = setInterval(() => {
+        start(config);
+    }, 1 * 60 * 60 * 1000);
+
+    harvestingJobs[config.site] = interval;
 
     // cleanup site only if job configuration requires it
     const cleanupPromise = harvester.cleanupSite(config)
