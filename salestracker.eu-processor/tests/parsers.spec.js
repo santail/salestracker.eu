@@ -3,7 +3,6 @@
 var expect = require('chai').expect;
 var _ = require("lodash")._;
 var fs = require("fs");
-var tidy = require('htmltidy').tidy;
 var cheerio = require("cheerio");
 
 var sites = {
@@ -15,6 +14,9 @@ var sites = {
     },
     'www.zoomaailm.ee': {
         'https://www.zoomaailm.ee/ee/koerad/kausid/alusel-kausid-koertele/keraamilised-kausid-edition-komplekt-alusega-2tkx0-3l-12cm-35x22cm': true,
+    },
+    'www.euronics.ee': {
+        'https://www.euronics.ee/t/81165/telefonid/nutitelefon-samsung-galaxy-j3-(2017)-dual-sim/sm-j330fzkdseb': true,
     }
 };
 
@@ -30,42 +32,29 @@ _.each(_.keys(sites), function (site) {
 
             var filename = _.last(offerHref.pathname.split('/'));
 
-            var data = JSON.parse(fs.readFileSync(__dirname + '/' + site + '/' + filename + '.data.json', 'utf8'));
-            var content = fs.readFileSync(__dirname + '/' + site + '/' + filename, 'utf8');
-
             describe(url, function () {
 
                 it("All offer properties parsed successfully", function (done) {
+                    var data = JSON.parse(fs.readFileSync(__dirname + '/' + site + '/' + filename + '.data.json', 'utf8'));
 
-                    tidy(content, {
-                        doctype: 'html5',
-                        indent: false,
-                        bare: true,
-                        breakBeforeBr: false,
-                        hideComments: false,
-                        fixUri: false,
-                        wrap: 0
-                    }, (err, body) => {
-                        if (err) {
-                            return done(err);
-                        }
+                    var dom = cheerio.load(data.content, {
+                        normalizeWhitespace: true,
+                        lowerCaseTags: true,
+                        lowerCaseAttributeNames: true,
+                        recognizeCDATA: true,
+                        recognizeSelfClosing: true,
+                        decodeEntities: false
+                    });
 
-                        var dom = cheerio.load(body, {
-                            normalizeWhitespace: true,
-                            lowerCaseTags: true,
-                            lowerCaseAttributeNames: true,
-                            recognizeCDATA: true,
-                            recognizeSelfClosing: true,
-                            decodeEntities: false
-                        });
+                    parser.parse(dom, function (err, offer) {
+                        delete data.content;
+                        delete data.href;
 
-                        parser.parse(dom, function (err, offer) {
-                            expect(err).to.be.null;
-                            expect(offer).to.not.be.empty;
-                            expect(data).to.deep.equal(offer);
+                        expect(err).to.be.null;
+                        expect(offer).to.not.be.empty;
+                        expect(data).to.deep.equal(offer);
 
-                            done();
-                        });
+                        done();
                     });
                 });
             });
