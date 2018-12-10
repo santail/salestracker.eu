@@ -84,11 +84,11 @@ class AbstractEuronicsParser extends AbstractParser {
           pictureUrls.push(this.compileImageHref(mainPictureUrl));
         }
 
-        let hrefs = $('div.oi-viewport-media > ol > li > a[data-img]').map((index, el) => {
+        let hrefs = $('div.oi-viewport-media > ol > li.oi-pager-item > a[data-img]').map((index, el) => {
           return this.compileImageHref($(el).attr('href'));
-        });
+        }).get();
 
-        pictureUrls.push(hrefs);
+        _.merge(pictureUrls, hrefs);
 
         return pictureUrls;
       },
@@ -132,9 +132,13 @@ class AbstractEuronicsParser extends AbstractParser {
   
   compilePagingPattern = () => {
     return this.config.site + this.config.paging!!.pattern;
-  }
+  };
 
   compileOfferHref = (link) => {
+    return link;
+  };
+
+  compileImageHref = (link) => {
     return link;
   };
 };

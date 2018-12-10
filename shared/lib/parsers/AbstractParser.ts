@@ -181,7 +181,7 @@ class AbstractParser {
 
         for (var key in templates) {
 
-          if (templates.hasOwnProperty(key)) {
+          if (key !== 'content' && templates.hasOwnProperty(key)) {
             var template = templates[key];
 
             if (typeof template === 'string') {
