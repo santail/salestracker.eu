@@ -71,7 +71,9 @@ class WorkerService {
     scheduleDataProcessing(options) {
         return new Promise((fulfill, reject) => {
             SessionFactory.getQueueConnection().create('processData', options)
-                .attempts(3).backoff({
+                .attempts(3)
+                .delay(10 * 1000)
+                .backoff({
                     delay: 60 * 1000,
                     type: 'exponential'
                 })
