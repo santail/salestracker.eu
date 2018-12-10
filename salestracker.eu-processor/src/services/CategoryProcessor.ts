@@ -15,9 +15,10 @@ const CATEGORIES = {
         'Pipra Naps', 'Gran Reserva', 'Nederburg Winemasters', 'Somersby Orchard', 'J. P. Chenet', 'Metsis Handcrafted',
         'Prosecco', 'Cointreau', 'Veuve Clicquot', 'St.Remy', 'Martell V.S', 'J.P.Chenet', 'Ibis brändi X.O.',
         'Sierra Tequila', 'Russian Standard', 'Beluga Noble', 'Carlsberg ', 'Aramis V', 'Gran Castillo',
-        'Old Tbilisi', 'Rigol Cava', 'Torres', 'Napoleon VS', 'Rigol Cava', 'Torres'
+        'Old Tbilisi', 'Rigol Cava', 'Torres', 'Napoleon VS', 'Rigol Cava', 'Torres', 'Havana Club',
+        
     ],
-    'cosmetics': ['Himalaya', 'Garnier', 'Vuokkoset', 'L\'Oreal Paris'],
+    'cosmetics': ['Himalaya', 'Garnier', 'Vuokkoset', 'L\'Oreal Paris', 'VEET Debut'],
     'children': ['Pampers', 'HUGGIES'],
     'toys': ['LEGO FRIENDS'],
     'fashion': [],
