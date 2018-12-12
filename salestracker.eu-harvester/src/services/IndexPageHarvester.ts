@@ -4,6 +4,7 @@ var util = require("util");
 
 import Crawler from "./Crawler";
 import WorkerService from "./WorkerService";
+import PagingSimple from "./PagingSimple";
 
 var LOG = require("../../lib/services/Logger");
 var ParserFactory = require("../../lib/services/ParserFactory");
@@ -13,41 +14,51 @@ class IndexPageHarvester {
 
     public processFirstPage = (options, callback) => {
         var parser = ParserFactory.getParser(options.site);
-        var indexPage = parser.config.index_page;
 
         options.language = parser.getMainLanguage();
-        
+
         if (parser.config.hierarchy) {
             options.hierarchy = 1;
         }
 
         if (parser.config.has_index_page) {
-            options.href = indexPage.replace(/{search_criteria}/g, options.search); // TODO add default paging parameters
-
-            this.harvestIndexPage(options, (err, offers) => {
-                if (err) {
-                    LOG.error(util.format('[ERROR] [%s] Gathering offers failed', options.site, err));
-                    return callback(err);
-                }
-
-                LOG.info(util.format('[OK] [%s] Gathering offers finished', options.site));
-                return callback(null, offers);
-            });
-        } 
-        else {
-            options.href = parser.compileNextPageHref(); // TODO add default paging parameters
-
-            this._processNextPage(options, (err, offers) => {
-                if (err) {
-                    LOG.error(util.format('[ERROR] [%s] Gathering offers failed', options.site, err));
-                    return callback(err);
-                }
-
-                LOG.info(util.format('[OK] [%s] Gathering offers finished', options.site));
-                return callback(null, offers);
-            });
+            this._processSiteWithIndexPage(options, callback);
+        } else {
+            this._processSiteWithoutIndexPage(options, callback);
         }
     };
+
+    private _processSiteWithIndexPage(options, callback) {
+        var parser = ParserFactory.getParser(options.site);
+
+        options.href = parser.config.index_page;
+
+        this.harvestIndexPage(options, (err, offers) => {
+            if (err) {
+                LOG.error(util.format('[ERROR] [%s] Site index page harvesting failed', options.site, err));
+                return callback(err);
+            }
+
+            LOG.info(util.format('[OK] [%s] Site index page harvesting finished', options.site));
+            return callback(null, offers);
+        });
+    }
+
+    private _processSiteWithoutIndexPage(options, callback) {
+        var parser = ParserFactory.getParser(options.site);
+
+        options.href = parser.compileNextPageHref();
+
+        this._processNextPage(options, (err, offers) => {
+            if (err) {
+                LOG.error(util.format('[ERROR] [%s] Site without index page next page harvesting failed', options.site, err));
+                return callback(err);
+            }
+
+            LOG.info(util.format('[OK] [%s] Site without index page next page harvesting', options.site));
+            return callback(null, offers);
+        });
+    }
 
     public harvestIndexPage = (options, callback) => {
         LOG.info(util.format('[OK] [%s] [%s] Fetching index page', options.site, options.href));
@@ -55,7 +66,7 @@ class IndexPageHarvester {
         var parser = ParserFactory.getParser(options.site);
 
         if (parser.config.payload) {
-            options.payload = parser.config.payload.replace(/{search_criteria}/g, options.search);
+            options.payload = parser.config.payload;
         }
 
         var crawler = new Crawler();
@@ -85,28 +96,32 @@ class IndexPageHarvester {
 
         var parser = ParserFactory.getParser(options.site);
 
-        if (parser.config.paging) {
-            if (parser.config.paging.finit) {
-                WorkerService.schedulePageProcessing({
-                    'site': options.site,
-                    'href': parser.compileNextPageHref(),
-                    'page_index': 1
-                }, callback);
-            } 
-            else {
-                WorkerService.schedulePageProcessing({
-                    'site': options.site,
-                    'href': parser.compileNextPageHref(),
-                    'page_index': 1,
-                    'infinite_pagination': true
-                }, callback);
-            }
-        } 
-        else {
+        if (!parser.config.paging) {
             LOG.info(util.format('[OK] [%s] No paging found', options.site));
-
             return callback();
         }
+
+        const href = parser.compileNextPageHref();
+
+        let config = {
+            'site': options.site,
+            'href': href,
+            'page_index': 1
+        } as any;
+
+        if (!parser.config.paging.finit) {
+            config.infinite_pagination = true;
+        }
+
+        WorkerService.schedulePageProcessing(config)
+            .then(() => {
+                LOG.info(util.format('[OK] [%s] [%s] Next infinite pagination page harvesting scheduled', options.site, href));
+                return callback();
+            })
+            .catch(err => {
+                LOG.error(util.format('[ERROR] [%s] [%s] Next infinite pagination page harvesting not scheduled', options.site, href), err);
+                return callback(err);
+            });
     };
 
     private _processHierarchicalIndexPage = (options, content, callback) => {
@@ -114,37 +129,64 @@ class IndexPageHarvester {
         var hierarchicalIndexPages = parser.getHierarchicalIndexPages(options, content);
 
         if (hierarchicalIndexPages.length) {
-            var nextHierarchyLevel = options.hierarchy + 1;
+            this._processHierarchicalPageWithCategories(options, hierarchicalIndexPages, callback);
+        } else {
+            this._processHierarchicalPageWithOffers(options, callback);
+        }
+    }
 
-            var categorizedIndexesHandlers = _.map(hierarchicalIndexPages, (href) => {
-                var config = {
-                    'site': options.site,
-                    'href': href
-                } as any;
+    private _processHierarchicalPageWithCategories(options, hrefs, callback) {
+        var parser = ParserFactory.getParser(options.site);
 
-                if (!_.isUndefined(parser.config.hierarchy['level-' + nextHierarchyLevel]) || parser.config.hierarchy!!.pattern) {
-                    config.hierarchy = nextHierarchyLevel;
-                }
+        LOG.info(util.format('[OK] [%s] [%s] Next hiearchical page reached. Process as index page.', options.site, options.href));
 
-                return (categorizedIndexHandlerFinished) => WorkerService.scheduleIndexPageProcessing(config, categorizedIndexHandlerFinished);
-            });
+        var nextHierarchyLevel = options.hierarchy + 1;
 
-            async.series(categorizedIndexesHandlers, function (err, results) {
-                if (err) {
-                    LOG.error(util.format('[ERROR] [%s] Pages processing not scheduled', options.site, err));
-                    return callback(err);
-                }
+        var categorizedIndexesHandlers = _.map(hrefs, href => {
+            var config = {
+                'site': options.site,
+                'href': href
+            } as any;
 
+            if (!_.isUndefined(parser.config.hierarchy['level-' + nextHierarchyLevel]) || parser.config.hierarchy!!.pattern) {
+                config.hierarchy = nextHierarchyLevel;
+            }
+
+            return WorkerService.scheduleIndexPageProcessing(config)
+                .then(() => {
+                    LOG.info(util.format('[OK] [%s] [%s] Next hiearchical page harvesting scheduled', options.site, href));
+                })
+                .catch(err => {
+                    LOG.error(util.format('[ERROR] [%s] [%s] Next hiearchical page harvesting not scheduled', options.site, href), err);
+                });
+        });
+
+        Promise.all(categorizedIndexesHandlers)
+            .then(() => {
                 LOG.info(util.format('[OK] [%s] Pages processing scheduled', options.site));
-                return callback(null, results);
+                return callback();
+            })
+            .catch(err => {
+                LOG.error(util.format('[ERROR] [%s] Pages processing not scheduled', options.site, err));
+                return callback(err);
             });
-        } 
-        else {
-            WorkerService.scheduleIndexPageProcessing({
+    }
+
+    private _processHierarchicalPageWithOffers(options, callback) {
+        LOG.info(util.format('[OK] [%s] [%s] Lowest hiearchical page reached. Process as index page.', options.site, options.href));
+
+        WorkerService.scheduleIndexPageProcessing({
                 'site': options.site,
                 'href': options.href
-            }, callback);
-        }
+            })
+            .then(() => {
+                LOG.info(util.format('[OK] [%s] [%s] Lowest hiearchical page harvesting scheduled', options.site, options.href));
+                return callback();
+            })
+            .catch(err => {
+                LOG.error(util.format('[ERROR] [%s] [%s] Lowest hiearchical page harvesting not scheduled', options.site, options.href), err);
+                return callback(err);
+            });
     }
 
     private _startPaginatedIndexPageProcessing = (options, content, callback) => {
@@ -153,109 +195,98 @@ class IndexPageHarvester {
         LOG.info(util.format('[OK] [%s] Paging found', options.site));
 
         if (parser.config.paging.finit) {
-            this._processFinitePagination(options, content, callback);
+            this._processFinitePaginationIndexPage(options, content, callback);
         } else {
-            this._processInfinitePagination(options, callback);
+            this._processInfinitePaginationIndexPage(options, callback);
         }
-
-        content = null;
     };
 
-    private _processFinitePagination(options, content, callback): any {
+    private _processFinitePaginationIndexPage(options, content, callback): any {
         var parser = ParserFactory.getParser(options.site);
         var pagingParams = parser.compilePagingParameters(content, options);
+
+        LOG.info(util.format('[OK] [%s] Next finite pagination page processing started', options.site));
 
         var paginatedIndexesHandlers = [];
 
         if (parser.config.payload) {
             paginatedIndexesHandlers = _.map(pagingParams.payloads, (payload, index) => {
-                return (paginatedIndexHandlerFinished) => WorkerService.schedulePageProcessing({
-                    'site': options.site,
-                    'href': payload.href,
-                    'payload': payload.payload,
-                    'page_index': index + 1,
-                    'total_pages': pagingParams.payloads.length
-                }, paginatedIndexHandlerFinished);
+                return WorkerService.schedulePageProcessing({
+                        'site': options.site,
+                        'href': payload.href,
+                        'payload': payload.payload,
+                        'page_index': index + 1,
+                        'total_pages': pagingParams.payloads.length
+                    })
+                    .then(() => {
+                        LOG.info(util.format('[OK] [%s] [%s] Next finite pagination page harvesting scheduled', options.site, payload.href));
+                    })
+                    .catch(err => {
+                        LOG.error(util.format('[ERROR] [%s] [%s] Next finite pagination page harvesting not scheduled', options.site, payload.href), err);
+                    });
             });
-        } 
-        else {
+        } else {
             paginatedIndexesHandlers = _.map(pagingParams.pages, (href, index) => {
-                return (paginatedIndexHandlerFinished) => WorkerService.schedulePageProcessing({
-                    'site': options.site,
-                    'href': href,
-                    'page_index': index + 1,
-                    'total_pages': pagingParams.pages.length
-                }, paginatedIndexHandlerFinished);
+                return WorkerService.schedulePageProcessing({
+                        'site': options.site,
+                        'href': href,
+                        'page_index': index + 1,
+                        'total_pages': pagingParams.pages.length
+                    })
+                    .then(() => {
+                        LOG.info(util.format('[OK] [%s] [%s] Next finite pagination page harvesting scheduled', options.site, href));
+                    })
+                    .catch(err => {
+                        LOG.error(util.format('[ERROR] [%s] [%s] Next finite pagination page harvesting not scheduled', options.site, href), err);
+                    });
             });
         }
 
-        async.series(paginatedIndexesHandlers, function (err, results) {
-            if (err) {
+        Promise.all(paginatedIndexesHandlers)
+            .then(() => {
+                LOG.info(util.format('[OK] [%s] Pages processing scheduled', options.site));
+                return callback();
+            })
+            .catch(err => {
                 LOG.error(util.format('[ERROR] [%s] Pages processing not scheduled', options.site, err));
                 return callback(err);
-            }
-
-            LOG.info(util.format('[OK] [%s] Pages processing scheduled', options.site));
-            return callback(null, results);
-        });
+            })
     };
 
-    private _processInfinitePagination(options: any, callback: any): any {
+    private _processInfinitePaginationIndexPage(options: any, callback: any): any {
         var parser = ParserFactory.getParser(options.site);
         var href = parser.compileNextPageHref();
 
-        LOG.info(util.format('[OK] [%s] Next page processing scheduled', options.site));
+        LOG.info(util.format('[OK] [%s] [%s] Next infinite pagination page processing started', options.site, href));
 
         WorkerService.schedulePageProcessing({
-            'site': options.site,
-            'href': href,
-            'page_index': 1,
-            'infinite_pagination': true
-        }, callback);
+                'site': options.site,
+                'href': href,
+                'page_index': 1,
+                'infinite_pagination': true
+            })
+            .then(() => {
+                LOG.info(util.format('[OK] [%s] [%s] Next infinite pagination page harvesting scheduled', options.site, href));
+                return callback();
+            })
+            .catch(err => {
+                LOG.error(util.format('[ERROR] [%s] [%s] Next infinite pagination page harvesting not scheduled', options.site, href), err);
+                return callback(err);
+            });
     };
 
     private _startSimpleIndexPageProcessing = function (options, content, callback) {
-        LOG.info(util.format('[OK] [%s] No paging found', options.site));
+        LOG.info(util.format('[OK] [%s] [%s] Simple page without paging processing started', options.site, options.href));
 
-        var parser = ParserFactory.getParser(options.site);
-
-        var offers = [];
-    
-        try {
-          offers = parser.getOffers(content);
-        } catch (err) {
-          content = null;
-
-          LOG.error(util.format('[ERROR] [%s] Offers processing not scheduled', options.site, err));
-          return callback(new Error('Offers processing not scheduled: ' + err.message));
-        }
-
-        var offersHandlers = _.map(offers, function (offer) {
-          return function (offerHandlerFinished) {
-            content = null;
-
-            WorkerService.scheduleOfferHarvesting(_.extend(offer, {
-              'site': options.site,
-              'language': parser.getMainLanguage()
-            }))
-              .then(() => {
-                return offerHandlerFinished();
-              })
-              .catch(err => {
-                return offerHandlerFinished(err);
-              });
-          };
-        });
-
-        async.series(offersHandlers, function (err, results) {
-            if (err) {
+        PagingSimple.processPage(content, options)
+            .then(() => {
+                LOG.info(util.format('[OK] [%s] Offers processing scheduled', options.site));
+                return callback();
+            })
+            .catch(err => {
                 LOG.error(util.format('[ERROR] [%s] Offers processing not scheduled', options.site, err));
                 return callback(err);
-            }
-
-            LOG.info(util.format('[OK] [%s] Offers processing scheduled', options.site));
-            return callback(null, results);
-        });
+            });
     };
 }
 

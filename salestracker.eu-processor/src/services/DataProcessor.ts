@@ -2,7 +2,9 @@ var _ = require('lodash');
 var path = require('path');
 var slugify = require('slugify');
 var util = require('util');
-import { URL } from 'url';
+import {
+    URL
+} from 'url';
 
 var LOG = require("../../lib/services/Logger");
 var parserFactory = require("../../lib/services/ParserFactory");
@@ -24,63 +26,63 @@ class DataProcessor {
                 // TODO reclaim event processing
                 LOG.error(util.format('[ERROR] Checking offer failed', err));
                 return callback(err);
-            } 
+            }
 
             try {
                 this._processFoundOffer(options, foundOffer, callback);
-            }
-            catch (ex) {
+            } catch (ex) {
                 callback();
             }
         });
     };
 
     private _processFoundOffer(options, foundOffer, callback) {
-        if (foundOffer) {
-            LOG.info(util.format('[OK] [%s] Offer found %s. Proceed with processing data.', options.site, options.origin_href));
-            
-            let promises: Promise<void | {}>[] = [];
-
-            if (options.process_pictures) {
-                promises.push(this.processPictures(options, foundOffer));
-            }
-
-            if (options.process_categories) {
-                promises.push(this.processCategories(options));
-            }
-
-            if (options.process_index) {
-                promises.push(this.processIndexes(options));
-            }
-
-            Promise.all(promises)
-                .then(() => {
-                    return callback();
-                })
-                .catch(() => {
-                    return callback();
-                })
-        }
-        else {
+        if (!foundOffer) {
             LOG.error(util.format('[ERROR] [%s] Offer not found. Processing data failed.', options.site, options.origin_href));
             return callback(new Error('No offer found'));
-        };
+        }
+
+        LOG.info(util.format('[OK] [%s] Offer found %s. Proceed with processing data.', options.site, options.origin_href));
+
+        let promises: Promise < void | {} > [] = [];
+
+        if (options.process_pictures) {
+            promises.push(this.processPictures(options, foundOffer));
+        }
+
+        if (options.process_categories) {
+            promises.push(this.processCategories(options));
+        }
+
+        if (options.process_index) {
+            promises.push(this.processIndexes(options));
+        }
+
+        Promise.all(promises)
+            .then(() => {
+                return callback();
+            })
+            .catch(() => {
+                return callback();
+            })
     }
 
-    processPictures = (options, offer) => {    
+    processPictures = (options, offer) => {
         var parser = parserFactory.getParser(options.site);
 
         if (!parser.config.languages[options.language].main) {
-            return;
+            return Promise.resolve();
         }
 
         return _.map(offer.pictures, pictureHref => {
-            if (SHOULD_HARVEST_PICTURES) {
-                const offerHref = new URL(options.href);
-                
-                let picturePath = path.join(process.cwd(), './uploads/offers/' + options.site + '/' + slugify(offerHref.pathname));
+            if (!SHOULD_HARVEST_PICTURES) {
+                return Promise.resolve();
+            }
 
-                return WorkerService.schedulePictureHarvesting({
+            const offerHref = new URL(options.href);
+            let picturePath = path.join(process.cwd(), './uploads/offers/' + options.site + '/' + slugify(offerHref.pathname));
+
+            return WorkerService.schedulePictureHarvesting({
                     'site': options.site,
                     'href': options.href,
                     'origin_href': options.origin_href,
@@ -90,17 +92,17 @@ class DataProcessor {
                 .catch(err => {
                     LOG.error(util.format('[ERROR] [%s] Picture harvesting not scheduled.', options.picture_href, err));
                 });
-            }
-
-            return Promise.resolve();
         });
     };
 
     processCategories = (options) => {
         var parser = parserFactory.getParser(options.site);
 
-        if (parser.config.languages[options.language].main) {
-            return WorkerService.scheduleCategoriesProcessing({
+        if (!parser.config.languages[options.language].main) {
+            return Promise.resolve();
+        }
+
+        return WorkerService.scheduleCategoriesProcessing({
                 'site': options.site,
                 'language': options.language,
                 'href': options.href,
@@ -109,21 +111,18 @@ class DataProcessor {
             .catch(err => {
                 LOG.error(util.format('[ERROR] [%s] Categories processing not scheduled.', options.origin_href, err));
             });
-        }
-
-        return Promise.resolve();
     };
 
     processIndexes = (options) => {
         return WorkerService.scheduleIndexing({
-            'site': options.site,
-            'language': options.language,
-            'href': options.href,
-            'origin_href': options.origin_href
-        })
-        .catch(err => {
-            LOG.error(util.format('[ERROR] [%s] Indexes processing not scheduled.', options.origin_href, err));
-        });
+                'site': options.site,
+                'language': options.language,
+                'href': options.href,
+                'origin_href': options.origin_href
+            })
+            .catch(err => {
+                LOG.error(util.format('[ERROR] [%s] Indexes processing not scheduled.', options.origin_href, err));
+            });
     };
 
 }

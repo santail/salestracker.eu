@@ -52,11 +52,11 @@ class Harvester {
     return new Promise((fulfill, reject) => {
       IndexPageHarvester.processFirstPage(options, (err, offers) => {
         if (err) {
-          LOG.error(util.format('[ERROR] [%s] Gathering offers failed', options.site, err));
+          LOG.error(util.format('[ERROR] [%s] First page processing failed', options.site, err));
           return reject(err);
         }
 
-        LOG.info(util.format('[OK] [%s] Gathering offers finished', options.site));
+        LOG.info(util.format('[OK] [%s] Processing first page finished', options.site));
         return fulfill(offers);
       });
     });
@@ -92,7 +92,7 @@ class Harvester {
    *
    */
   public harvestOffer = (options, callback) => {
-    LOG.info(util.format('[OK] [%s] Offer processing started %s', options.site, options.href));
+    LOG.info(util.format('[OK] [%s] [%s] Offer page harvesting started', options.site, options.href));
 
     return OfferHarvester.harvestOffer(options, callback);
   };

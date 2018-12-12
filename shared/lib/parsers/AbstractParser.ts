@@ -3,6 +3,8 @@
 var _ = require('lodash');
 var util = require("util");
 
+var LOG = require("../services/Logger");
+
 interface LanguageConfiguration {
   main?: boolean;
   exists: boolean;
@@ -97,8 +99,8 @@ class AbstractParser {
     const firstPage = this.config.paging!!.first!!(content) || 1;
     var lastPage = this.config.paging!!.last!!(content) || 1;
 
-    if (process.env.NODE_ENV === 'development' && process.env.PAGING_PAGES_LIMIT && parseInt(process.env.PAGING_PAGES_LIMIT, 10) < lastPage) {
-      lastPage = parseInt(process.env.PAGING_PAGES_LIMIT, 10);
+    if (process.env.NODE_ENV === 'development' && process.env.PAGING_PAGES_LIMIT && _.toFinite(process.env.PAGING_PAGES_LIMIT) < lastPage) {
+      lastPage = _.toFinite(process.env.PAGING_PAGES_LIMIT);
     } else if (options.limit && options.limit < lastPage) {
       lastPage = options.limit;
     } else if (this.config.paging!!.limit!! && this.config.paging!!.limit!! < lastPage) {
@@ -137,10 +139,18 @@ class AbstractParser {
   };
 
   getOffers = (content) => {
-    var dataItems = this.config.list.call(this, content);
+    let dataItems = [];
+
+    try {
+      dataItems = this.config.list.call(this, content);
+    } 
+    catch (err) {
+      content = null;
+      LOG.error(util.format('[ERROR] Offers processing not scheduled'), err);
+    }
 
     if (process.env.NODE_ENV === 'development' && process.env.OFFERS_LIMIT) {
-      dataItems = dataItems.slice(0, process.env.OFFERS_LIMIT);
+      dataItems = dataItems.slice(0, _.toFinite(process.env.OFFERS_LIMIT));
     }
 
     var metadata = _.map(dataItems, (item) => {

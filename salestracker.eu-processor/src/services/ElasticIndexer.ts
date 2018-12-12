@@ -144,13 +144,15 @@ class ElasticIndexer {
         });
     }
 
-    private _processFoundOffer(options, foundOffer, callback) {
-        let offer = _.clone(foundOffer);
+    private _processFoundOffer(options, offer, callback) {
         let translations = offer.translations[options.language];
 
-        delete translations.href;
-        delete translations.content;
+        if (!translations) {
+            return callback(new Error('No translation found for ' + options.language));
+        }
 
+        delete translations.content;
+            
         offer = _.extend(offer, translations);
 
         delete offer._id;
@@ -164,11 +166,11 @@ class ElasticIndexer {
             body: offer
         }, function (err, resp) {
             if (err) {
-                LOG.error(util.format('[ERROR] [%s] [%s] Indexing offer failed', offer.site, offer.id, err));
+                LOG.error(util.format('[ERROR] [%s] [%s] Indexing offer failed', offer.site, offer.href), err);
                 return callback(err);
             }
 
-            LOG.info(util.format('[OK] [%s] Offer indexed %s', offer.site, offer.href));
+            LOG.info(util.format('[OK] [%s] [%s ] Offer indexed', offer.site, offer.href));
             return callback();
         });
     }
