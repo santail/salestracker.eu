@@ -16,7 +16,8 @@ module.exports = function (app) {
     .post(jobs.processData);
 
   app.route('/api/jobs/process/offer/pictures')
-    .post(jobs.processPictures);
+    .post(jobs.processPictures)
+    .delete(jobs.stopProcessPictures);
 
   app.route('/api/jobs/process/offer/categories')
     .post(jobs.processCategories);

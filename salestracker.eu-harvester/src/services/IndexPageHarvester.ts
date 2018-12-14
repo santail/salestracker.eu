@@ -109,7 +109,7 @@ class IndexPageHarvester {
             'page_index': 1
         } as any;
 
-        if (!parser.config.paging.finit) {
+        if (!parser.config.paging.finite) {
             config.infinite_pagination = true;
         }
 
@@ -194,7 +194,7 @@ class IndexPageHarvester {
 
         LOG.info(util.format('[OK] [%s] Paging found', options.site));
 
-        if (parser.config.paging.finit) {
+        if (parser.config.paging.finite) {
             this._processFinitePaginationIndexPage(options, content, callback);
         } else {
             this._processInfinitePaginationIndexPage(options, callback);

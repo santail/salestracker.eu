@@ -17,7 +17,7 @@ class SelverParser extends AbstractParser {
       }
     },
     'paging': {
-      'finit': true,
+      'finite': true,
       'pattern': '&p={paging_pagenumber}',
       'first': function () {
         return 1;

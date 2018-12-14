@@ -33,6 +33,7 @@ class BarboraParser extends AbstractParser {
       }
     },
     'paging': {
+      'finite': false,
       'pattern': '?page={paging_pagenumber}'
     },
     'list': ($) => {

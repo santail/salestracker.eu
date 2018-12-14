@@ -80,7 +80,9 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
                 <ul className="row stats">
                     <li className="col-xs-3"><a href="#" className="btn btn-default">{this.state.total}</a> <span>товаров найдено</span></li>
                     <li className="col-xs-3">
-                        <button className="btn btn-sm btn-info" type="button" onClick={ this._onProcessSite }><i className="fa fa-tasks"></i> Small button</button>
+                        <button className="btn btn-sm btn-info" type="button" onClick={ this._onProcessSite }><i className="fa fa-tasks"></i> Harvest site</button>
+                        <button className="btn btn-sm btn-info" type="button" onClick={ this._onProcessPictures }><i className="fa fa-tasks"></i> Harvest pictures</button>
+                        <button className="btn btn-sm btn-info" type="button" onClick={ this._onProcessPicturesStop }><i className="fa fa-tasks"></i> Stop harvest pictures</button>
                     </li>
                 </ul>
 
@@ -196,6 +198,24 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
         e.stopPropagation();
 
         JobsStore.processSite({
+            site: this.state.site
+        });
+    }
+
+    private _onProcessPictures = (e: React.MouseEvent<HTMLButtonElement>): void => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        JobsStore.processOfferPictures({
+            site: this.state.site
+        });
+    }
+
+    private _onProcessPicturesStop = (e: React.MouseEvent<HTMLButtonElement>): void => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        JobsStore.stopProcessOfferPictures({
             site: this.state.site
         });
     }

@@ -46,6 +46,7 @@ class OfferItem extends ComponentBase<OfferItemProps, OfferItemState> {
                         <div className="thumb-options">
                             <span>
                                 { optionalControls }
+                                
                                 <a href="#" className="btn btn-icon btn-default" onClick={this._onProcessContent}><i className="fa fa-edit"></i></a>
                                 <a href="#" className="btn btn-icon btn-default" onClick={this._onProcessData}><i className="fa fa-th"></i></a>
                                 <a href="#" className="btn btn-icon btn-default" onClick={this._onProcessPictures}><i className="fa fa-picture-o"></i></a>
@@ -114,7 +115,14 @@ class OfferItem extends ComponentBase<OfferItemProps, OfferItemState> {
         e.preventDefault();
         e.stopPropagation();
 
-        JobsStore.processOfferPictures(this.props.offer);
+        const offer = this.props.offer;
+
+        const options = {
+            'site': offer.site,
+            'origin_href': offer.origin_href
+        };
+
+        JobsStore.processOfferPictures(options);
     }
 
     private _onProcessCategories = (e: React.MouseEvent<HTMLAnchorElement>): void => {

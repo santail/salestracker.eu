@@ -101,7 +101,7 @@ class Harvester {
    *
    */
   public harvestPicture = (options) => {
-    LOG.info(util.format('[OK] [%s] Image processing started %s', options.site, options.href));
+    LOG.info(util.format('[OK] [%s] [%s] [%s] Image harvesting started', options.site, options.origin_href, options.picture_href));
 
     return ImageHarvester.harvestImage(options);
   };

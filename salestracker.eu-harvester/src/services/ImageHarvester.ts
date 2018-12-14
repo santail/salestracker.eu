@@ -43,7 +43,7 @@ class ImageHarvester {
                             .then(() => {
                                 return WorkerService.scheduleImageProcessing({
                                     site: options.site,
-                                    href: options.href,
+                                    href: options.picture_href,
                                     origin_href: options.origin_href,
                                     picture_path: picturePath
                                 });

@@ -160,11 +160,11 @@ worker.process('harvestPicture', numParallel, function (job, done) {
 
     harvester.harvestPicture(config)
         .then(result => {
-            LOG.info(util.format('[OK] [%s] Image harvesting finished %s', config.site, config.href));
+            LOG.info(util.format('[OK] [%s] [%s] [%s] Image harvesting finished', config.site, config.origin_href, config.picture_href));
             return done(null, result);
         })
         .catch(error => {
-            LOG.error(util.format('[ERROR] [%s] Image harvesting failed %s', config.site, config.href, error));
+            LOG.error(util.format('[ERROR] [%s] [%s] [%s] Image harvesting failed', config.site, config.origin_href, config.picture_href), error);
             return done(error);
         });
 });

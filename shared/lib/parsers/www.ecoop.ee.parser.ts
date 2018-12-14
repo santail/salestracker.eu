@@ -39,6 +39,7 @@ class EcoopParser extends AbstractParser {
       }
     },
     'paging': {
+      'finite': false,
       'pattern': '&page={paging_pagenumber}'
     },
     'list': (data) => {

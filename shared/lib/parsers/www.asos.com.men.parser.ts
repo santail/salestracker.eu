@@ -20,7 +20,7 @@ class AsosManParser extends AbstractParser {
       'Cache-Control': 'no-cache',
       'Accept': 'application/json, text/plain, */*',
       'Origin': 'http://www.asos.com',
-      'Referer': 'http://www.asos.com/search/lingerie?page=3&q=lingerie',
+      'Referer': 'http://www.asos.com/',
       'Accept-Encoding': 'gzip, deflate, br',
       'Accept-Language': 'en-US,en;q=0.9,et;q=0.8,ru;q=0.7,de;q=0.6,nl;q=0.5,lv;q=0.4     ',
     },
@@ -37,7 +37,7 @@ class AsosManParser extends AbstractParser {
       }
     },
     'paging': {
-      'finit': true,
+      'finite': true,
       'pattern': '/product/search/v1/categories/27396?channel=desktop-web&country=EE&currency=EUR&lang=en&limit={paging_pagesize}&offset={paging_offset}&rowlength=4&store=26'
     },
     'list': function (data) {

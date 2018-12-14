@@ -43,7 +43,7 @@ class MinuvalikParser extends AbstractParser {
       }
     },
     'paging': {
-      'finit': true,
+      'finite': true,
       'pattern': '&from={paging_pagenumber}',
       'first': function ($) {
         return this.controls!!($).find('span.sel').first().text().replace(/.*from=(\d)/, "$1");

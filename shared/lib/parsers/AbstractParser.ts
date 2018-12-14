@@ -38,7 +38,7 @@ interface PagingConfiguration {
   last?: (content: any) => number;
   limit?: number;
   pattern: string;
-  finit?: boolean;
+  finite?: boolean;
   controls?: (content: any) => any;
 }
 

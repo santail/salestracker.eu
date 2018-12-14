@@ -31,7 +31,7 @@ class ZoomaailmParser extends AbstractParser {
             }
         },
         'paging': {
-            'finit': true,
+            'finite': true,
             'pattern': '&limit=12&p={paging_pagenumber}',
             'first': function ($) {
                 var controls = this.controls!!($);

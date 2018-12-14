@@ -129,6 +129,35 @@ exports.processPictures = function (req, res) {
 /**
  * Create a Offer
  */
+exports.stopProcessPictures = function (req, res) {
+    const job = {
+        'site': req.body.site,
+        'language': req.body.language,
+        'href': req.body.href,
+        'origin_href': req.body.origin_href,
+        'process_pictures': true
+    };
+
+    jobs
+        .create('stopProcessData', job)
+        .attempts(3)
+        .backoff({ delay: 60 * 1000, type: 'exponential' })
+        .removeOnComplete(true)
+        .save(function (err) {
+            if (err) {
+                console.error(util.format('[ERROR] [%s] Job not scheduled', JSON.stringify(job), err));
+                res.json({ status: 'failed' })
+                return;
+            }
+
+            console.info(util.format('[OK] [%s] Job scheduled', JSON.stringify(job)));
+            res.json( { status: 'ok' } );
+        });
+};
+
+/**
+ * Create a Offer
+ */
 exports.processCategories = function (req, res) {
     const job = {
         'site': req.body.site,

@@ -16,11 +16,12 @@ const CATEGORIES = {
         'Prosecco', 'Cointreau', 'Veuve Clicquot', 'St.Remy', 'Martell V.S', 'J.P.Chenet', 'Ibis brändi X.O.',
         'Sierra Tequila', 'Russian Standard', 'Beluga Noble', 'Carlsberg ', 'Aramis V', 'Gran Castillo',
         'Old Tbilisi', 'Rigol Cava', 'Torres', 'Napoleon VS', 'Rigol Cava', 'Torres', 'Havana Club',
-        
+        'Angostura Rum Dark'
     ],
     'cosmetics': ['Himalaya', 'Garnier', 'Vuokkoset', 'L\'Oreal Paris', 'VEET Debut'],
     'children': ['Pampers', 'HUGGIES'],
-    'toys': ['LEGO FRIENDS'],
+    'toys': ['LEGO FRIENDS', 'TRANSFORMERS', 'MONOPOLY', 'LITTLEST PET SHOP', 'MY LITTLE PONY', 'L.O.L',
+        'BRUDER', 'GERARDOS TOYS', 'GERARDO´S TOYS', 'LEGO'],
     'fashion': [],
     'pets': ['KITEKAT', 'PURINA ONE']
 }

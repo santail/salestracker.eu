@@ -138,21 +138,32 @@ export class JobsStore extends StoreBase {
             });
     }
 
-    processOfferPictures = (offer: IOffer): void => {
-        const job = {
-            'site': offer.site,
-            'language': offer.language,
-            'href': offer.href,
-            'origin_href': offer.origin_href
-        };
-
+    processOfferPictures = (options: any): void => {
         fetch('/api/jobs/process/offer/pictures', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(job)
+            body: JSON.stringify(options)
+        })
+            .then((response) => response.json())
+            .then((responseJson) => {
+                console.log(responseJson);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    }
+
+    stopProcessOfferPictures = (options: any): void => {
+        fetch('/api/jobs/process/offer/pictures', {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(options)
         })
             .then((response) => response.json())
             .then((responseJson) => {

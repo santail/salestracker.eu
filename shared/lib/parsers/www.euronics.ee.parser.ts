@@ -37,7 +37,7 @@ class AbstractEuronicsParser extends AbstractParser {
       }
     },
     'paging': {
-      'finit': true,
+      'finite': true,
       'pattern': '/tooted/status/outlet/nr/{paging_pagenumber}',
       'first': function ($) {
         var controls = this.controls!!($);

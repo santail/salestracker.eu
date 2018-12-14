@@ -31,6 +31,16 @@ elastic.ping({ // test
                     ContentProcessor.process(data, done);
                 });
 
+                worker.process('stopProcessData', 10, function (job, done) {
+                    var data = job.data;
+
+                    data.process_pictures = true;
+                    data.process_categories = true;
+                    data.process_index = true;
+
+                    DataProcessor.stopProcess(data, done);
+                });
+
                 worker.process('processData', 10, function (job, done) {
                     var data = job.data;
 

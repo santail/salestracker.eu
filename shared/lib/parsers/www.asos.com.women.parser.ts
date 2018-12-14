@@ -37,7 +37,7 @@ class AsosWomanParser extends AbstractParser {
       }
     },
     'paging': {
-      'finit': true,
+      'finite': true,
       'pattern': '/product/search/v1/categories/27391?channel=desktop-web&country=EE&currency=EUR&lang=en&limit={paging_pagesize}&offset={paging_offset}&rowlength=4&store=26'
     },
     'list': function (data) {

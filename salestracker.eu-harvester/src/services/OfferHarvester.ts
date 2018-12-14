@@ -181,8 +181,6 @@ class OfferHarvester {
 
         var translations = this._findTranslationHrefs(options, body);
 
-        console.log(translations);
-        
         let delay = 1000;
 
         const translationsRequestPromises = _.map(_.keys(translations), language => {
