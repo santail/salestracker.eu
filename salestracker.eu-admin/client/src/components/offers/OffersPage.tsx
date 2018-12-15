@@ -99,6 +99,7 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
                             <option value="">All</option>
                             <option value="www.asos.com.men">www.asos.com for men</option>
                             <option value="www.asos.com.women">www.asos.com form women</option>
+                            <option value="www.babycity.ee">www.babycity.ee</option>
                             <option value="www.barbora.ee">www.barbora.ee</option>
                             <option value="www.ecoop.ee">www.ecoop.ee</option>
                             <option value="www.euronics.ee">www.euronics.ee</option>

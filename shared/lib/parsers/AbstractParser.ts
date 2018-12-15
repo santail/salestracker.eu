@@ -139,7 +139,7 @@ class AbstractParser {
   };
 
   getOffers = (content) => {
-    let dataItems = [];
+    let dataItems: any[] = [];
 
     try {
       dataItems = this.config.list.call(this, content);
