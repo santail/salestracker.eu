@@ -72,6 +72,24 @@ backend-harvester:
     - server-mongodb
     - server-redis
 
+backend-janitor:
+  container_name: backend-janitor
+  build: ./salestracker.eu-janitor/
+  dockerfile: Dockerfile
+  volumes:
+    - ./salestracker.eu-janitor/:/usr/src/app/
+    - ./shared/config/:/usr/src/app/config/
+    - ./shared/lib/:/usr/src/app/lib/
+    - backend-janitor-modules:/usr/src/app/node_modules
+  environment:
+    ELASTICSEARCH_URL: http://elasticsearch:9200
+    MONGODB_URI: mongodb://mongo:27017/salestracker-dev
+    REDIS_ADDR: redis://redis:6379
+  links:
+    - server-elasticsearch
+    - server-mongodb
+    - server-redis
+
 backend-notifier:
   container_name: backend-notifier
   build: ./salestracker.eu-notifier/

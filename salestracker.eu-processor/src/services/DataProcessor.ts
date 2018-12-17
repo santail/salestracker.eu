@@ -140,13 +140,18 @@ class DataProcessor {
             site: options.site
         }];
 
+        var currentTime = new Date().getTime();
+    
         if (this._lastProcessedOfferId && this._lastProcessedOfferParsedTime) {
             criteria.push({
+                _id: {
+                    "$ne": this._lastProcessedOfferId
+                },
                 parsed: {
                     "$gt": new Date(this._lastProcessedOfferParsedTime)
                 },
-                _id: {
-                    "$ne": this._lastProcessedOfferId
+                expires: { 
+                    "$gt":  new Date(currentTime - 2 * 60 * 60 * 1000) 
                 }
             });
         }
