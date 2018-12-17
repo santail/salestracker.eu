@@ -38,6 +38,8 @@ class ImageHarvester {
                         if (options.site === 'www.barbora.ee') {
                             picturePath = picturePath.replace('GetInventoryImage?id=', '') + '.jpg';
                         }
+
+                        picturePath = encodeURI(picturePath);
         
                         writeFile(picturePath, res.body, 'binary')
                             .then(() => {
