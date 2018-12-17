@@ -21,6 +21,7 @@ class DataProcessor {
 
     private _processorTimeout: { [site: string]: NodeJS.Timer } = {};
     private _lastProcessedOfferId;
+    private _lastProcessedOfferParsedTime;
 
     private _stopProcessingRequested;
 
@@ -104,7 +105,7 @@ class DataProcessor {
                 "$query": {
                     _id: {
                         "$gte": this._lastProcessedOfferId
-                    }
+                    },
                 },
                 "$orderby": {
                     "_id": 1
@@ -139,19 +140,26 @@ class DataProcessor {
             site: options.site
         }];
 
-        if (this._lastProcessedOfferId) {
+        if (this._lastProcessedOfferId && this._lastProcessedOfferParsedTime) {
             criteria.push({
                 parsed: {
-                    "$gt": new Date(this._lastProcessedOfferId)
+                    "$gt": new Date(this._lastProcessedOfferParsedTime)
+                },
+                _id: {
+                    "$ne": this._lastProcessedOfferId
                 }
             });
         }
 
         SessionFactory.getDbConnection().offers
             .findOne({ 
-                "$query":{
-                $and: criteria
-            }, "$orderBy":{ "parsed": 1 }}, (err, foundOffer) => {            
+                "$query": {
+                    $and: criteria
+                }, 
+                "$orderBy": { 
+                    "parsed": 1 
+                }
+            }, (err, foundOffer) => {            
                 if (err) {
                     // TODO reclaim event processing
                     LOG.error(util.format('[ERROR] Next offer not found. Stop processing.'), err);
@@ -164,12 +172,14 @@ class DataProcessor {
                     clearTimeout(this._processorTimeout[options.site]);
 
                     this._lastProcessedOfferId = null;
+                    this._lastProcessedOfferParsedTime = null;
                     return callback();
                 }
 
                 LOG.info(util.format('[OK] [%s] [%s] Offer found. Proceed with processing data.', foundOffer.site, foundOffer.origin_href));
 
-                this._lastProcessedOfferId = foundOffer.parsed;
+                this._lastProcessedOfferId = foundOffer._id;
+                this._lastProcessedOfferParsedTime = foundOffer.parsed;
 
                 this._processFoundOffer(options, foundOffer)
                     .then(() => {
