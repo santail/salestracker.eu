@@ -18,8 +18,16 @@ class ImageHarvester {
 
     public harvestImage = (options) => {
         return new Promise((fulfill, reject) => {
+            let pictureHref = options.picture_href;
+
+            if (options.site === 'www.asos.com.men' || options.site === 'www.asos.com.women') {
+                pictureHref += '?$XXL$';
+            }
+
+            LOG.info(util.format('[OK] [%s] [%s] Downloading image', options.site, pictureHref));
+
             request({
-                url: options.picture_href,
+                url: pictureHref,
                 encoding: 'binary',
                 resolveWithFullResponse: true,
                 simple: false 
@@ -33,7 +41,11 @@ class ImageHarvester {
                             }
                         }
 
-                        let picturePath = path.join(options.picture_path, path.basename(options.picture_href));
+                        if (options.site === 'www.asos.com.men' || options.site === 'www.asos.com.women') {
+                            pictureHref = pictureHref.replace('?$XXL$', '');
+                        }
+
+                        let picturePath = path.join(options.picture_path, path.basename(pictureHref));
 
                         if (options.site === 'www.barbora.ee') {
                             picturePath = picturePath.replace('GetInventoryImage?id=', '') + '.jpg';
@@ -41,6 +53,8 @@ class ImageHarvester {
 
                         picturePath = encodeURI(picturePath);
         
+                        LOG.info(util.format('[OK] [%s] [%s] Storing image', options.site, picturePath));
+
                         writeFile(picturePath, res.body, 'binary')
                             .then(() => {
                                 return WorkerService.scheduleImageProcessing({
