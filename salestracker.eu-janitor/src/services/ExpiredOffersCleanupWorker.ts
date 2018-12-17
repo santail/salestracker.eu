@@ -16,7 +16,7 @@ class ExpiredOffersCleanupWorker {
         
         SessionFactory.getDbConnection().offers.findOne({ 
                 expires: { 
-                    "$lt":  new Date(currentTime - 2 * 60 * 60 * 1000) 
+                    "$lt":  new Date(currentTime - 6 * 60 * 60 * 1000) 
                 }
             }, (err, foundOffer) => {            
                 if (err) {
