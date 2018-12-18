@@ -86,6 +86,9 @@ worker.process('harvestSite', numParallel, function (job, done) {
     clearInterval(harvestingJobs[config.site]);
 
     let interval = setInterval(() => {
+        config.should_cleanup = false;
+        config.cleanup_uploads = false;
+        
         start(config);
     }, 1 * 60 * 60 * 1000);
 

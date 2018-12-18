@@ -114,6 +114,7 @@ backend-processor:
     - ./salestracker.eu-processor/:/usr/src/app/
     - ./shared/config/:/usr/src/app/config/
     - ./shared/lib/:/usr/src/app/lib/
+    - ./shared/uploads/:/usr/src/app/uploads/
     - backend-processor-modules:/usr/src/app/node_modules
   environment:
     REDIS_ADDR: redis://redis:6379

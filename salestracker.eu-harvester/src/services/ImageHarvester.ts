@@ -4,8 +4,6 @@ var _ = require('lodash');
 var fs = require('fs-extra');
 var path = require('path');
 var request = require('request-promise');
-var slugify = require('slugify');
-const { URL } = require('url');
 var util = require("util");
 
 const readdir = util.promisify(fs.readdir)

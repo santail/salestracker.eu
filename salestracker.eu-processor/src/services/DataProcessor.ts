@@ -268,7 +268,7 @@ class DataProcessor {
                     return reject();
                 }
     
-                LOG.info(util.format('[OK] [%s] [%s]  Offer updated.', options.site, offer.origin_href));
+                LOG.info(util.format('[OK] [%s] [%s] Offer updated with empty pictures collection.', options.site, offer.origin_href));
     
                 return _.map(offer.pictures, pictureHref => {
                     if (!SHOULD_HARVEST_PICTURES) {
