@@ -3,11 +3,19 @@
 /**
  * Module dependencies.
  */
-var path = require('path'),
-    mongoose = require('mongoose'),
-    Offer = mongoose.model('Offer'),
-    errorHandler = require('./errors.server.controller'),
-    _ = require('lodash');
+var elasticsearch = require('elasticsearch');
+var errorHandler = require('./errors.server.controller');
+var _ = require('lodash');
+var mongoose = require('mongoose');
+var Offer = mongoose.model('Offer');
+var path = require('path');
+
+let ELASTIC_ADDR = process.env.ELASTICSEARCH_URL || 'http://127.0.0.1:9200';
+
+const elastic = new elasticsearch.Client({
+    host: ELASTIC_ADDR,
+    log: 'error'
+});
 
 /**
  * Create a Offer
@@ -74,64 +82,93 @@ exports.delete = function (req, res) {
  * List of Offers
  */
 exports.list = function (req, res) {
-    var sort;
-    var sortObject = {};
+    var currentTime = new Date().getTime();
+
     var count = req.query.count || 72;
     var page = req.query.page || 0;
     page = page < 0 ? 0 : page;
 
-    var filter = {
-        filters: {
-            mandatory: {
-                contains: req.query.filter
+    var criteria = [];
+    var filters = [{
+        "range": {
+            "expires": {
+                "gt": new Date(currentTime - 6 * 60 * 60 * 1000)
             }
         }
-    };
+    }];
 
-    var pagination = {
-        start: page * count,
-        count: count
-    };
-
-    if (req.query.sorting) {
-        var sortKey = Object.keys(req.query.sorting)[0];
-        var sortValue = req.query.sorting[sortKey];
-        sortObject[sortValue] = sortKey;
-    }
-    else {
-        sortObject._id = 1;
-    }
-
-    sort = {
-        sort: sortObject
-    };
-
-    var currentTime = new Date().getTime();
-    var criteria = { expires: { $gt:  new Date(currentTime - 2 * 60 * 60 * 1000) }};
-
-    if (req.query.category) {
-        criteria.category = req.query.category; // TODO validate query value against real configs
-    }
-    else {
-        criteria.category = { "$exists" : false };
+    if (req.query.filter) {
+        criteria.push({
+            "match_phrase": {
+                "title": req.query.filter
+            }
+        });
     }
 
     if (req.query.site) {
-        criteria.site = req.query.site; // TODO validate query value against real configs
-    }
-
-    Offer.find(criteria)
-        .filter(filter)
-        .order(sort)
-        .page(pagination, function (err, offers) {
-            if (err) {
-                return res.status(400).send({
-                    message: errorHandler.getErrorMessage(err)
-                });
-            } else {
-                res.jsonp(offers);
+        criteria.push({
+            "term": {
+                "site": req.query.site
             }
         });
+    }
+
+    elastic.search({
+        index: 'salestracker-eng',
+        type: 'offers',
+        body: {
+            "from": page * count,
+            "size": count,
+            "query": {
+                "bool": {
+                    "should": criteria,
+                    "filter": filters
+                }
+            }
+        }
+    }, function (err, response) {
+        if (err) {
+            return res.status(400).send({
+                message: JSON.stringify(err)
+            });
+        }
+
+        if (!response.hits || !response.hits.hits) {
+            res.jsonp({
+                total: 0,
+                results: []
+            });
+            
+            return;
+        }
+
+        var offers = _.map(response.hits.hits, function (hit) {
+            var offer = hit._source;
+
+            if (!offer.downloads || !offer.downloads.pictures) {
+                offer.downloads = {
+                    pictures: []
+                }
+            }
+
+            offer.downloads.pictures = _.map(offer.downloads.pictures, picture => {
+                const parsedPath = path.parse(picture);
+
+                return path.format({
+                    dir: parsedPath.dir,
+                    name: parsedPath.name + '_200x200',
+                    ext: '.png'
+                });
+            });
+
+            return offer;
+        });
+
+        res.jsonp({
+            total: response.hits.total,
+            results: offers
+        });
+    });
 };
 
 /**
@@ -145,4 +182,3 @@ exports.offerByID = function (req, res, next, id) {
         next();
     });
 };
-

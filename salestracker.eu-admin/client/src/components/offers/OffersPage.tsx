@@ -1,6 +1,6 @@
 import _ = require('lodash');
 import * as React from 'react';
-import { InputGroup, Tabs, Tab, FormGroup, FormControl } from 'react-bootstrap';
+import { InputGroup, Tabs, Tab, FormGroup, FormControl, FormControlProps } from 'react-bootstrap';
 import ReactPaginate from 'react-paginate';
 import { ComponentBase } from 'resub';
 
@@ -17,6 +17,7 @@ interface OffersPageState {
     total: number;
     activePage: number;
     pageSize: number;
+    filter?: string | number | string[];
     site?: string;
     category?: string;
     pagesTotal: number;
@@ -86,12 +87,12 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
                     </li>
                 </ul>
 
-<FormGroup>
-    <InputGroup>
-      <InputGroup.Addon>@</InputGroup.Addon>
-      <FormControl type="text" />
-    </InputGroup>
-  </FormGroup>
+                <FormGroup>
+                    <InputGroup>
+                        <InputGroup.Addon>@</InputGroup.Addon>
+                        <FormControl type="text" onChange={ this._onFilterChange } value={this.state.filter} />
+                    </InputGroup>
+                </FormGroup>
                 
                 <div className="row paging">
                     <div className="col-md-2">
@@ -229,6 +230,18 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
             pageSize: this.state.pageSize,
             site: this.state.site,
             category: this.state.category
+        });
+    }
+
+    private _onFilterChange = (e: React.FormEvent<FormControlProps>): void => {
+        this.setState({ filter: e.currentTarget.value });
+
+        OfferStore.loadOffers({
+            activePage: 0, 
+            pageSize: this.state.pageSize,
+            site: this.state.site,
+            category: this.state.category,
+            filter: e.currentTarget.value
         });
     }
 

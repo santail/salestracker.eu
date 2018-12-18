@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const path = require('path');
 
 import * as React from 'react';
@@ -6,6 +7,7 @@ import { ComponentBase } from 'resub';
 import { IOffer } from '../../stores/OfferStore';
 import BasketStore from '../../stores/BasketStore';
 import JobsStore from '../../stores/JobsStore';
+import { Carousel } from 'react-bootstrap';
 
 interface OfferItemProps extends React.Props<any> {
     offer: IOffer;
@@ -29,20 +31,13 @@ class OfferItem extends ComponentBase<OfferItemProps, OfferItemState> {
             <a href="#" className="btn btn-icon btn-default" onClick={this._onRemoveFromBasket}><i className="fa fa-times"></i></a>
         ) : undefined;
 
-        let optionalImage = offer.downloads && offer.downloads.pictures ? (
-            <a href="#" title="" className="caption-title" onClick={this._onAddToBasket}>
-                <img alt="" src={'/img/offers/' + offer.downloads.pictures[0]} />
-            </a>
-        ) : undefined;
-
-        let optionalPrice = this._compileOfferPrice(offer);
-
-        return (
-            <div className="widget">
-                <div className="thumbnail">
-                    <div className="thumb">
-                        {optionalImage}
-                        
+        let pictures = _.map(offer.downloads.pictures, (picture: string, index: number) => {
+            return (
+                <Carousel.Item key={ 'offer_thumb' + index }>
+                    <a href="#" title="" className="caption-title" onClick={this._onAddToBasket}>
+                        <img alt="" src={'/img/offers/' + picture} />
+                    </a>
+                    <Carousel.Caption>
                         <div className="thumb-options">
                             <span>
                                 { optionalControls }
@@ -54,7 +49,19 @@ class OfferItem extends ComponentBase<OfferItemProps, OfferItemState> {
                                 <a href="#" className="btn btn-icon btn-default" onClick={this._onProcessIndex}><i className="fa fa-inbox"></i></a>
                             </span>
                         </div>
-                    </div>
+                    </Carousel.Caption>
+                </Carousel.Item>
+            );
+        });
+
+        let optionalPrice = this._compileOfferPrice(offer);
+
+        return (
+            <div className="widget">
+                <div className="thumbnail">
+                    <Carousel className="thumb">
+                        { pictures }
+                    </Carousel>
                     <div className="caption">
                         <a href="#" title="" className="caption-title" onClick={this._onAddToBasket}>{offer.title}</a>
                         {optionalPrice}

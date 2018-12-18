@@ -10,9 +10,10 @@ web-admin:
     - web-admin-modules:/usr/src/app/node_modules # will statically map node_modules folder to container. Should clean-up on each package.json change with docker rm -v containerId
     - web-admin-public:/usr/src/app/public/lib # will statically map public/lib folder to container. Should clean-up on each bower.json change with docker rm -v containerId
   environment:
-    REDIS_ADDR: redis://redis:6379
+    ELASTICSEARCH_URL: http://elasticsearch:9200
     MONGODB_URI: mongodb://mongo:27017/salestracker-dev
     PORT: 8000
+    REDIS_ADDR: redis://redis:6379
   links:
     - server-elasticsearch
     - server-mongodb

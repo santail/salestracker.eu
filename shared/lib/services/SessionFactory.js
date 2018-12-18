@@ -28,7 +28,7 @@ function Sessionfactory() {
   this.elastic = new elasticsearch.Client({
     host: ELASTIC_ADDR,
     log: 'error'
-  });;
+  });
 }
 
 Sessionfactory.prototype.getDbConnection = function () {
