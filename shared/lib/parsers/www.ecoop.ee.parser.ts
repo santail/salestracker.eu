@@ -42,25 +42,25 @@ class EcoopParser extends AbstractParser {
       'finite': false,
       'pattern': '&page={paging_pagenumber}'
     },
-    'list': (data) => {
+    'list': data => {
       return data.results;
     },
     'templates': {
-      'content': (data) => {
+      'content': data => {
         return data;
       },
-      'title': (data) => {
+      'title': data => {
         return data.name;
       },
-      'pictures': (data) => {
+      'pictures': data => {
         return _.map(data.images, image => {
           return this.compileImageHref(image.productimage);
         });
       },
-      'description': (data) => {
+      'description': data => {
         return data.usage_instructions;
       },
-      'price': (data) => {
+      'price': data => {
         var current = this.priceCleanup(data.campaigns[0].discounts[0].price);
         var original = this.priceCleanup(data.sell_price);
 
@@ -71,7 +71,10 @@ class EcoopParser extends AbstractParser {
           currency: 'EUR'
         }
       },
-      'vendor': (data) => {
+      'client_card_required': data => {
+        return data.campaigns[0].discounts[0].type === 'savingscard_price';
+      },
+      'vendor': data => {
         return data.meta.producer;
       }
     },
