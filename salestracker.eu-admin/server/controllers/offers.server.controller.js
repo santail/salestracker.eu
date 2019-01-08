@@ -113,62 +113,81 @@ exports.list = function (req, res) {
         });
     }
 
-    elastic.search({
-        index: 'salestracker-eng',
-        type: 'offers',
-        body: {
-            "from": page * count,
-            "size": count,
-            "query": {
-                "bool": {
-                    "should": criteria,
-                    "filter": filters
-                }
+    let body = {
+        "from": page * count,
+        "size": count,
+        "query": {
+            "bool": {
+                "must": criteria,
+                "filter": filters
             }
-        }
-    }, function (err, response) {
-        if (err) {
+        },
+        "sort": [
+            { "price.discount.amount":   { "order": "desc" }},
+            { "price.discount.percents": { "order": "desc" }}
+        ]
+    };
+
+    let promises = _.map(['est', 'eng', 'rus'], language => {
+        return elastic.search({
+            index: 'salestracker-' + language,
+            type: 'offers',
+            body: body
+        })
+            .then(response => {
+                response.language = language;
+
+                return Promise.resolve(response);
+            });
+    });
+
+    Promise.all(promises)
+        .then(results => {
+            const maxResult = _.maxBy(results, result => {
+                return result.hits ? result.hits.total : 0;
+            });
+
+            if (!maxResult.hits || !maxResult.hits.hits) {
+                res.jsonp({
+                    total: 0,
+                    results: []
+                });
+                
+                return;
+            }
+
+            var offers = _.map(maxResult.hits.hits, function (hit) {
+                var offer = hit._source;
+    
+                if (!offer.downloads || !offer.downloads.pictures) {
+                    offer.downloads = {
+                        pictures: []
+                    }
+                }
+    
+                offer.downloads.pictures = _.map(offer.downloads.pictures, picture => {
+                    const parsedPath = path.parse(picture);
+    
+                    return path.format({
+                        dir: parsedPath.dir,
+                        name: parsedPath.name + '_200x200',
+                        ext: '.png'
+                    });
+                });
+    
+                return offer;
+            });
+    
+            res.jsonp({
+                total: maxResult.hits.total,
+                results: offers
+            });
+        })
+        .catch(err => {
             return res.status(400).send({
                 message: JSON.stringify(err)
             });
-        }
-
-        if (!response.hits || !response.hits.hits) {
-            res.jsonp({
-                total: 0,
-                results: []
-            });
-            
-            return;
-        }
-
-        var offers = _.map(response.hits.hits, function (hit) {
-            var offer = hit._source;
-
-            if (!offer.downloads || !offer.downloads.pictures) {
-                offer.downloads = {
-                    pictures: []
-                }
-            }
-
-            offer.downloads.pictures = _.map(offer.downloads.pictures, picture => {
-                const parsedPath = path.parse(picture);
-
-                return path.format({
-                    dir: parsedPath.dir,
-                    name: parsedPath.name + '_200x200',
-                    ext: '.png'
-                });
-            });
-
-            return offer;
-        });
-
-        res.jsonp({
-            total: response.hits.total,
-            results: offers
-        });
-    });
+        })
 };
 
 /**

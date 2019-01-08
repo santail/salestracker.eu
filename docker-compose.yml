@@ -103,6 +103,7 @@ backend-notifier:
   environment:
     REDIS_ADDR: redis://redis:6379
     MONGODB_URI: mongodb://mongo:27017/salestracker-dev
+    TELEGRAM_API_TOKEN: ${TELEGRAM_API_TOKEN}
   links:
     - server-mongodb
     - server-redis

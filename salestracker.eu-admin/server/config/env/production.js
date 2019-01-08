@@ -2,7 +2,7 @@
 
 module.exports = {
   db: {
-    uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/salestracker-dev',
+    uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/salestracker',
     options: {
       user: '',
       pass: ''

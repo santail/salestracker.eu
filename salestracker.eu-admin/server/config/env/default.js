@@ -2,9 +2,9 @@
 
 module.exports = {
   app: {
-    title: 'GoodLooking.eu - Admin',
-    description: 'GoodLooking.eu administration portal',
-    keywords: 'GoodLooking.eu'
+    title: 'Salestracker.eu - Admin',
+    description: 'Salestracker.eu administration portal',
+    keywords: 'Salestracker.eu'
   },
   port: process.env.PORT || 3000,
   templateEngine: 'swig',
