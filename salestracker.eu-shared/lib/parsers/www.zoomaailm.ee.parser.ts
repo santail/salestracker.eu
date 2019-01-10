@@ -6,7 +6,7 @@ import AbstractParser, { ParserConfiguration } from "./AbstractParser";
 
 class ZoomaailmParser extends AbstractParser {
 
-    protected config: ParserConfiguration = {
+  protected config: ParserConfiguration = {
         'site': 'https://www.zoomaailm.ee/',
         'has_index_page': true,
         'index_page': 'https://www.zoomaailm.ee/ee/specials/',

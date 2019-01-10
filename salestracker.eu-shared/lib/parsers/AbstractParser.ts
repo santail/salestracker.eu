@@ -36,19 +36,19 @@ interface OfferTemplates {
 interface PagingConfiguration {
   first?: (content: any) => number;
   last?: (content: any) => number;
+  controls?: (content: any) => any;
   limit?: number;
   pattern: string;
   finite?: boolean;
-  controls?: (content: any) => any;
-}
+};
 
 export interface ParserConfiguration {
   ttl: number;
   site: string;
-  paging?: PagingConfiguration;
   has_index_page: boolean;
   index_page: string;
   hierarchy?: { [level: string]: (content: any) => string[] };
+  paging?: PagingConfiguration;
   list: (content: any) => any[];
   json?: boolean
   templates: OfferTemplates;
@@ -58,32 +58,32 @@ export interface ParserConfiguration {
   required_properties: string[];
 }
 
-
 class AbstractParser {
-
   protected config: ParserConfiguration = {
     has_index_page: false,
     index_page: '',
     hierarchy: {
-      groups: () => { return []},
-      categories: () => { return []}
+      groups: () => { return [] },
+      categories: () => { return [] }
     },
     list: () => [],
     templates: {
-      content: () => { return ''},
-      title: () => { return ''},
-      pictures: () => { return []},
-      price: () => { return {
-        current: 0,
-        original: 0,
-        discount: {
-          amount: 0,
-          percents:  0
-        },
-        currency: ''
-      }},
-      vendor: () => { return ''},
-      description: () => { return ''}
+      content: () => { return '' },
+      title: () => { return '' },
+      pictures: () => { return [] },
+      price: () => {
+        return {
+          current: 0,
+          original: 0,
+          discount: {
+            amount: 0,
+            percents: 0
+          },
+          currency: ''
+        }
+      },
+      vendor: () => { return '' },
+      description: () => { return '' }
     },
     languages: {},
     translations: [],
@@ -91,6 +91,14 @@ class AbstractParser {
     ttl: 0,
     site: '',
     headers: {}
+  };
+
+  getHierarchicalIndexPages = (options, content) => {
+    if (this.config.hierarchy!!.pattern) {
+      return this.config.hierarchy!!.pattern(content);
+    }
+
+    return this.config.hierarchy!!['level-' + options.hierarchy](content);
   };
 
   compilePagingParameters = (content, options) => {
@@ -103,7 +111,7 @@ class AbstractParser {
       lastPage = _.toFinite(process.env.PAGING_PAGES_LIMIT);
     } else if (options.limit && options.limit < lastPage) {
       lastPage = options.limit;
-    } else if (this.config.paging!!.limit!! && this.config.paging!!.limit!! < lastPage) {
+    } else if (this.config.paging!!.limit && this.config.paging!!.limit < lastPage) {
       lastPage = this.config.paging!!.limit || 1;
     }
 
@@ -124,18 +132,14 @@ class AbstractParser {
     return this.compilePageHref(pattern)
   };
 
-  compileNextPageHref = (index: number = 0) => {
-    index++;
-    
-    return this.compilePagingPattern().replace(/{paging_pagenumber}/g, '' + index);
+  compilePageHref = (link) => {
+    return this.config.index_page + link;
   };
 
-  getHierarchicalIndexPages = (options, content) => {
-    if (this.config.hierarchy!!.pattern) {
-      return this.config.hierarchy!!.pattern(content);
-    }
-    
-    return this.config.hierarchy!!['level-' + options.hierarchy](content);
+  compileNextPageHref = (index: number = 0) => {
+    index++;
+
+    return this.compilePagingPattern().replace(/{paging_pagenumber}/g, '' + index);
   };
 
   getOffers = (content) => {
@@ -143,7 +147,7 @@ class AbstractParser {
 
     try {
       dataItems = this.config.list.call(this, content);
-    } 
+    }
     catch (err) {
       content = null;
       LOG.error(util.format('[ERROR] Offers processing not scheduled'), err);
@@ -214,7 +218,7 @@ class AbstractParser {
         data = null;
 
         return result;
-      } 
+      }
       catch (err) {
         console.error('Error parsing offer\'s data', err);
 
@@ -223,10 +227,6 @@ class AbstractParser {
     })(this, body);
 
     return callback(null, offer);
-  };
-
-  compilePageHref = (link) => {
-    return this.config.index_page + link;
   };
 
   compileOfferHref = (link, language?: string) => {
@@ -289,15 +289,15 @@ class AbstractParser {
   compileDiscount = (current, original) => {
     var amount = 0;
     var percents = 0;
-    
+
     if (current && original) {
       amount = original - current;
       percents = Math.floor(100 - current / original * 100);
     }
 
-    return { 
-      amount: Number((+amount).toFixed(2)), 
-      percents: Number((+percents).toFixed(2)), 
+    return {
+      amount: Number((+amount).toFixed(2)),
+      percents: Number((+percents).toFixed(2)),
     };
   };
 

@@ -6,8 +6,7 @@ var util = require("util");
 
 import AbstractParser, { ParserConfiguration } from "./AbstractParser";
 
-
-class AbstractEuronicsParser extends AbstractParser {
+class EuronicsParser extends AbstractParser {
 
   protected config: ParserConfiguration = {
     'has_index_page': true,
@@ -143,4 +142,4 @@ class AbstractEuronicsParser extends AbstractParser {
   };
 };
 
-module.exports = AbstractEuronicsParser;
+module.exports = EuronicsParser;

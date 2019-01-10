@@ -5,7 +5,6 @@ var url = require("url");
 
 import AbstractParser, { ParserConfiguration } from "./AbstractParser";
 
-
 class MinuvalikParser extends AbstractParser {
 
   protected config: ParserConfiguration = {

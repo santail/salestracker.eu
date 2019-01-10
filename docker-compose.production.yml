@@ -6,7 +6,7 @@ web-admin:
     - "8000:8000"
   volumes:
     - ./salestracker.eu-admin/:/usr/src/app/
-    - ./shared/uploads/:/usr/src/app/uploads/
+    - ./salestracker.eu-shared/uploads/:/usr/src/app/uploads/
     - web-admin-modules:/usr/src/app/node_modules # will statically map node_modules folder to container. Should clean-up on each package.json change with docker rm -v containerId
     - web-admin-public:/usr/src/app/public/lib # will statically map public/lib folder to container. Should clean-up on each bower.json change with docker rm -v containerId
   environment:
@@ -30,7 +30,7 @@ web-public:
     - "9000:9000"
   volumes:
     - ./salestracker.eu-public/:/usr/src/app/
-    - ./shared/uploads/:/usr/src/app/uploads/
+    - ./salestracker.eu-shared/uploads/:/usr/src/app/uploads/
     - web-public-modules:/usr/src/app/node_modules # will statically map node_modules folder to container. Should clean-up on each package.json change with docker rm -v containerId
     - web-public-public:/usr/src/app/public/lib # will statically map public/lib folder to container. Should clean-up on each bower.json change with docker rm -v containerId
   environment:
@@ -44,8 +44,8 @@ backend-finder:
   dockerfile: Dockerfile.production
   volumes:
     - ./salestracker.eu-finder/:/usr/src/app/
-    - ./shared/config/:/usr/src/app/config/
-    - ./shared/lib/:/usr/src/app/lib/
+    - ./salestracker.eu-shared/config/:/usr/src/app/config/
+    - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
     - backend-finder-modules:/usr/src/app/node_modules
   environment:
     - REDIS_ADDR=redis://redis:6379
@@ -62,9 +62,9 @@ backend-harvester:
   dockerfile: Dockerfile.production
   volumes:
     - ./salestracker.eu-harvester/:/usr/src/app/
-    - ./shared/config/:/usr/src/app/config/
-    - ./shared/lib/:/usr/src/app/lib/
-    - ./shared/uploads/:/usr/src/app/uploads/
+    - ./salestracker.eu-shared/config/:/usr/src/app/config/
+    - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
+    - ./salestracker.eu-shared/uploads/:/usr/src/app/uploads/
     - backend-harvester-modules:/usr/src/app/node_modules
   environment:
     REDIS_ADDR: redis://redis:6379
@@ -79,8 +79,8 @@ backend-janitor:
   dockerfile: Dockerfile.production
   volumes:
     - ./salestracker.eu-janitor/:/usr/src/app/
-    - ./shared/config/:/usr/src/app/config/
-    - ./shared/lib/:/usr/src/app/lib/
+    - ./salestracker.eu-shared/config/:/usr/src/app/config/
+    - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
     - backend-janitor-modules:/usr/src/app/node_modules
   environment:
     ELASTICSEARCH_URL: http://elasticsearch:9200
@@ -97,8 +97,8 @@ backend-notifier:
   dockerfile: Dockerfile.production
   volumes:
     - ./salestracker.eu-notifier/:/usr/src/app/
-    - ./shared/config/:/usr/src/app/config/
-    - ./shared/lib/:/usr/src/app/lib/
+    - ./salestracker.eu-shared/config/:/usr/src/app/config/
+    - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
     - backend-notifier-modules:/usr/src/app/node_modules
   environment:
     REDIS_ADDR: redis://redis:6379
@@ -114,9 +114,9 @@ backend-processor:
   dockerfile: Dockerfile.production
   volumes:
     - ./salestracker.eu-processor/:/usr/src/app/
-    - ./shared/config/:/usr/src/app/config/
-    - ./shared/lib/:/usr/src/app/lib/
-    - ./shared/uploads/:/usr/src/app/uploads/
+    - ./salestracker.eu-shared/config/:/usr/src/app/config/
+    - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
+    - ./salestracker.eu-shared/uploads/:/usr/src/app/uploads/
     - backend-processor-modules:/usr/src/app/node_modules
   environment:
     REDIS_ADDR: redis://redis:6379

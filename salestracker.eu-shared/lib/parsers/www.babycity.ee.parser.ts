@@ -6,7 +6,6 @@ var util = require("util");
 
 import AbstractParser, { ParserConfiguration } from "./AbstractParser";
 
-
 class BabycityParser extends AbstractParser {
 
   protected config: ParserConfiguration = {
