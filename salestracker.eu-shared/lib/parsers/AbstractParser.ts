@@ -111,8 +111,8 @@ class AbstractParser {
       lastPage = _.toFinite(process.env.PAGING_PAGES_LIMIT);
     } else if (options.limit && options.limit < lastPage) {
       lastPage = options.limit;
-    } else if (this.config.paging!!.limit && this.config.paging!!.limit < lastPage) {
-      lastPage = this.config.paging!!.limit || 1;
+    } else if (this.config.paging!!.limit!! && this.config.paging!!.limit!! < lastPage) {
+      lastPage = this.config.paging!!.limit!! || 1;
     }
 
     for (var pageNumber: number = firstPage; pageNumber <= lastPage; pageNumber++) {
