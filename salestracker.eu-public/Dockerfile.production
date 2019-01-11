@@ -13,11 +13,7 @@ COPY package.json package-lock.json /usr/src/app/
 
 RUN npm install
 
-# Make everything available for start
 COPY . /usr/src/app
-
-# Set development environment as default
-ENV NODE_ENV production
 
 EXPOSE 9000 35729
 

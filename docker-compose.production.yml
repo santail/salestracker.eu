@@ -1,185 +1,281 @@
-web-admin:
-  container_name: web-admin
-  build: ./salestracker.eu-admin/
-  dockerfile: Dockerfile.production
-  ports:
-    - "8000:8000"
-  volumes:
-    - ./salestracker.eu-admin/:/usr/src/app/
-    - ./salestracker.eu-shared/uploads/:/usr/src/app/uploads/
-    - web-admin-modules:/usr/src/app/node_modules # will statically map node_modules folder to container. Should clean-up on each package.json change with docker rm -v containerId
-    - web-admin-public:/usr/src/app/public/lib # will statically map public/lib folder to container. Should clean-up on each bower.json change with docker rm -v containerId
-  environment:
-    ELASTICSEARCH_URL: http://elasticsearch:9200
-    MONGODB_URI: mongodb://${APP_WEB_ADMIN_MONGO_USER}:${APP_WEB_ADMIN_MONGO_PASSWORD}@mongodb:27017/salestracker
-    PORT: 8000
-    REDIS_ADDR: redis://redis:6379
-  links:
-    - server-elasticsearch
-    - server-mongodb
-    - server-redis
+version: '3.7'
+services:
+          
+  web-admin:
+    container_name: web-admin
+    build:
+      context: ./salestracker.eu-admin/
+      dockerfile: Dockerfile.production
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./salestracker.eu-admin/:/usr/src/app/
+      - ./salestracker.eu-shared/uploads/:/usr/src/app/uploads/
+      - web-admin-modules:/usr/src/app/node_modules # will statically map node_modules folder to container. Should clean-up on each package.json change with docker rm -v containerId
+      - web-admin-public:/usr/src/app/public/lib # will statically map public/lib folder to container. Should clean-up on each bower.json change with docker rm -v containerId
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - MONGODB_URI=mongodb://${APP_WEB_ADMIN_MONGO_USER}:${APP_WEB_ADMIN_MONGO_PASSWORD}@mongodb:27017/salestracker
+      - PORT=8000
+      - REDIS_ADDR=redis://redis:6379
+      - NODE_ENV=production
+    links:
+      - "server-elasticsearch:elasticsearch"
+      - "server-mongodb:mongodb"
+      - "server-redis:redis"
 
-web-public:
-  container_name: web-public
-  build: ./salestracker.eu-public/
-  dockerfile: Dockerfile.production
-  links:
-    - server-elasticsearch
-    - server-mongodb
-  ports:
-    - "9000:9000"
-  volumes:
-    - ./salestracker.eu-public/:/usr/src/app/
-    - ./salestracker.eu-shared/uploads/:/usr/src/app/uploads/
-    - web-public-modules:/usr/src/app/node_modules # will statically map node_modules folder to container. Should clean-up on each package.json change with docker rm -v containerId
-    - web-public-public:/usr/src/app/public/lib # will statically map public/lib folder to container. Should clean-up on each bower.json change with docker rm -v containerId
-  environment:
-    REDIS_ADDR: redis://redis:6379
-    MONGODB_URI: mongodb://${APP_WEB_PUBLIC_MONGO_USER}:${APP_WEB_PUBLIC_MONGO_PASSWORD}@mongodb:27017/salestracker
-    PORT: 9000
+  web-public:
+    container_name: web-public
+    build:
+      context: ./salestracker.eu-public/
+      dockerfile: Dockerfile.production
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./salestracker.eu-public/:/usr/src/app/
+      - ./salestracker.eu-shared/uploads/:/usr/src/app/uploads/
+      - web-public-modules:/usr/src/app/node_modules # will statically map node_modules folder to container. Should clean-up on each package.json change with docker rm -v containerId
+      - web-public-public:/usr/src/app/public/lib # will statically map public/lib folder to container. Should clean-up on each bower.json change with docker rm -v containerId
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - MONGODB_URI=mongodb://${APP_WEB_PUBLIC_MONGO_USER}:${APP_WEB_PUBLIC_MONGO_PASSWORD}@mongodb:27017/salestracker
+      - PORT=9000
+      - REDIS_ADDR=redis://redis:6379
+      - NODE_ENV=production
+    links:
+      - "server-elasticsearch:elasticsearch"
+      - "server-mongodb:mongodb"
+      - "server-redis:redis"
 
-backend-finder:
-  container_name: backend-finder
-  build: ./salestracker.eu-finder/
-  dockerfile: Dockerfile.production
-  volumes:
-    - ./salestracker.eu-finder/:/usr/src/app/
-    - ./salestracker.eu-shared/config/:/usr/src/app/config/
-    - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
-    - backend-finder-modules:/usr/src/app/node_modules
-  environment:
-    - REDIS_ADDR=redis://redis:6379
-    - MONGODB_URI=mongodb://${APP_BACKEND_FINDER_MONGO_USER}:${APP_BACKEND_FINDER_MONGO_PASSWORD}@mongodb:27017/salestracker
-    - ELASTICSEARCH_URL=http://elasticsearch:9200
-  links:
-    - server-elasticsearch
-    - server-mongodb
-    - server-redis
+  backend-finder:
+    container_name: backend-finder
+    build:
+      context: ./salestracker.eu-finder/
+      dockerfile: Dockerfile.production
+    volumes:
+      - ./salestracker.eu-finder/:/usr/src/app/
+      - ./salestracker.eu-shared/config/:/usr/src/app/config/
+      - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
+      - backend-finder-modules:/usr/src/app/node_modules
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - MONGODB_URI=mongodb://${APP_BACKEND_FINDER_MONGO_USER}:${APP_BACKEND_FINDER_MONGO_PASSWORD}@mongodb:27017/salestracker
+      - NODE_ENV=production
+      - REDIS_ADDR=redis://redis:6379
+    links:
+      - "server-elasticsearch:elasticsearch"
+      - "server-mongodb:mongodb"
+      - "server-redis:redis"
+    depends_on:
+      - server-elasticsearch
+      - server-mongodb
+      - server-redis
+    networks:
+      - networks-backend-elasticsearch
+      - networks-backend-mongodb
+      - networks-backend-redis
 
-backend-harvester:
-  container_name: backend-harvester
-  build: ./salestracker.eu-harvester/
-  dockerfile: Dockerfile.production
-  volumes:
-    - ./salestracker.eu-harvester/:/usr/src/app/
-    - ./salestracker.eu-shared/config/:/usr/src/app/config/
-    - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
-    - ./salestracker.eu-shared/uploads/:/usr/src/app/uploads/
-    - backend-harvester-modules:/usr/src/app/node_modules
-  environment:
-    REDIS_ADDR: redis://redis:6379
-    MONGODB_URI: mongodb://${APP_BACKEND_HARVESTER_MONGO_USER}:${APP_BACKEND_HARVESTER_MONGO_PASSWORD}@mongodb:27017/salestracker
-  links:
-    - server-mongodb
-    - server-redis
+  backend-harvester:
+    container_name: backend-harvester
+    build:
+      context: ./salestracker.eu-harvester/
+      dockerfile: Dockerfile.production
+    volumes:
+      - ./salestracker.eu-harvester/:/usr/src/app/
+      - ./salestracker.eu-shared/config/:/usr/src/app/config/
+      - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
+      - ./salestracker.eu-shared/uploads/:/usr/src/app/uploads/
+      - backend-harvester-modules:/usr/src/app/node_modules
+    environment:
+      - MONGODB_URI=mongodb://${APP_BACKEND_HARVESTER_MONGO_USER}:${APP_BACKEND_HARVESTER_MONGO_PASSWORD}@mongodb:27017/salestracker
+      - REDIS_ADDR=redis://redis:6379
+      - NODE_ENV=production
+    links:
+      - "server-mongodb:mongodb"
+      - "server-redis:redis"
+    depends_on:
+      - server-mongodb
+      - server-redis
+    networks:
+      - networks-backend-mongodb
+      - networks-backend-redis
 
-backend-janitor:
-  container_name: backend-janitor
-  build: ./salestracker.eu-janitor/
-  dockerfile: Dockerfile.production
-  volumes:
-    - ./salestracker.eu-janitor/:/usr/src/app/
-    - ./salestracker.eu-shared/config/:/usr/src/app/config/
-    - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
-    - backend-janitor-modules:/usr/src/app/node_modules
-  environment:
-    ELASTICSEARCH_URL: http://elasticsearch:9200
-    MONGODB_URI: mongodb://${APP_BACKEND_JANITOR_MONGO_USER}:${APP_BACKEND_JANITOR_MONGO_PASSWORD}@mongodb:27017/salestracker
-    REDIS_ADDR: redis://redis:6379
-  links:
-    - server-elasticsearch
-    - server-mongodb
-    - server-redis
+  backend-janitor:
+    container_name: backend-janitor
+    build:
+      context: ./salestracker.eu-janitor/
+      dockerfile: Dockerfile.production
+    volumes:
+      - ./salestracker.eu-janitor/:/usr/src/app/
+      - ./salestracker.eu-shared/config/:/usr/src/app/config/
+      - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
+      - backend-janitor-modules:/usr/src/app/node_modules
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - MONGODB_URI=mongodb://${APP_BACKEND_JANITOR_MONGO_USER}:${APP_BACKEND_JANITOR_MONGO_PASSWORD}@mongodb:27017/salestracker
+      - REDIS_ADDR=redis://redis:6379
+      - NODE_ENV=production
+    links:
+      - "server-elasticsearch:elasticsearch"
+      - "server-mongodb:mongodb"
+      - "server-redis:redis"
+    depends_on:
+      - server-elasticsearch
+      - server-mongodb
+      - server-redis
+    networks:
+      - networks-backend-elasticsearch
+      - networks-backend-mongodb
+      - networks-backend-redis
 
-backend-notifier:
-  container_name: backend-notifier
-  build: ./salestracker.eu-notifier/
-  dockerfile: Dockerfile.production
-  volumes:
-    - ./salestracker.eu-notifier/:/usr/src/app/
-    - ./salestracker.eu-shared/config/:/usr/src/app/config/
-    - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
-    - backend-notifier-modules:/usr/src/app/node_modules
-  environment:
-    REDIS_ADDR: redis://redis:6379
-    MONGODB_URI: mongodb://${APP_BACKEND_NOTIFIER_MONGO_USER}:${APP_BACKEND_NOTIFIER_MONGO_PASSWORD}@mongodb:27017/salestracker
-    TELEGRAM_API_TOKEN: ${TELEGRAM_API_TOKEN}
-  links:
-    - server-mongodb
-    - server-redis
+  backend-notifier:
+    container_name: backend-notifier
+    build:
+      context: ./salestracker.eu-notifier/
+      dockerfile: Dockerfile.production
+    volumes:
+      - ./salestracker.eu-notifier/:/usr/src/app/
+      - ./salestracker.eu-shared/config/:/usr/src/app/config/
+      - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
+      - backend-notifier-modules:/usr/src/app/node_modules
+    environment:
+      - MONGODB_URI=mongodb://${APP_BACKEND_NOTIFIER_MONGO_USER}:${APP_BACKEND_NOTIFIER_MONGO_PASSWORD}@mongodb:27017/salestracker
+      - REDIS_ADDR=redis://redis:6379
+      - TELEGRAM_API_TOKEN=${TELEGRAM_API_TOKEN}
+      - NODE_ENV=production
+    links:
+      - "server-mongodb:mongodb"
+      - "server-redis:redis"
+    depends_on:
+      - server-mongodb
+      - server-redis
+    networks:
+      - networks-backend-mongodb
+      - networks-backend-redis
 
-backend-processor:
-  container_name: backend-processor
-  build: ./salestracker.eu-processor/
-  dockerfile: Dockerfile.production
-  volumes:
-    - ./salestracker.eu-processor/:/usr/src/app/
-    - ./salestracker.eu-shared/config/:/usr/src/app/config/
-    - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
-    - ./salestracker.eu-shared/uploads/:/usr/src/app/uploads/
-    - backend-processor-modules:/usr/src/app/node_modules
-  environment:
-    REDIS_ADDR: redis://redis:6379
-    MONGODB_URI: mongodb://${APP_BACKEND_PROCESSOR_MONGO_USER}:${APP_BACKEND_PROCESSOR_MONGO_PASSWORD}@mongodb:27017/salestracker
-    ELASTICSEARCH_URL: http://elasticsearch:9200
-  links:
-    - server-mongodb
-    - server-redis
-    - server-elasticsearch
+  backend-processor:
+    container_name: backend-processor
+    build:
+      context: ./salestracker.eu-processor/
+      dockerfile: Dockerfile.production
+    volumes:
+      - ./salestracker.eu-processor/:/usr/src/app/
+      - ./salestracker.eu-shared/config/:/usr/src/app/config/
+      - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
+      - ./salestracker.eu-shared/uploads/:/usr/src/app/uploads/
+      - backend-processor-modules:/usr/src/app/node_modules
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - MONGODB_URI=mongodb://${APP_BACKEND_PROCESSOR_MONGO_USER}:${APP_BACKEND_PROCESSOR_MONGO_PASSWORD}@mongodb:27017/salestracker
+      - REDIS_ADDR=redis://redis:6379
+      - NODE_ENV=production
+    links:
+      - "server-elasticsearch:elasticsearch"
+      - "server-mongodb:mongodb"
+      - "server-redis:redis"
+    depends_on:
+      - server-elasticsearch
+      - server-mongodb
+      - server-redis
+    networks:
+      - networks-backend-elasticsearch
+      - networks-backend-mongodb
+      - networks-backend-redis
 
-server-mongodb:
-  container_name: server-mongodb
-  image: mongo:latest
-  hostname: mongodb
-  restart: on-failure
-  environment:
-    - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
-    - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
-    - MONGO_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
-    - MONGO_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
-    - APP_WEB_ADMIN_MONGO_USER=${APP_WEB_ADMIN_MONGO_USER}
-    - APP_WEB_ADMIN_MONGO_PASSWORD=${APP_WEB_ADMIN_MONGO_PASSWORD}
-    - APP_WEB_PUBLIC_MONGO_USER=${APP_WEB_PUBLIC_MONGO_USER}
-    - APP_WEB_PUBLIC_MONGO_PASSWORD=${APP_WEB_PUBLIC_MONGO_PASSWORD}
-    - APP_BACKEND_FINDER_MONGO_USER=${APP_BACKEND_FINDER_MONGO_USER}
-    - APP_BACKEND_FINDER_MONGO_PASSWORD=${APP_BACKEND_FINDER_MONGO_PASSWORD}
-    - APP_BACKEND_HARVESTER_MONGO_USER=${APP_BACKEND_HARVESTER_MONGO_USER}
-    - APP_BACKEND_HARVESTER_MONGO_PASSWORD=${APP_BACKEND_HARVESTER_MONGO_PASSWORD}
-    - APP_BACKEND_JANITOR_MONGO_USER=${APP_BACKEND_JANITOR_MONGO_USER}
-    - APP_BACKEND_JANITOR_MONGO_PASSWORD=${APP_BACKEND_JANITOR_MONGO_PASSWORD}
-    - APP_BACKEND_NOTIFIER_MONGO_USER=${APP_BACKEND_NOTIFIER_MONGO_USER}
-    - APP_BACKEND_NOTIFIER_MONGO_PASSWORD=${APP_BACKEND_NOTIFIER_MONGO_PASSWORD}
-    - APP_BACKEND_PROCESSOR_MONGO_USER=${APP_BACKEND_PROCESSOR_MONGO_USER}
-    - APP_BACKEND_PROCESSOR_MONGO_PASSWORD=${APP_BACKEND_PROCESSOR_MONGO_PASSWORD}
-    - APP_MONGO_DB=${APP_MONGO_DB}
-  volumes:
-    - "./data/mongodb:/data/db"
-    - "./config/bootstrap/mongodb/:/docker-entrypoint-initdb.d/"
-  ports:
-   - "27017:27017"
+  server-mongodb:
+    container_name: server-mongodb
+    image: mongo:latest
+    restart: on-failure
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+      - MONGO_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+      - MONGO_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+      - APP_WEB_ADMIN_MONGO_USER=${APP_WEB_ADMIN_MONGO_USER}
+      - APP_WEB_ADMIN_MONGO_PASSWORD=${APP_WEB_ADMIN_MONGO_PASSWORD}
+      - APP_WEB_PUBLIC_MONGO_USER=${APP_WEB_PUBLIC_MONGO_USER}
+      - APP_WEB_PUBLIC_MONGO_PASSWORD=${APP_WEB_PUBLIC_MONGO_PASSWORD}
+      - APP_BACKEND_FINDER_MONGO_USER=${APP_BACKEND_FINDER_MONGO_USER}
+      - APP_BACKEND_FINDER_MONGO_PASSWORD=${APP_BACKEND_FINDER_MONGO_PASSWORD}
+      - APP_BACKEND_HARVESTER_MONGO_USER=${APP_BACKEND_HARVESTER_MONGO_USER}
+      - APP_BACKEND_HARVESTER_MONGO_PASSWORD=${APP_BACKEND_HARVESTER_MONGO_PASSWORD}
+      - APP_BACKEND_JANITOR_MONGO_USER=${APP_BACKEND_JANITOR_MONGO_USER}
+      - APP_BACKEND_JANITOR_MONGO_PASSWORD=${APP_BACKEND_JANITOR_MONGO_PASSWORD}
+      - APP_BACKEND_NOTIFIER_MONGO_USER=${APP_BACKEND_NOTIFIER_MONGO_USER}
+      - APP_BACKEND_NOTIFIER_MONGO_PASSWORD=${APP_BACKEND_NOTIFIER_MONGO_PASSWORD}
+      - APP_BACKEND_PROCESSOR_MONGO_USER=${APP_BACKEND_PROCESSOR_MONGO_USER}
+      - APP_BACKEND_PROCESSOR_MONGO_PASSWORD=${APP_BACKEND_PROCESSOR_MONGO_PASSWORD}
+      - APP_MONGO_DB=${APP_MONGO_DB}
+    networks:
+      - networks-backend-mongodb
+    configs:
+    # to avoid changes to the original mongo image, we import the healthcheck script using configs
+      - mongo-healthcheck
+    # it simply checks that the client can connect to mongo. No test is run w.r.t. the cluster.
+    healthcheck:
+        test: ["CMD", "bash", "/mongo-healthcheck"]
+        interval: 1m
+        timeout: 10s
+        retries: 3
+    volumes:
+      - "./data/mongodb:/data/db"
+      - "./config/bootstrap/mongodb/:/docker-entrypoint-initdb.d/"
+    ports:
+      - "27017:27017"
 
-server-redis:
-  container_name: server-redis
-  image: redis
-  hostname: redis
-  restart: on-failure
-  ports:
-    - "6379:6379"
+  server-redis:
+    container_name: server-redis
+    image: redis
+    restart: on-failure
+    networks:
+      - networks-backend-redis
+    volumes:
+      - ./data/redis:/data
+    ports:
+      - "6379:6379"
 
-server-elasticsearch:
-  image: elasticsearch:6.4.2
-  hostname: elasticsearch
-  restart: on-failure
-  container_name: server-elasticsearch
-  command: elasticsearch -Ecluster.name=salestracker -Ebootstrap.memory_lock=true -Ehttp.port=9200 -Ehttp.cors.allow-origin="http://localhost:1358" -Ehttp.cors.enabled=true -Ehttp.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization -Ehttp.cors.allow-credentials=true
-  environment:
-    - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-  ports:
-    - "9200:9200"
-    - "9300:9300"
-  ulimits:
-    memlock:
-      soft: -1
-      hard: -1
-  volumes:
-    - ./data/elasticsearch:/usr/share/elasticsearch/data
+  server-elasticsearch:
+    image: elasticsearch:6.4.2
+    restart: on-failure
+    container_name: server-elasticsearch
+    command: elasticsearch -Ecluster.name=salestracker -Ebootstrap.memory_lock=true -Ehttp.port=9200 -Ehttp.cors.allow-origin="http://localhost:1358" -Ehttp.cors.enabled=true -Ehttp.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization -Ehttp.cors.allow-credentials=true
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    networks:
+      - networks-backend-elasticsearch
+    volumes:
+      - ./data/elasticsearch:/usr/share/elasticsearch/data
+    healthcheck:
+        test: curl -s https://localhost:9200 >/dev/null; if [[ $$? == 52 ]]; then echo 0; else echo 1; fi
+        interval: 30s
+        timeout: 10s
+        retries: 5
+        start_period: 60s
+
+configs:
+  # to avoid changes to the original mongo image, we import the healthcheck script using configs
+  mongo-healthcheck:
+    file: ./config/bootstrap/mongodb/mongo-healthcheck
+
+networks:
+  networks-backend-elasticsearch:
+  networks-backend-mongodb:
+  networks-backend-redis:
+
+volumes:
+  web-admin-modules:
+  web-admin-public:
+  web-public-modules:
+  web-public-public:
+  backend-finder-modules:
+  backend-harvester-modules:
+  backend-janitor-modules:
+  backend-notifier-modules:
+  backend-processor-modules:
