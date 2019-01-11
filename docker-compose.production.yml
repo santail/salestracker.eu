@@ -23,6 +23,15 @@ services:
       - "server-elasticsearch:elasticsearch"
       - "server-mongodb:mongodb"
       - "server-redis:redis"
+    depends_on:
+      - server-elasticsearch
+      - server-mongodb
+      - server-redis
+    restart: on-failure
+    networks:
+      - networks-backend-elasticsearch
+      - networks-backend-mongodb
+      - networks-backend-redis
 
   web-public:
     container_name: web-public
@@ -70,6 +79,8 @@ services:
       - server-elasticsearch
       - server-mongodb
       - server-redis
+      - backend-processor
+    restart: on-failure
     networks:
       - networks-backend-elasticsearch
       - networks-backend-mongodb
@@ -87,16 +98,22 @@ services:
       - ./salestracker.eu-shared/uploads/:/usr/src/app/uploads/
       - backend-harvester-modules:/usr/src/app/node_modules
     environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
       - MONGODB_URI=mongodb://${APP_BACKEND_HARVESTER_MONGO_USER}:${APP_BACKEND_HARVESTER_MONGO_PASSWORD}@mongodb:27017/salestracker
       - REDIS_ADDR=redis://redis:6379
       - NODE_ENV=production
     links:
+      - "server-elasticsearch:elasticsearch"
       - "server-mongodb:mongodb"
       - "server-redis:redis"
     depends_on:
+      - server-elasticsearch
       - server-mongodb
       - server-redis
+      - backend-processor
+    restart: on-failure    
     networks:
+      - networks-backend-elasticsearch
       - networks-backend-mongodb
       - networks-backend-redis
 
@@ -123,6 +140,8 @@ services:
       - server-elasticsearch
       - server-mongodb
       - server-redis
+      - backend-processor
+    restart: on-failure    
     networks:
       - networks-backend-elasticsearch
       - networks-backend-mongodb
@@ -149,6 +168,7 @@ services:
     depends_on:
       - server-mongodb
       - server-redis
+    restart: on-failure    
     networks:
       - networks-backend-mongodb
       - networks-backend-redis
@@ -177,6 +197,7 @@ services:
       - server-elasticsearch
       - server-mongodb
       - server-redis
+    restart: on-failure
     networks:
       - networks-backend-elasticsearch
       - networks-backend-mongodb
@@ -208,15 +229,12 @@ services:
       - APP_MONGO_DB=${APP_MONGO_DB}
     networks:
       - networks-backend-mongodb
-    configs:
-    # to avoid changes to the original mongo image, we import the healthcheck script using configs
-      - mongo-healthcheck
-    # it simply checks that the client can connect to mongo. No test is run w.r.t. the cluster.
     healthcheck:
-        test: ["CMD", "bash", "/mongo-healthcheck"]
-        interval: 1m
-        timeout: 10s
-        retries: 3
+      test:
+        - CMD
+        - mongo
+        - --eval
+        - "db.adminCommand('ping')"
     volumes:
       - "./data/mongodb:/data/db"
       - "./config/bootstrap/mongodb/:/docker-entrypoint-initdb.d/"
@@ -258,11 +276,6 @@ services:
         timeout: 10s
         retries: 5
         start_period: 60s
-
-configs:
-  # to avoid changes to the original mongo image, we import the healthcheck script using configs
-  mongo-healthcheck:
-    file: ./config/bootstrap/mongodb/mongo-healthcheck
 
 networks:
   networks-backend-elasticsearch:
