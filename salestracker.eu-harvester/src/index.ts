@@ -110,10 +110,10 @@ worker.process('harvestSite', numParallel, function (job, done) {
         });
 
     Promise.all([cleanupPromise, processSitePromise])
-        .then(function (result) {
+        .then(result => {
             LOG.info(util.format('[OK] Sites harvesting finished'));
             return done(null, result);
-        }, function (err) {
+        }, err => {
             LOG.error(util.format('[ERROR] Sites harvesting failed', err));
             return done(err);
         });

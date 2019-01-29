@@ -1,4 +1,3 @@
-var async = require('async');
 var _ = require('lodash');
 var util = require("util");
 

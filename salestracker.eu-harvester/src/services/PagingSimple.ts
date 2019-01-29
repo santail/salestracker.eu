@@ -14,9 +14,9 @@ class PagingSimple {
 
         var offersHandlers = _.map(offers, offer => {
             return WorkerService.scheduleOfferHarvesting(_.extend(offer, {
-                    'site': options.site,
-                    'language': parser.getMainLanguage()
-                }), 0)
+                'site': options.site,
+                'language': parser.getMainLanguage()
+            }), 0)
                 .then(() => {
                     LOG.info(util.format('[OK] [%s] [%s] Offer harvesting scheduled', options.site, offer.href));
                 })
