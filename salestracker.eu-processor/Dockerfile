@@ -15,11 +15,6 @@ COPY package.json package-lock.json /usr/src/app/
 
 RUN npm install
 
-LABEL test=1
-
 COPY . /usr/src/app
-
-ENV NODE_ENV development
-ENV SHOULD_HARVEST_PICTURES true
 
 CMD ["npm", "start"]

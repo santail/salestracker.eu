@@ -16,10 +16,6 @@ RUN npm install
 # Make everything available for start
 COPY . /usr/src/app
 
-# Set development environment as default
-ENV NODE_ENV development
-ENV MONGO_SEED true
-
 # Port 9000 for server
 # Port 35729 for livereload
 EXPOSE 9000 35729

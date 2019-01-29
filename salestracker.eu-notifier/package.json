@@ -32,7 +32,7 @@
     "@types/lodash": "^4.14.91",
     "@types/mongodb": "^3.1.4",
     "@types/mongoose": "^5.2.6",
-    "@types/node": "^9.4.6",
+    "@types/node": "^9.6.41",
     "@types/winston": "^2.4.4"
   }
 }

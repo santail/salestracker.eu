@@ -13,8 +13,6 @@ COPY package.json package-lock.json /usr/src/app/
 
 RUN npm install
 
-ENV NODE_ENV development
-
 COPY . /usr/src/app
 
 CMD ["npm", "run", "dev"]

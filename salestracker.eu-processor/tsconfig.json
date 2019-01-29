@@ -15,13 +15,12 @@
       "baseUrl": "./",
       "experimentalDecorators": true,
       "emitDecoratorMetadata": true,
-      "allowJs": true
+      "allowJs": true,
+      "types" : ["node", "lodash"]
     },
     "include": [
         "lib/**/*.ts",
-        "src/**/*.ts",
-        "tests/**/*.ts",
-        "../shared/**/*.*s"
+        "src/**/*.ts"
     ],
     "exclude": [
       "node_modules"

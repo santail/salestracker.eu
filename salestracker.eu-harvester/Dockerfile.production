@@ -1,4 +1,4 @@
-FROM node:9
+FROM node
 
 LABEL maintainer="nikolai muhhin <nikolai.muhhin@gmail.com>"
 

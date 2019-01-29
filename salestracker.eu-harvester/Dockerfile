@@ -1,4 +1,4 @@
-FROM node:9
+FROM node
 
 LABEL maintainer="nikolai muhhin <nikolai.muhhin@gmail.com>"
 
@@ -14,9 +14,5 @@ COPY package.json package-lock.json /usr/src/app/
 RUN npm install
 
 COPY . /usr/src/app
-
-ENV NODE_ENV development
-ENV PAGING_PAGES_LIMIT 1
-ENV OFFERS_LIMIT 1
 
 CMD ["npm", "start"]
