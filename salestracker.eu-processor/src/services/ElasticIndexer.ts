@@ -1,11 +1,9 @@
 var _ = require('lodash');
 var util = require('util');
 
-
 var LOG = require("../../lib/services/Logger");
 var SessionFactory = require('../../lib/services/SessionFactory');
 
-var elastic = SessionFactory.getElasticsearchConnection();
 
 class ElasticIndexer {
 
@@ -18,20 +16,20 @@ class ElasticIndexer {
     }
 
     private _checkIndexExists(indexName: string) {
-
-        return elastic.indices.exists({
+        return SessionFactory.getElasticsearchConnection().indices.exists({
                 index: indexName
             })
             .then(function (exists) {
                 if (!exists) {
                     LOG.info(util.format('[OK] [%s] Index missing. Initializing index.', indexName));
 
-                    return elastic.indices.create({
+                    return SessionFactory.getElasticsearchConnection().indices.create({
                         index: indexName
                     });
                 }
 
                 LOG.info(util.format('[OK] [%s] Index exists. Skip index creation.', indexName));
+
                 return Promise.resolve(false);
             })
             // .then(function () {
@@ -50,7 +48,8 @@ class ElasticIndexer {
                 }
 
                 LOG.info(util.format('[OK] [%s] Index missing. Initialize mapping.', indexName));
-                return elastic.indices.putMapping({
+                
+                return SessionFactory.getElasticsearchConnection().indices.putMapping({
                     index: indexName,
                     type: "offers",
                     body: {
@@ -74,6 +73,10 @@ class ElasticIndexer {
                                         "type": "scaled_float",
                                         "scaling_factor": 100
                                     },
+                                    "original": {
+                                        "type": "scaled_float",
+                                        "scaling_factor": 100
+                                    },
                                     "discount": {
                                         "properties": {
                                             "amount": {
@@ -83,10 +86,6 @@ class ElasticIndexer {
                                                 "type": "float"
                                             }
                                         }
-                                    },
-                                    "original": {
-                                        "type": "scaled_float",
-                                        "scaling_factor": 100
                                     }
                                 }
                             },
@@ -160,18 +159,37 @@ class ElasticIndexer {
         delete offer.translations;
         delete offer.language;
 
-        elastic.index({
+        LOG.info(util.format('[OK] [%s] [%s] [%s] Remove existing indexed document.', offer.site, offer.origin_href, options.language));
+
+        SessionFactory.getElasticsearchConnection().deleteByQuery({
             index: 'salestracker-' + options.language,
             type: 'offers',
-            body: offer
-        }, function (err, resp) {
+            body: {
+              query: {
+                term: { origin_href: offer.origin_href }
+              }
+            }
+          }, function (err, resp) {
             if (err) {
-                LOG.error(util.format('[ERROR] [%s] [%s] Indexing offer failed', offer.site, offer.href), err);
+                LOG.error(util.format('[ERROR] [%s] [%s] Removing indexed document failed', offer.site, offer.href), err);
                 return callback(err);
             }
 
-            LOG.info(util.format('[OK] [%s] [%s ] Offer indexed', offer.site, offer.href));
-            return callback();
+            LOG.info(util.format('[OK] [%s] [%s] [%s] Adding new document to index.', offer.site, offer.origin_href, options.language));
+
+            SessionFactory.getElasticsearchConnection().index({
+                index: 'salestracker-' + options.language,
+                type: 'offers',
+                body: offer
+            }, function (err, resp) {
+                if (err) {
+                    LOG.error(util.format('[ERROR] [%s] [%s] Adding new document do index failed', offer.site, offer.href), err);
+                    return callback(err);
+                }
+    
+                LOG.info(util.format('[OK] [%s] [%s ] Adding new document succeeded', offer.site, offer.href));
+                return callback();
+            });
         });
     }
 }

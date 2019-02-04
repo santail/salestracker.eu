@@ -24,35 +24,13 @@ class ImageProcessor {
                 return callback(new Error('Offer not found for update: ' + options.origin_href));
             }
 
-            let downloads = foundOffer.downloads || {
-                pictures: []
-            };
-
-            downloads.pictures.push(options.picture_path.replace(path.join(process.cwd(), './uploads/offers/'), ''));
-
             Promise.all([
                 this._resizeImage(options, 100, 100),
                 this._resizeImage(options, 200, 200)
             ])
                 .then(() => {
-                    LOG.info(util.format('[OK] [%s] [%s] [%s] Offer image processed. Updating offer.', options.site, options.origin_href, options.href));
-
-                    SessionFactory.getDbConnection().offers.update({
-                        origin_href: options.origin_href
-                    }, {
-                        $set: {
-                            downloads: downloads
-                        }
-                    }, function (err) {
-                        if (err) {
-                            LOG.error(util.format('[ERROR] [%s] [%s] [%s] Offer update failed', options.site, options.origin_href, options.href), err);
-                            return callback(err);
-                        }
-
-                        LOG.info(util.format('[OK] [%s] [%s] [%s] Offer updated with newly downloaded pictures.', options.site, options.origin_href, options.href));
-
-                        return callback();
-                    });
+                    LOG.info(util.format('[OK] [%s] [%s] [%s] Offer image processed. ', options.site, options.origin_href, options.href));
+                    return callback();
                 })
                 .catch(err => {
                     LOG.error(util.format('[ERROR] [%s] [%s] [%s] Offer image processing failed.', options.site, options.origin_href, options.href), err);

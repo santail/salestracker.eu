@@ -18,9 +18,12 @@ const CATEGORIES = {
         'Old Tbilisi', 'Rigol Cava', 'Torres', 'Napoleon VS', 'Rigol Cava', 'Torres', 'Havana Club',
         'Angostura Rum Dark'
     ],
-    'cosmetics': ['Himalaya', 'Garnier', 'Vuokkoset', 'L\'Oreal Paris', 'VEET Debut'],
-    'children': ['Pampers', 'HUGGIES'],
-    'toys': ['LEGO FRIENDS', 'TRANSFORMERS', 'MONOPOLY', 'LITTLEST PET SHOP', 'MY LITTLE PONY', 'L.O.L',
+    'cosmetics': [
+        'Himalaya', 'Garnier', 'Vuokkoset', 'L\'Oreal Paris', 'VEET Debut'],
+    'children': [
+        'Pampers', 'HUGGIES'],
+    'toys': [
+        'LEGO FRIENDS', 'TRANSFORMERS', 'MONOPOLY', 'LITTLEST PET SHOP', 'MY LITTLE PONY', 'L.O.L',
         'BRUDER', 'GERARDOS TOYS', 'GERARDO´S TOYS', 'LEGO'],
     'fashion': [],
     'pets': ['KITEKAT', 'PURINA ONE']

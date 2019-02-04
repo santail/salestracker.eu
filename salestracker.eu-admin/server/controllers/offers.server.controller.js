@@ -166,10 +166,10 @@ exports.list = function (req, res) {
                 }
     
                 offer.downloads.pictures = _.map(offer.downloads.pictures, picture => {
-                    const parsedPath = path.parse(picture);
+                    const parsedPath = path.parse(picture.path);
     
                     return path.format({
-                        dir: parsedPath.dir,
+                        dir: path.join(offer.site, parsedPath.dir),
                         name: parsedPath.name + '_200x200',
                         ext: '.png'
                     });

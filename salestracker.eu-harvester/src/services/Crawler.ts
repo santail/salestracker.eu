@@ -114,8 +114,9 @@ class Crawler {
                 }
             } 
             else if (response.statusCode === 404) {
-                LOG.error(util.format('[ERROR] [%s] Parsing page body failed %s', options.url, err));
-                return options.onError(err);
+                LOG.error(util.format('[ERROR] [%s] [%s] Fetching href failed', options.url, response.statusCode));
+                
+                return options.onSuccess();
             }
             else {
                 response = null;

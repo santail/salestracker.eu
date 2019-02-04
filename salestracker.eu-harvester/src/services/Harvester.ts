@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var Promise = require('promise');
 var util = require("util");
 
@@ -12,9 +13,11 @@ var SessionFactory = require("../../lib/services/SessionFactory");
 
 class Harvester {
   private _db: any;
+  private _elastic: any;
 
   constructor() {
     this._db = SessionFactory.getDbConnection();
+    this._elastic = SessionFactory.getElasticsearchConnection();
   }
 
   /*
@@ -27,21 +30,53 @@ class Harvester {
 
     LOG.info(util.format('[OK] [%s] Cleanup started', options.site));
 
-    return new Promise((fulfill, reject) => {
+    let promises = [
+      this._clearDatabase(options),
+      this._clearIndex(options)
+    ];
+
+    return Promise.all(promises);
+  };
+
+  private _clearDatabase(options) {
+    try {
       this._db.offers.remove({
         'site': options.site
-      }, (err) => {
-        if (err) reject(err);
-        else {
-          if (options.cleanup_uploads) {
-            ImageHarvester.cleanUploadedImages(options.site); // TODO Wrap to promise
-          }
-
-          fulfill()
-        };
       });
+
+      LOG.info(util.format('[OK] [%s] Database clean-up finished', options.site));
+      return Promise.resolve();
+    } catch (err) {
+      LOG.error(util.format('[ERROR] [%s] Database clean-up failed', options.site), err);
+      return Promise.reject();
+    }
+  }
+
+  private _clearIndex(options) {
+    let promises = _.map(['est', 'eng', 'rus'], language => {
+      LOG.info(util.format('[OK] [%s] [%s] Clearing index', options.site, language));
+
+      const index = 'salestracker-' + language;
+
+      return this._elastic.deleteByQuery({
+        index: index,
+        type: 'offers',
+        body: {
+          query: {
+            term: { site: options.site }
+          }
+        }
+      })
+        .then(() => {
+          LOG.info(util.format('[OK] [%s] [%s] Index clean-up finished', options.site, index));
+        })
+        .catch(err => {
+          LOG.error(util.format('[ERROR] [%s] [%s] Index clean-up failed', options.site, index), err);
+        });
     });
-  };
+
+    return Promise.all(promises);
+  }
 
   /*
    *

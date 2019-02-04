@@ -13,10 +13,13 @@ class PagingSimple {
         var offers = parser.getOffers(content);
 
         var offersHandlers = _.map(offers, offer => {
-            return WorkerService.scheduleOfferHarvesting(_.extend(offer, {
+            offer = _.extend(offer, {
                 'site': options.site,
-                'language': parser.getMainLanguage()
-            }), 0)
+                'language': parser.getMainLanguage(),
+                'origin_href': offer.href
+            });
+
+            return WorkerService.scheduleOfferHarvesting(offer)
                 .then(() => {
                     LOG.info(util.format('[OK] [%s] [%s] Offer harvesting scheduled', options.site, offer.href));
                 })

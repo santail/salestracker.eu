@@ -1,6 +1,4 @@
-import {
-    ObjectId
-} from 'bson';
+import { ObjectId } from 'bson';
 var _ = require('lodash');
 var path = require('path');
 var slugify = require('slugify');
@@ -156,49 +154,48 @@ class DataProcessor {
             });
         }
 
-        SessionFactory.getDbConnection().offers
-            .findOne({ 
-                "$query": {
-                    $and: criteria
-                }, 
-                "$orderBy": { 
-                    "parsed": 1 
-                }
-            }, (err, foundOffer) => {            
-                if (err) {
-                    // TODO reclaim event processing
-                    LOG.error(util.format('[ERROR] Next offer not found. Stop processing.'), err);
-                    clearTimeout(this._processorTimeout[options.site]);
-                    return callback(err);
-                }
+        SessionFactory.getDbConnection().offers.findOne({ 
+            "$query": {
+                $and: criteria
+            }, 
+            "$orderBy": { 
+                "parsed": 1 
+            }
+        }, (err, foundOffer) => {            
+            if (err) {
+                // TODO reclaim event processing
+                LOG.error(util.format('[ERROR] Next offer not found. Stop processing.'), err);
+                clearTimeout(this._processorTimeout[options.site]);
+                return callback(err);
+            }
 
-                if (!foundOffer) {
-                    LOG.error(util.format('[ERROR] Next offer not found. Stop processing.'));
-                    clearTimeout(this._processorTimeout[options.site]);
+            if (!foundOffer) {
+                LOG.error(util.format('[ERROR] Next offer not found. Stop processing.'));
+                clearTimeout(this._processorTimeout[options.site]);
 
-                    this._lastProcessedOfferId = null;
-                    this._lastProcessedOfferParsedTime = null;
-                    return callback();
-                }
+                this._lastProcessedOfferId = null;
+                this._lastProcessedOfferParsedTime = null;
+                return callback();
+            }
 
-                LOG.info(util.format('[OK] [%s] [%s] Offer found. Proceed with processing data.', foundOffer.site, foundOffer.origin_href));
+            LOG.info(util.format('[OK] [%s] [%s] Offer found. Proceed with processing data.', foundOffer.site, foundOffer.origin_href));
 
-                this._lastProcessedOfferId = foundOffer._id;
-                this._lastProcessedOfferParsedTime = foundOffer.parsed;
+            this._lastProcessedOfferId = foundOffer._id;
+            this._lastProcessedOfferParsedTime = foundOffer.parsed;
 
-                this._processFoundOffer(options, foundOffer)
-                    .then(() => {
-                        LOG.info(util.format('[OK] [%s] [%s] Processing offer data finished. Next offer.', foundOffer.site, foundOffer.origin_href));
+            this._processFoundOffer(options, foundOffer)
+                .then(() => {
+                    LOG.info(util.format('[OK] [%s] [%s] Processing offer data finished. Next offer.', foundOffer.site, foundOffer.origin_href));
 
-                        this._processorTimeout[options.site] = setTimeout(() => {
-                            this._processSiteOffers(options, callback);
-                        }, 0)
-                    })
-                    .catch(() => {
-                        LOG.error(util.format('[ERROR] Checking offer failed', err));
-                        callback();
-                    });
-            });
+                    this._processorTimeout[options.site] = setTimeout(() => {
+                        this._processSiteOffers(options, callback);
+                    }, 0)
+                })
+                .catch(() => {
+                    LOG.error(util.format('[ERROR] Checking offer failed', err));
+                    callback();
+                });
+        });
     };
 
     private _processSingleOffer(options, callback) {
@@ -231,6 +228,8 @@ class DataProcessor {
 
         let promises: Promise<void | {}>[] = [];
 
+        promises.push(this._requestTranslationsIfNeeded(options, foundOffer));
+
         if (options.process_pictures) {
             promises.push(this.processPictures(options, foundOffer));
         }
@@ -246,6 +245,47 @@ class DataProcessor {
         return Promise.all(promises);
     }
 
+    private _requestTranslationsIfNeeded = (options, offer) => {
+        var parser = parserFactory.getParser(options.site);
+
+        LOG.info(util.format('[OK] [%s] [%s] Schedule offer translations', options.site, options.href));
+
+        const translationsRequestPromises = _.map(_.keys(offer.translations), language => {
+            const isMainOffer = parser.config.languages[language].main;
+
+            // do not request main language translation harvesting as it is already there
+            if (isMainOffer) {
+                return;
+            }
+
+            const translation = offer.translations[language];
+
+            let config = {
+                'site': options.site,
+                'language': language,
+                'href': translation.href,
+                'origin_href': options.origin_href,
+            };
+
+            return WorkerService.scheduleOfferHarvesting(config)
+                .then(() => {
+                    LOG.info(util.format('[OK] [%s] [%s] [%s] Offer translation harvesting scheduled', options.site, options.href, language));                    
+                })
+                .catch(err => {
+                    LOG.error(util.format('[ERROR] [%s] [%s] [%s] Offer translation harvesting not scheduled %s', options.site, options.href, language), err);
+                    // TODO Mark offer as failed due to missing translation
+                });
+        });
+
+        return Promise.all(translationsRequestPromises)
+            .then(() => {
+                LOG.info(util.format('[OK] [%s] [%s] Offer translations scheduled', options.site, options.href));
+            })
+            .catch(err => {
+                LOG.error(util.format('[ERROR] [%s] [%s] Offer translations not scheduled %s', options.site, options.href), err);
+            })
+    };
+
     processPictures = (options, offer) => {
         var parser = parserFactory.getParser(options.site);
 
@@ -255,46 +295,33 @@ class DataProcessor {
 
         LOG.info(util.format('[OK] [%s] [%s] Process pictures.', offer.site, offer.origin_href));
 
-        return new Promise((fulfill, reject) => {
-            SessionFactory.getDbConnection().offers.update({
-                origin_href: offer.origin_href
-            }, {
-                $set: {
-                    downloads: { pictures: [] }
-                }
-            }, function (err) {
-                if (err) {
-                    LOG.error(util.format('[ERROR] [%s] [%s] Offer update failed', options.site, offer.origin_href), err);
-                    return reject();
-                }
-    
-                LOG.info(util.format('[OK] [%s] [%s] Offer updated with empty pictures collection.', options.site, offer.origin_href));
-    
-                return _.map(offer.pictures, pictureHref => {
-                    if (!SHOULD_HARVEST_PICTURES) {
-                        return fulfill();
-                    }
-        
-                    const offerHref = new URL(offer.origin_href);
-                    let picturePath = path.join(process.cwd(), './uploads/offers/' + options.site + '/' + slugify(offerHref.pathname));
-        
-                    return WorkerService.schedulePictureHarvesting({
-                            'site': options.site,
-                            'origin_href': offer.origin_href,
-                            'picture_href': pictureHref,
-                            'picture_path': picturePath
-                        })
-                        .then(() => {
-                            LOG.info(util.format('[OK] [%s] [%s] [%s] Picture harvesting scheduled.', offer.site, offer.origin_href, pictureHref));
-                            return fulfill();
-                        })
-                        .catch(err => {
-                            LOG.error(util.format('[ERROR] [%s] Picture harvesting not scheduled.', pictureHref), err);
-                            return reject(err);
-                        });
-                });
+        if (!SHOULD_HARVEST_PICTURES) {
+            return Promise.resolve();
+        }
+
+        const picturesProcessPromises = _.map(offer.downloads.pictures, picture => {
+            return WorkerService.schedulePictureHarvesting({
+                'site': options.site,
+                'origin_href': offer.origin_href,
+                'picture_href': picture.origin_href,
+                'href': options.href,
+                'picture_path': path.join(process.cwd(), './uploads/offers/' + options.site + '/' + picture.path)
+            })
+            .then(() => {
+                LOG.info(util.format('[OK] [%s] [%s] [%s] Picture harvesting scheduled.', offer.site, offer.origin_href, picture.origin_href));
+            })
+            .catch(err => {
+                LOG.error(util.format('[ERROR] [%s] Picture harvesting not scheduled.', picture.origin_href), err);
             });
         });
+
+        return Promise.all(picturesProcessPromises)
+            .then(() => {
+                LOG.info(util.format('[OK] [%s] [%s] Offer translations scheduled', options.site, options.href));
+            })
+            .catch(err => {
+                LOG.error(util.format('[ERROR] [%s] [%s] Offer translations not scheduled %s', options.site, options.href), err);
+            });
     };
 
     processCategories = (options, offer) => {

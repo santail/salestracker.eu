@@ -85,8 +85,8 @@ class AsosManParser extends AbstractParser {
       lastPage = parseInt(process.env.PAGING_PAGES_LIMIT, 10);
     } else if (options.limit && options.limit < lastPage) {
       lastPage = options.limit;
-    } else if (this.config.paging!!.limit && this.config.paging!!.limit < lastPage) {
-      lastPage = this.config.paging!!.limit;
+    } else if (this.config.paging && this.config.paging.limit && this.config.paging.limit < lastPage) {
+      lastPage = this.config.paging.limit;
     }
   
     var pages: string[] = [];

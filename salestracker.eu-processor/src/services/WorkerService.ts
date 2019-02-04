@@ -7,11 +7,32 @@ var SessionFactory = require('../../lib/services/SessionFactory');
 
 
 class WorkerService {
+    scheduleOfferHarvesting = (options) => {
+        return new Promise((fulfill, reject) => {
+            SessionFactory.getQueueConnection().create('harvestOffer', options)
+                .attempts(3)
+                .backoff({
+                    delay: 60 * 1000,
+                    type: 'exponential'
+                })
+                .removeOnComplete(true)
+                .save(function (err) {
+                    if (err) {
+                        LOG.error(util.format('[ERROR] [%s] [%s] Offer processing schedule failed', options.site, options.href), err);
+                        return reject(err);
+                    }
 
+                    LOG.debug(util.format('[OK] [%s] [%s] Offer processing scheduled', options.site, options.href));
+                    return fulfill();
+                });
+        });
+    }
+    
     schedulePictureHarvesting(options) {
         return new Promise((fulfill, reject) => {
             SessionFactory.getQueueConnection().create('harvestPicture', options)
-                .attempts(3).backoff({
+                .attempts(3)
+                .backoff({
                     delay: 60 * 1000,
                     type: 'exponential'
                 })
@@ -31,7 +52,8 @@ class WorkerService {
     scheduleCategoriesProcessing(options) {
         return new Promise((fulfill, reject) => {
             SessionFactory.getQueueConnection().create('processCategories', options)
-                .attempts(3).backoff({
+                .attempts(3)
+                .backoff({
                     delay: 60 * 1000,
                     type: 'exponential'
                 })
@@ -51,7 +73,8 @@ class WorkerService {
     scheduleIndexing(options) {
         return new Promise((fulfill, reject) => {
             SessionFactory.getQueueConnection().create('processIndexing', options)
-                .attempts(3).backoff({
+                .attempts(3)
+                .backoff({
                     delay: 60 * 1000,
                     type: 'exponential'
                 })
@@ -72,7 +95,6 @@ class WorkerService {
         return new Promise((fulfill, reject) => {
             SessionFactory.getQueueConnection().create('processData', options)
                 .attempts(3)
-                .delay(10 * 1000)
                 .backoff({
                     delay: 60 * 1000,
                     type: 'exponential'

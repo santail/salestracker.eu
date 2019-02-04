@@ -5,11 +5,10 @@ var SessionFactory = require('../../lib/services/SessionFactory');
 
 
 class WorkerService {
-    scheduleOfferHarvesting = (options, delay) => {
+    scheduleOfferHarvesting = (options) => {
         return new Promise((fulfill, reject) => {
             SessionFactory.getQueueConnection().create('harvestOffer', options)
                 .attempts(3)
-                .delay(delay)
                 .backoff({
                     delay: 60 * 1000,
                     type: 'exponential'
@@ -73,7 +72,6 @@ class WorkerService {
         return new Promise((fulfill, reject) => {
             SessionFactory.getQueueConnection().create('processContent', data)
                 .attempts(3)
-                .delay(10 * 1000)
                 .backoff({
                     delay: 60 * 1000,
                     type: 'exponential'

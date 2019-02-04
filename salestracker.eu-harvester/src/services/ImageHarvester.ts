@@ -16,50 +16,33 @@ class ImageHarvester {
 
     public harvestImage = (options) => {
         return new Promise((fulfill, reject) => {
-            let pictureHref = options.picture_href;
 
-            if (options.site === 'www.asos.com.men' || options.site === 'www.asos.com.women') {
-                pictureHref += '?$XXL$';
-            }
-
-            LOG.info(util.format('[OK] [%s] [%s] Downloading image', options.site, pictureHref));
+            LOG.info(util.format('[OK] [%s] [%s] Downloading image', options.site, options.picture_href));
 
             request({
-                url: pictureHref,
+                url: options.picture_href,
                 encoding: 'binary',
                 resolveWithFullResponse: true,
                 simple: false 
             })
             .then(res => {
                 if (res.body && res.statusCode === 200) {
-                    fs.ensureDir(options.picture_path, '0777', (err) => {
+                    fs.ensureDir(path.dirname(options.picture_path), '0777', (err) => {
                         if (err) {
                             if (err.code == 'EEXIST') {
                                 // do nothing 
                             }
                         }
 
-                        if (options.site === 'www.asos.com.men' || options.site === 'www.asos.com.women') {
-                            pictureHref = pictureHref.replace('?$XXL$', '');
-                        }
+                        LOG.info(util.format('[OK] [%s] [%s] Storing image', options.site, options.picture_href, options.picture_path));
 
-                        let picturePath = path.join(options.picture_path, path.basename(pictureHref));
-
-                        if (options.site === 'www.barbora.ee') {
-                            picturePath = picturePath.replace('GetInventoryImage?id=', '') + '.jpg';
-                        }
-
-                        picturePath = encodeURI(picturePath);
-        
-                        LOG.info(util.format('[OK] [%s] [%s] Storing image', options.site, picturePath));
-
-                        writeFile(picturePath, res.body, 'binary')
+                        writeFile(options.picture_path, res.body, 'binary')
                             .then(() => {
                                 return WorkerService.scheduleImageProcessing({
                                     site: options.site,
                                     href: options.picture_href,
                                     origin_href: options.origin_href,
-                                    picture_path: picturePath
+                                    picture_path: options.picture_path
                                 });
                             })
                             .then(() => {
