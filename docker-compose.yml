@@ -262,6 +262,7 @@ services:
 
   tools-mongodb-commander:
     image: mongo-express
+    restart: on-failure
     container_name: tools-mongodb-commander
     environment:
       ME_CONFIG_MONGODB_SERVER: mongodb
@@ -275,6 +276,23 @@ services:
       - "8082:8082"
     networks:
       - networks-backend-mongodb
+
+  tools-kue-ui:
+    image: christophwitzko/kue-ui
+    restart: on-failure
+    hostname: kui-ui
+    container_name: tools-kui-ui
+    restart: always
+    links:
+      - "server-redis:redis"
+    depends_on:
+      - server-redis
+    environment:
+      KUE_PREFIX: q
+    ports:
+      - "5000:5000"
+    networks:
+      - networks-backend-redis
 
 networks:
   networks-backend-elasticsearch:
