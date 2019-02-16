@@ -118,7 +118,7 @@ class Harvester {
    *
    */
   public harvestPage = (options, callback) => {
-    LOG.info(util.format('[OK] [%s] Page processing %s of %s started', options.site, options.page_index, options.total_pages));
+    LOG.info(util.format('[OK] [%s] Page harvesting %s of %s started', options.site, options.page_index, options.total_pages));
 
     return PagingHarvester.harvestPage(options, callback);
   };

@@ -170,6 +170,8 @@ class Crawler {
         // TODO Warning: tidy uses 32 bit binary instead of 64, https://github.com/vavere/htmltidy/issues/11
         // TODO Needs manual update on production for libs
 
+        LOG.info(util.format('[OK] [%s] Cleaning up received data', options.url));
+
         tidy(data, {
             doctype: 'html5',
             indent: false,
@@ -180,6 +182,8 @@ class Crawler {
             wrap: 0
         }, (err, body) => {
             data = null;
+
+            LOG.info(util.format('[OK] [%s] Parsing received data to cheerio model', options.url));
 
             if (err) {
                 LOG.error(util.format('[ERROR] [%s] Cleanup response body failed', options.url, err));

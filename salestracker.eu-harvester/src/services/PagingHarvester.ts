@@ -11,6 +11,8 @@ class PagingHarvester {
   public harvestPage = (options, callback) => {
     var parser = parserFactory.getParser(options.site);
 
+    LOG.info(util.format('[OK] [%s] [%s] Page harvesting started', options.site, options.href));
+
     var crawler = new Crawler();
     crawler.request({
       url: options.href,
