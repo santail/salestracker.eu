@@ -88,17 +88,13 @@ exports.list = function (req, res) {
     var page = req.query.page || 0;
     page = page < 0 ? 0 : page;
 
-    var criteria = [];
-    var filters = [{
-        "range": {
-            "expires": {
-                "gt": new Date(currentTime - 6 * 60 * 60 * 1000)
-            }
-        }
-    }];
+    var must = [];
+    var mustNot = [];
+    
+    var filters = [];
 
     if (req.query.filter) {
-        criteria.push({
+        must.push({
             "match_phrase": {
                 "title": req.query.filter
             }
@@ -106,21 +102,46 @@ exports.list = function (req, res) {
     }
 
     if (req.query.site) {
-        criteria.push({
+        must.push({
             "term": {
                 "site": req.query.site
             }
         });
     }
 
+    if (req.query.category) {
+        must.push({
+            "term": {
+                "category": req.query.category
+            }
+        });
+    } else {
+        mustNot.push({
+            "exists": {
+                "field": "category"
+            }
+        });
+    }
+
+    let bool = {};
+
+    if (filters.length) {
+        bool.filter = filters;
+    }
+
+    if (must.length) {
+        bool.must = must;
+    }
+
+    if (mustNot.length) {
+        bool.must_not = mustNot;
+    }
+
     let body = {
         "from": page * count,
         "size": count,
         "query": {
-            "bool": {
-                "must": criteria,
-                "filter": filters
-            }
+            "bool": bool
         },
         "sort": [
             { "price.discount.amount":   { "order": "desc" }},
@@ -156,7 +177,7 @@ exports.list = function (req, res) {
                 return;
             }
 
-            var offers = _.map(maxResult.hits.hits, function (hit) {
+            var offers = _.map(maxResult.hits.hits, hit => {
                 var offer = hit._source;
     
                 if (!offer.downloads || !offer.downloads.pictures) {
