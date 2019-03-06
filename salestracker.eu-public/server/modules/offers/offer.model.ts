@@ -3,13 +3,13 @@
 /**
  * Module dependencies.
  */
-var mongoose = require('mongoose'),
+let mongoose = require('mongoose'),
 	Schema = mongoose.Schema;
 
 /**
  * Offer Schema
  */
-var OfferSchema = new Schema({
+let OfferSchema = new Schema({
 	category: String,
     brand: String,
     price: String,

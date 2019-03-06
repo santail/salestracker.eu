@@ -3,7 +3,7 @@
 /**
  * Module dependencies.
  */
-var _ = require('lodash')._;
+let _ = require('lodash')._;
 var franc = require('franc');
 var mongoose = require('mongoose');
 

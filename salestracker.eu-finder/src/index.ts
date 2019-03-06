@@ -1,15 +1,13 @@
-var _ = require('lodash');
-var mongojs = require('mongojs');
-var util = require('util');
+let _ = require('lodash');
+let mongojs = require('mongojs');
+let util = require('util');
 
-var LOG = require('../lib/services/Logger');
-var SessionFactory = require("../lib/services/SessionFactory");
+let LOG = require('../lib/services/Logger');
+let SessionFactory = require("../lib/services/SessionFactory");
 
 
-var db = SessionFactory.getDbConnection();
-var worker = SessionFactory.getQueueConnection();
-var elastic = SessionFactory.getElasticsearchConnection();
-
+let db = SessionFactory.getDbConnection();
+let worker = SessionFactory.getQueueConnection();
 
 const WISH_CHECK_PERIOD = process.env.WISH_CHECK_PERIOD ? parseInt(process.env.WISH_CHECK_PERIOD, 10) : 1 * 60 * 60 * 1000;
 const DEFAULT_LANGUAGE = 'est';
@@ -44,9 +42,9 @@ const performSearch = function () {
             foundWish.language = foundWish.locale;
             delete foundWish.locale;
 
-            var indexName = 'salestracker-' + foundWish.language;
+            let indexName = 'salestracker-' + foundWish.language;
             
-            var criteria: any[] = [
+            let criteria: any[] = [
                 [{
                     "match": {
                         "title": foundWish.content
@@ -64,7 +62,7 @@ const performSearch = function () {
                 });
             }
 
-            elastic.search({
+            SessionFactory.getElasticsearchConnection().search({
                 index: indexName,
                 type: 'offers',
                 body: {
@@ -103,11 +101,11 @@ const performSearch = function () {
                             }
                         });
                     } else {
-                        var offers = _.map(response.hits.hits, function (offer) {
+                        let offers = _.map(response.hits.hits, function (offer) {
                             return offer._source;
                         });
 
-                        var latestProcessedOffer = _.maxBy(offers, function (offer) { // TODO probably move this sorting to elastic search query
+                        let latestProcessedOffer = _.maxBy(offers, function (offer) { // TODO probably move this sorting to elastic search query
                             return offer.parsed;
                         });
 
@@ -156,10 +154,11 @@ const performSearch = function () {
             });
         } else {
             LOG.info(util.format('[OK] No unprocessed wishes found'));
+
             setTimeout(function () {
                 performSearch();
             }, 10000)
-        };
+        }
     });
 };
 

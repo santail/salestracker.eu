@@ -1,16 +1,16 @@
-var _ = require('lodash');
+let _ = require('lodash');
 
-var Promise: PromiseConstructor = require('promise');
-var util = require('util');
+let Promise: PromiseConstructor = require('promise');
+let util = require('util');
 
 import harvester from './services/Harvester';
 
-var LOG = require('../lib/services/Logger');
-var SessionFactory = require('../lib/services/SessionFactory');
+let LOG = require('../lib/services/Logger');
+let SessionFactory = require('../lib/services/SessionFactory');
 
-var numParallel = 2;
+let numParallel = 2;
 
-var sites = [{
+let sites = [{
     site: 'www.barbora.ee',
     interval: 1 * 60 * 60 * 1000
 }, {
@@ -39,11 +39,11 @@ var sites = [{
     interval: 1 * 60 * 60 * 1000
 }, {
     site: 'www.euronics.ee',
-    interval: 1 * 60 * 60 * 1000
+    interval: 2 * 60 * 1000
 }];
 
-var worker = SessionFactory.getQueueConnection();
-var harvestingJobs: {[site: string]: NodeJS.Timer} = {};
+let worker = SessionFactory.getQueueConnection();
+let harvestingJobs: {[site: string]: NodeJS.Timer} = {};
 
 function start(config) {
     worker.createJob('harvestSite', config)
@@ -63,7 +63,7 @@ function start(config) {
 };
 
 worker.process('harvestSite', numParallel, function (job, done) {
-    var config = job.data;
+    let config = job.data;
 
     if (!config.site || !config.site.length) {
         _.each(_.keys(harvestingJobs), site => {
@@ -120,7 +120,7 @@ worker.process('harvestSite', numParallel, function (job, done) {
 });
 
 worker.process('harvestIndexPage', numParallel, function (job, done) {
-    var config = job.data;
+    let config = job.data;
 
     harvester.harvestIndexPage(config, function (err, result) {
         if (err) {
@@ -134,7 +134,7 @@ worker.process('harvestIndexPage', numParallel, function (job, done) {
 });
 
 worker.process('harvestPage', numParallel, function (job, done) {
-    var config = job.data;
+    let config = job.data;
 
     harvester.harvestPage(config, function (err, result) {
         if (err) {
@@ -148,7 +148,7 @@ worker.process('harvestPage', numParallel, function (job, done) {
 });
 
 worker.process('harvestOffer', numParallel, function (job, done) {
-    var config = job.data;
+    let config = job.data;
 
     harvester.harvestOffer(config, function (err, result) {
         if (err) {
@@ -162,7 +162,7 @@ worker.process('harvestOffer', numParallel, function (job, done) {
 });
 
 worker.process('harvestPicture', numParallel, function (job, done) {
-    var config = job.data;
+    let config = job.data;
 
     harvester.harvestPicture(config)
         .then(result => {

@@ -1,18 +1,23 @@
-var _ = require('lodash');
-var util = require("util");
+let _ = require('lodash');
+let util = require("util");
 
 import WorkerService from "./WorkerService";
 
-var LOG = require("../../lib/services/Logger");
-var parserFactory = require("../../lib/services/ParserFactory");
+let LOG = require("../../lib/services/Logger");
+let parserFactory = require("../../lib/services/ParserFactory");
 
 class PagingSimple {
 
     processPage(content, options) {
-        var parser = parserFactory.getParser(options.site);
-        var offers = parser.getOffers(content);
+        let parser = parserFactory.getParser(options.site);
 
-        var offersHandlers = _.map(offers, offer => {
+        LOG.info(util.format('[OK] [%s] [%s] Processing simple page. Getting offers hrefs.', options.site, options.href));
+
+        let offers = parser.getOffers(content);
+
+        LOG.info(util.format('[OK] [%s] [%s] Processing simple page. $d offers found.', options.site, options.href, offers.length));
+
+        let offersHandlers = _.map(offers, offer => {
             offer = _.extend(offer, {
                 'site': options.site,
                 'language': parser.getMainLanguage(),
@@ -49,10 +54,11 @@ class PagingSimple {
             LOG.info(util.format('[OK] [%s] Last infinite paging page found. Stop processing.', options.site));
             return Promise.resolve();
         }
+        let parser = parserFactory.getParser(options.site);
 
-        var href = parser.compileNextPageHref(options.page_index);
+        let href = parser.compileNextPageHref(options.page_index);
 
-        LOG.info(util.format('[OK] [%s] Next infinite paging page processing scheduled', options.site));
+        LOG.info(util.format('[OK] [%s] [%s] Proccessing next infinite paging page', options.site, href));
 
         return WorkerService.schedulePageProcessing({
                 'site': options.site,

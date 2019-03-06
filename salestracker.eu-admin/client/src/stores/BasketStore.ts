@@ -46,7 +46,7 @@ export class BasketStore extends StoreBase {
     }
 
     updateOffer = (offer: IOffer, values: { [key: string]: any }): void => {
-        var foundBundleItem = _.find(this._bundle.items, (item: IBundleItem) => {
+        let foundBundleItem = _.find(this._bundle.items, (item: IBundleItem) => {
             return item.offer.origin_href === offer.origin_href;
         });
 
