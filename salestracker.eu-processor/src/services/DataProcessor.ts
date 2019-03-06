@@ -317,10 +317,10 @@ class DataProcessor {
 
         return Promise.all(picturesProcessPromises)
             .then(() => {
-                LOG.info(util.format('[OK] [%s] [%s] Offer translations scheduled', options.site, options.href));
+                LOG.info(util.format('[OK] [%s] [%s] Offer pictures harvesting scheduled', options.site, options.href));
             })
             .catch(err => {
-                LOG.error(util.format('[ERROR] [%s] [%s] Offer translations not scheduled %s', options.site, options.href), err);
+                LOG.error(util.format('[ERROR] [%s] [%s] Offer pictures harvesting not scheduled %s', options.site, options.href), err);
             });
     };
 
@@ -334,14 +334,14 @@ class DataProcessor {
         }
 
         return WorkerService.scheduleCategoriesProcessing({
-                'site': options.site,
-                'language': options.language,
-                'href': options.href,
-                'origin_href': options.origin_href
-            })
-            .catch(err => {
-                LOG.error(util.format('[ERROR] [%s] Categories processing not scheduled.', options.origin_href), err);
-            });
+            'site': options.site,
+            'language': options.language,
+            'href': options.href,
+            'origin_href': options.origin_href
+        })
+        .catch(err => {
+            LOG.error(util.format('[ERROR] [%s] Categories processing not scheduled.', options.origin_href), err);
+        });
     };
 
     processIndexes = (options, offer) => {
