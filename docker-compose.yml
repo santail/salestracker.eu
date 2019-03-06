@@ -27,6 +27,7 @@ services:
       - server-elasticsearch
       - server-mongodb
       - server-redis
+      - tools-seeds
     restart: on-failure
     networks:
       - networks-backend-elasticsearch
@@ -62,6 +63,8 @@ services:
     build:
       context: ./salestracker.eu-finder/
       dockerfile: Dockerfile
+    ports:
+      - "9229:9229"
     volumes:
       - ./salestracker.eu-finder/:/usr/src/app/
       - ./salestracker.eu-shared/config/:/usr/src/app/config/
@@ -80,6 +83,7 @@ services:
       - server-elasticsearch
       - server-mongodb
       - server-redis
+      - tools-seeds
       - backend-processor
     restart: on-failure
     networks:
@@ -113,6 +117,7 @@ services:
       - server-elasticsearch
       - server-mongodb
       - server-redis
+      - tools-seeds
       - backend-processor
     restart: on-failure    
     networks:
@@ -143,6 +148,7 @@ services:
       - server-elasticsearch
       - server-mongodb
       - server-redis
+      - tools-seeds
       - backend-processor
     restart: on-failure    
     networks:
@@ -201,6 +207,7 @@ services:
       - server-elasticsearch
       - server-mongodb
       - server-redis
+      - tools-seeds
     restart: on-failure
     networks:
       - networks-backend-elasticsearch
@@ -282,7 +289,6 @@ services:
     restart: on-failure
     hostname: kui-ui
     container_name: tools-kui-ui
-    restart: always
     links:
       - "server-redis:redis"
     depends_on:
@@ -293,6 +299,30 @@ services:
       - "5000:5000"
     networks:
       - networks-backend-redis
+
+  tools-mailcatcher:
+    image: schickling/mailcatcher:latest
+    container_name: tools-mailcatcher
+    hostname: mailcatcher
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+
+  tools-seeds:
+    container_name: tools-seeds
+    build:
+      context: ./salestracker.eu-seeds/
+      dockerfile: Dockerfile
+    environment:
+      DB_URI: mongodb://mongodb:27017/salestracker-dev
+      DROP_DATABASE: "true"
+      REPLACE_ID: "true"
+    links:
+      - "server-mongodb:mongodb"
+    networks:
+      - networks-backend-mongodb
+    depends_on:
+      - server-mongodb
 
 networks:
   networks-backend-elasticsearch:
