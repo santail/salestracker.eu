@@ -4,7 +4,7 @@
 docker-compose -f <docker-compose-config-file> up -d --build <service-name>
 
 # tail service logs
-docker-compose logs -f <service-name>
+docker-compose logs -f <service-name> --tail="20"  
 
 ### CONTAINERS
 
@@ -58,11 +58,18 @@ docker volume rm $(docker volume ls -qf dangling=true)
 
 
 # return all documents
-curl -X POST -H 'Content-Type: application/json' "http://localhost:9200/salestracker-eng/_search?pretty" -d '
-{"query": {"match_all" : { }}}'
+curl -X POST -H 'Content-Type: application/json' "http://localhost:9200/salestracker-eng/offers/_search?pretty" -d '{"query": {"match_all" : { }}}'
+
+# delete all documents in type
+curl -X POST "localhost:9200/salestracker-est/offers/_delete_by_query?pretty" -H 'Content-Type: application/json' -d'{"query": {"match_all": {}}}'
 
 # delete index
 curl -X DELETE "localhost:9200/salestracker-eng"
 
 # run tests
 mocha -r ts-node/register tests/parsers.spec.js
+
+
+
+curl -XPOST 'localhost:9200/salestracker-eng/offers/_delete_by_query?conflicts=proceed&pretty' -d'
+{ "query": { "match_all": {} } }'
