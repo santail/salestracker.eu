@@ -34,26 +34,20 @@ class PagingSimple {
         });
 
         if (options.infinite_pagination) {
-            offersHandlers.push(this._proceedWithNextInfinitePage(offers, options));
+            if (process.env.NODE_ENV === 'development' && process.env.PAGING_PAGES_LIMIT && parseInt(process.env.PAGING_PAGES_LIMIT, 10) === options.page_index) {
+                LOG.info(util.format('[OK] [DEVELOPMENT] [%s] Last infinite paging page found. Stop processing.', options.site));
+            } else if (_.isEmpty(offers) || _.last(offers).href === options.last_processed_offer) {
+                LOG.info(util.format('[OK] [%s] Last infinite paging page found. Stop processing.', options.site));
+            }
+            else {
+                offersHandlers.push(this._proceedWithNextInfinitePage(offers, options));
+            }
         }
 
         return Promise.all(offersHandlers);
     }
 
     private _proceedWithNextInfinitePage(offers, options) {
-        var parser = parserFactory.getParser(options.site);
-
-        if (process.env.NODE_ENV === 'development' && process.env.PAGING_PAGES_LIMIT && parseInt(process.env.PAGING_PAGES_LIMIT, 10) === options.page_index) {
-            LOG.info(util.format('[OK] [%s] Last infinite paging page found. Stop processing.', options.site));
-            return Promise.resolve();
-        }
-
-        LOG.info(util.format('[OK] [%s] Proccessing next infinite paging page', options.site));
-
-        if (_.isEmpty(offers) || _.last(offers).href === options.last_processed_offer) {
-            LOG.info(util.format('[OK] [%s] Last infinite paging page found. Stop processing.', options.site));
-            return Promise.resolve();
-        }
         let parser = parserFactory.getParser(options.site);
 
         let href = parser.compileNextPageHref(options.page_index);
@@ -66,7 +60,7 @@ class PagingSimple {
                 'page_index': options.page_index + 1,
                 'infinite_pagination': true,
                 'last_processed_offer': _.last(offers).href
-            })
+            }, 10000)
             .then(() => {
                 LOG.info(util.format('[OK] [%s] [%s] Next infinite pagination page harvesting scheduled', options.site, href));
             })

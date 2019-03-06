@@ -47,7 +47,7 @@ class WorkerService {
         });
     }
 
-    schedulePageProcessing = (options) => {
+    schedulePageProcessing = (options, delay) => {
         return new Promise((fulfill, reject) => {
             SessionFactory.getQueueConnection().create('harvestPage', options)
                 .attempts(3)
@@ -55,6 +55,7 @@ class WorkerService {
                     delay: 60 * 1000,
                     type: 'exponential'
                 })
+                .delay(delay)
                 .removeOnComplete(true)
                 .save(function (err) {
                     if (err) {

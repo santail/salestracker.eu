@@ -46,17 +46,34 @@ class IndexPageHarvester {
     private _processSiteWithoutIndexPage(options, callback) {
         var parser = ParserFactory.getParser(options.site);
 
-        options.href = parser.compileNextPageHref();
+        const href = parser.compileNextPageHref();
 
-        this._processNextPage(options, (err, offers) => {
-            if (err) {
-                LOG.error(util.format('[ERROR] [%s] Site without index page next page harvesting failed', options.site, err));
+        LOG.info(util.format('[OK] [%s] [%s] Fetching first page', options.site, href));
+
+        if (!parser.config.paging) {
+            LOG.info(util.format('[OK] [%s] No paging found', options.site));
+            return callback();
+        }
+
+        let config = {
+            'site': options.site,
+            'href': href,
+            'page_index': 1
+        } as any;
+
+        if (!parser.config.paging.finite) {
+            config.infinite_pagination = true;
+        }
+
+        WorkerService.schedulePageProcessing(config, 1000)
+            .then(() => {
+                LOG.info(util.format('[OK] [%s] [%s] Next infinite pagination page harvesting scheduled', options.site, href));
+                return callback();
+            })
+            .catch(err => {
+                LOG.error(util.format('[ERROR] [%s] [%s] Next infinite pagination page harvesting not scheduled', options.site, href), err);
                 return callback(err);
-            }
-
-            LOG.info(util.format('[OK] [%s] Site without index page next page harvesting', options.site));
-            return callback(null, offers);
-        });
+            });
     }
 
     public harvestIndexPage = (options, callback) => {
@@ -88,39 +105,6 @@ class IndexPageHarvester {
                 }
             }
         });
-    };
-
-    public _processNextPage = (options, callback) => {
-        LOG.info(util.format('[OK] [%s] [%s] Fetching next page', options.site, options.href));
-
-        var parser = ParserFactory.getParser(options.site);
-
-        if (!parser.config.paging) {
-            LOG.info(util.format('[OK] [%s] No paging found', options.site));
-            return callback();
-        }
-
-        const href = parser.compileNextPageHref();
-
-        let config = {
-            'site': options.site,
-            'href': href,
-            'page_index': 1
-        } as any;
-
-        if (!parser.config.paging.finite) {
-            config.infinite_pagination = true;
-        }
-
-        WorkerService.schedulePageProcessing(config)
-            .then(() => {
-                LOG.info(util.format('[OK] [%s] [%s] Next infinite pagination page harvesting scheduled', options.site, href));
-                return callback();
-            })
-            .catch(err => {
-                LOG.error(util.format('[ERROR] [%s] [%s] Next infinite pagination page harvesting not scheduled', options.site, href), err);
-                return callback(err);
-            });
     };
 
     private _processHierarchicalIndexPage = (options, content, callback) => {
@@ -216,7 +200,7 @@ class IndexPageHarvester {
                         'payload': payload.payload,
                         'page_index': index + 1,
                         'total_pages': pagingParams.payloads.length
-                    })
+                    }, 1000)
                     .then(() => {
                         LOG.info(util.format('[OK] [%s] [%s] Next finite pagination page harvesting scheduled', options.site, payload.href));
                     })
@@ -231,7 +215,7 @@ class IndexPageHarvester {
                         'href': href,
                         'page_index': index + 1,
                         'total_pages': pagingParams.pages.length
-                    })
+                    }, 1000)
                     .then(() => {
                         LOG.info(util.format('[OK] [%s] [%s] Next finite pagination page harvesting scheduled', options.site, href));
                     })
@@ -263,7 +247,7 @@ class IndexPageHarvester {
                 'href': href,
                 'page_index': 1,
                 'infinite_pagination': true
-            })
+            }, 1000)
             .then(() => {
                 LOG.info(util.format('[OK] [%s] [%s] Next infinite pagination page harvesting scheduled', options.site, href));
                 return callback();
