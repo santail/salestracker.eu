@@ -227,7 +227,7 @@ services:
         - --eval
         - "db.adminCommand('ping')"
     volumes:
-      - "./data/mongodb:/data/db"
+      - "./.data/mongodb:/data/db"
     ports:
       - "27017:27017"
 
@@ -238,7 +238,7 @@ services:
     networks:
       - networks-backend-redis
     volumes:
-      - ./data/redis:/data
+      - ./.data/redis:/data
     ports:
       - "6379:6379"
 
@@ -259,7 +259,7 @@ services:
     networks:
       - networks-backend-elasticsearch
     volumes:
-      - ./data/elasticsearch:/usr/share/elasticsearch/data
+      - ./.data/elasticsearch:/usr/share/elasticsearch/data
     healthcheck:
         test: curl -s https://localhost:9200 >/dev/null; if [[ $$? == 52 ]]; then echo 0; else echo 1; fi
         interval: 30s
