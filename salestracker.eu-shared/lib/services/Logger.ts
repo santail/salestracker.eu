@@ -1,6 +1,6 @@
 "use strict";
 
-var winston = require('winston');
+const winston = require('winston');
 
 let Logger = winston.createLogger({
   transports: [
@@ -9,4 +9,4 @@ let Logger = winston.createLogger({
   exitOnError: false, // do not exit on handled exceptions
 });
 
-module.exports = Logger;
+export default Logger;

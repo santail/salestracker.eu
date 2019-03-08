@@ -9,18 +9,16 @@ class BarboraParser extends AbstractParser {
   protected config: ParserConfiguration = {
     'site': 'https://www.barbora.ee/',
     'headers': {
-      'Pragma': 'no-cache',
-      'Accept-Encoding': 'gzip, deflate, sdch',
-      'Accept-Language': 'en-US,en;q=0.8',
+      'Connection': 'keep-alive',
       'Upgrade-Insecure-Requests': '1',
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.109 Safari/537.36 Vivaldi/1.0.403.24',
-      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-      'Referer': 'https://www.e-maxima.ee/Pages/Search/Products.aspx?jacobs&subcat=b2d7b08c-22a3-44cf-a53f-ce1bd8e814ed&UrlId=271579',
-      'Cookie': 'lang={language}',
-      'Connection': 'keep-alive',
-      'Cache-Control': 'no-cache'
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+      'Referer': 'https://www.barbora.ee/pakkumised?page=1',
+      'Accept-Encoding': 'gzip, deflate, br',
+      'Accept-Language': 'en-US,en;q=0.9,et;q=0.8,ru;q=0.7,de;q=0.6,nl;q=0.5,lv;q=0.4',
+      'Cookie': 'brbLastLoginDay=2019-02-04; lang=909b6b59-bf29-497c-80e4-1c844f1849c7'
     },
-    'has_index_page': true,
+    'has_index_page': false,
     'index_page': 'https://www.barbora.ee/pakkumised',
     'ttl': 2 * 60 * 60 * 1000,
     'languages': {

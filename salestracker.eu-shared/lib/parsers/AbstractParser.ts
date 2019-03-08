@@ -1,9 +1,9 @@
 'use strict';
 
-var _ = require('lodash');
-var util = require("util");
+const _ = require('lodash');
+const util = require("util");
 
-var LOG = require("../services/Logger");
+const LOG = require("../services/Logger");
 
 interface LanguageConfiguration {
   main?: boolean;
@@ -40,7 +40,7 @@ interface PagingConfiguration {
   limit?: number;
   pattern: string;
   finite?: boolean;
-};
+}
 
 export interface ParserConfiguration {
   ttl: number;
@@ -102,10 +102,10 @@ class AbstractParser {
   };
 
   compilePagingParameters = (content, options) => {
-    var pages: string[] = [];
+    let pages: string[] = [];
 
     const firstPage = this.config.paging!!.first!!(content) || 1;
-    var lastPage = this.config.paging!!.last!!(content) || 1;
+    let lastPage = this.config.paging!!.last!!(content) || 1;
 
     if (process.env.NODE_ENV === 'development' && process.env.PAGING_PAGES_LIMIT && _.toFinite(process.env.PAGING_PAGES_LIMIT) < lastPage) {
       lastPage = _.toFinite(process.env.PAGING_PAGES_LIMIT);
@@ -115,7 +115,7 @@ class AbstractParser {
       lastPage = this.config.paging!!.limit!! || 1;
     }
 
-    for (var pageNumber: number = firstPage; pageNumber <= lastPage; pageNumber++) {
+    for (let pageNumber: number = firstPage; pageNumber <= lastPage; pageNumber++) {
       pages.push(this.compilePagingPattern(options)
         .replace(/{paging_pagenumber}/g, '' + pageNumber)
         .replace(/{search_criteria}/g, options.search)
@@ -128,7 +128,7 @@ class AbstractParser {
   };
 
   compilePagingPattern = (options?: any) => {
-    var pattern = this.config.paging!!.pattern ? this.config.paging!!.pattern : this.config.index_page;
+    const pattern = this.config.paging!!.pattern ? this.config.paging!!.pattern : this.config.index_page;
     return this.compilePageHref(pattern)
   };
 
@@ -150,17 +150,17 @@ class AbstractParser {
     }
     catch (err) {
       content = null;
-      LOG.error(util.format('[ERROR] Offers processing not scheduled'), err);
+      LOG.error(util.format('[ERROR] Offers processing not scheduled', err));
     }
 
     if (process.env.NODE_ENV === 'development' && process.env.OFFERS_LIMIT) {
       dataItems = dataItems.slice(0, _.toFinite(process.env.OFFERS_LIMIT));
     }
 
-    var metadata = _.map(dataItems, (item) => {
-      var metadata = {
+    let metadata = _.map(dataItems, (item) => {
+      let metadata = {
         'href': this.compileOfferHref(item)
-      }
+      };
 
       if (this.config.json) {
         return _.extend(item, metadata);
@@ -180,30 +180,30 @@ class AbstractParser {
     }
 
     return this.config.templates.content.call(this, body);
-  }
+  };
 
   parse = (body, callback) => {
     if (this.config.json && typeof body === 'string') {
       body = JSON.parse(body);
     }
 
-    var offer = (function (that, data) {
-      var templates = _.extend({}, that.config.templates);
+    let offer = (function (that, data) {
+      let templates = _.extend({}, that.config.templates);
 
       function _parseTemplates(body, templates) {
-        var result = {};
+        let result = {};
 
-        for (var key in templates) {
+        for (let key in templates) {
 
           if (key !== 'content' && templates.hasOwnProperty(key)) {
-            var template = templates[key];
+            const template = templates[key];
 
             if (typeof template === 'string') {
               result[key] = template;
             } else if (typeof template === 'object') {
               result[key] = _parseTemplates(body, template);
             } else if (typeof template === 'function') {
-              var value = template.call(null, body);
+              const value = template.call(null, body);
               result[key] = typeof value === "string" ? value.trim().replace(/\t/g, ' ').replace(/\s\s+/g, ' ') : value;
             }
           }
@@ -213,7 +213,7 @@ class AbstractParser {
       }
 
       try {
-        var result = _parseTemplates(data, templates);
+        const result = _parseTemplates(data, templates);
 
         data = null;
 
@@ -238,7 +238,7 @@ class AbstractParser {
   };
 
   filterOfferProperties = (data) => {
-    var offer = {};
+    let offer = {};
 
     const filteredFields = ['language', 'href', 'content'];
 
@@ -252,7 +252,7 @@ class AbstractParser {
   };
 
   compileTranslations = (options, data) => {
-    var translations = {};
+    let translations = {};
     translations[options.language] = {};
 
     _.each(_.keys(data), (property) => {
@@ -267,7 +267,7 @@ class AbstractParser {
   };
 
   getMainLanguage = () => {
-    var mainLanguage = _.find(_.keys(this.config.languages), (language) => {
+    let mainLanguage = _.find(_.keys(this.config.languages), (language) => {
       return this.config.languages[language].main;
     });
 
@@ -280,15 +280,15 @@ class AbstractParser {
 
   priceCleanup = (price: string): number | undefined => {
     if (!_.isUndefined(price)) {
-      return Number((+(('' + price).replace(/[^0-9\.,]?/gi, '').replace(/,/gi, '.'))).toFixed(2));
+      return Number((+(('' + price).replace(/[^0-9.,]?/gi, '').replace(/,/gi, '.'))).toFixed(2));
     }
 
     return undefined;
   };
 
   compileDiscount = (current, original) => {
-    var amount = 0;
-    var percents = 0;
+    let amount = 0;
+    let percents = 0;
 
     if (current && original) {
       amount = original - current;
@@ -302,12 +302,10 @@ class AbstractParser {
   };
 
   validateOfferProperties = (offer) => {
-    const isValid = !_.some(this.config.required_properties, property => {
+    offer.is_valid = !_.some(this.config.required_properties, property => {
       return _.isUndefined(offer[property]) || _.isNil(offer[property]) || _.isEmpty(offer[property]);
     });
-
-    offer.is_valid = isValid;
   }
-};
+}
 
 export default AbstractParser;

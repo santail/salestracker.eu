@@ -1,6 +1,6 @@
 
 
-export default class ParserFactory {
+class ParserFactory {
     private _parsers = {};
 
     getParser(site) {
@@ -13,3 +13,5 @@ export default class ParserFactory {
         return this._parsers[site];
     }
 }
+
+export default new ParserFactory();
