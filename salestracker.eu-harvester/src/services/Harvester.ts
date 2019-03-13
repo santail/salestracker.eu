@@ -1,14 +1,14 @@
-var _ = require('lodash');
-var Promise = require('promise');
-var util = require("util");
+const _ = require('lodash');
+const Promise = require('promise');
+const util = require("util");
 
 import ImageHarvester from "./ImageHarvester";
 import IndexPageHarvester from "./IndexPageHarvester";
 import OfferHarvester from "./OfferHarvester";
 import PagingHarvester from "./PagingHarvester";
 
-var LOG = require("../../lib/services/Logger");
-var SessionFactory = require("../../lib/services/SessionFactory");
+import LOG from "../../lib/services/Logger";
+import SessionFactory from '../../lib/services/SessionFactory';
 
 
 class Harvester {
@@ -23,7 +23,7 @@ class Harvester {
   /*
    *
    */
-  public cleanupSite = (options) => {
+  public cleanupSite = (options): Promise<void> => {
     if (!options.should_cleanup) {
       return Promise.resolve();
     }
@@ -38,7 +38,7 @@ class Harvester {
     return Promise.all(promises);
   };
 
-  private _clearDatabase(options) {
+  private _clearDatabase(options): Promise<void> {
     try {
       this._db.offers.remove({
         'site': options.site
@@ -47,12 +47,12 @@ class Harvester {
       LOG.info(util.format('[OK] [%s] Database clean-up finished', options.site));
       return Promise.resolve();
     } catch (err) {
-      LOG.error(util.format('[ERROR] [%s] Database clean-up failed', options.site), err);
+      LOG.error(util.format('[ERROR] [%s] Database clean-up failed', options.site, err));
       return Promise.reject();
     }
   }
 
-  private _clearIndex(options) {
+  private _clearIndex(options): Promise<void> {
     let promises = _.map(['est', 'eng', 'rus'], language => {
       LOG.info(util.format('[OK] [%s] [%s] Clearing index', options.site, language));
 
@@ -71,7 +71,7 @@ class Harvester {
           LOG.info(util.format('[OK] [%s] [%s] Index clean-up finished', options.site, index));
         })
         .catch(err => {
-          LOG.error(util.format('[ERROR] [%s] [%s] Index clean-up failed', options.site, index), err);
+          LOG.error(util.format('[ERROR] [%s] [%s] Index clean-up failed', options.site, index, err));
         });
     });
 
@@ -112,7 +112,7 @@ class Harvester {
       LOG.info(util.format('[OK] [%s] Index page processing finished', options.site));
       return callback(null, offers);
     });
-  }
+  };
 
   /*
    *
@@ -127,7 +127,7 @@ class Harvester {
    *
    */
   public harvestOffer = (options, callback) => {
-    LOG.info(util.format('[OK] [%s] [%s] Offer page harvesting started', options.site, options.href));
+    LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Offer page harvesting started', options.language, options.site, options.origin_href, options.href));
 
     return OfferHarvester.harvestOffer(options, callback);
   };
@@ -140,7 +140,6 @@ class Harvester {
 
     return ImageHarvester.harvestImage(options);
   };
-
-};
+}
 
 export default new Harvester();

@@ -1,7 +1,7 @@
-var util = require('util');
+const util = require('util');
 
-var LOG = require("../../lib/services/Logger");
-var SessionFactory = require('../../lib/services/SessionFactory');
+import LOG from "../../lib/services/Logger";
+import SessionFactory from '../../lib/services/SessionFactory';
 
 
 class WorkerService {
@@ -16,7 +16,7 @@ class WorkerService {
                 .removeOnComplete(true)
                 .save(function (err) {
                     if (err) {
-                        LOG.error(util.format('[ERROR] [%s] [%s] Offer processing schedule failed', options.site, options.href), err);
+                        LOG.error(util.format('[ERROR] [%s] [%s] Offer processing schedule failed', options.site, options.href, err));
                         return reject(err);
                     }
 
@@ -24,7 +24,7 @@ class WorkerService {
                     return fulfill();
                 });
         });
-    }
+    };
 
     scheduleIndexPageProcessing = (options) => {
         return new Promise((fulfill, reject) => {
@@ -45,7 +45,7 @@ class WorkerService {
                     return fulfill();
                 });
         });
-    }
+    };
 
     schedulePageProcessing = (options, delay) => {
         return new Promise((fulfill, reject) => {
@@ -67,7 +67,7 @@ class WorkerService {
                     return fulfill();
                 });
         });
-    }
+    };
 
     scheduleContentProcessing(data: any): any {
         return new Promise((fulfill, reject) => {
@@ -110,7 +110,6 @@ class WorkerService {
                 });
         });
     }
-
-};
+}
 
 export default new WorkerService();

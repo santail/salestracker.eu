@@ -1,42 +1,42 @@
-let _ = require('lodash');
+const _ = require('lodash');
+const Promise: PromiseConstructor = require('promise');
+const util = require('util');
 
-let Promise: PromiseConstructor = require('promise');
-let util = require('util');
+import LOG from "../lib/services/Logger";
+import SessionFactory from '../lib/services/SessionFactory';
 
 import harvester from './services/Harvester';
 
-let LOG = require('../lib/services/Logger');
-let SessionFactory = require('../lib/services/SessionFactory');
 
-let numParallel = 2;
+const numParallel = 2;
 
-let sites = [{
+const SITES = [{
     site: 'www.barbora.ee',
-    interval: 1 * 60 * 60 * 1000
+    interval: 60 * 60 * 1000
 }, {
     site: 'www.babycity.ee',
-    interval: 1 * 60 * 60 * 1000
+    interval: 60 * 60 * 1000
 }, {
     site: 'www.ecoop.ee',
-    interval: 1 * 60 * 60 * 1000
+    interval: 60 * 60 * 1000
 }, {
     site: 'www.minuvalik.ee',
-    interval: 1 * 60 * 60 * 1000
+    interval: 60 * 60 * 1000
 }, {
     site: 'www.selver.ee',
-    interval: 1 * 60 * 60 * 1000
+    interval: 60 * 60 * 1000
 }, {
     site: 'www.zoomaailm.ee',
-    interval: 1 * 60 * 60 * 1000
+    interval: 60 * 60 * 1000
 }, {
     site: 'www.asos.com.men',
-    interval: 1 * 60 * 60 * 1000
+    interval: 60 * 60 * 1000
 }, {
     site: 'www.asos.com.women',
-    interval: 1 * 60 * 60 * 1000
+    interval: 60 * 60 * 1000
 }, {
     site: 'www.rimi.ee',
-    interval: 1 * 60 * 60 * 1000
+    interval: 60 * 60 * 1000
 }, {
     site: 'www.euronics.ee',
     interval: 2 * 60 * 1000
@@ -45,54 +45,57 @@ let sites = [{
 let worker = SessionFactory.getQueueConnection();
 let harvestingJobs: {[site: string]: NodeJS.Timer} = {};
 
-function start(config) {
-    worker.createJob('harvestSite', config)
-        .attempts(3)
-        .backoff({
-            delay: 60 * 1000,
-            type: 'exponential'
-        })
-        .removeOnComplete(true)
-        .save(function (err) {
-            if (err) {
-                LOG.error(util.format('[ERROR] [%s] Site processing not scheduled', config.site, err));
-            }
-
-            LOG.info(util.format('[OK] [%s] Site processing scheduled', config.site));
-        });
-};
-
 worker.process('harvestSite', numParallel, function (job, done) {
     let config = job.data;
 
     if (!config.site || !config.site.length) {
-        _.each(_.keys(harvestingJobs), site => {
-            clearInterval(harvestingJobs[site]);
-        })
-
-        _.each(sites, config => {
-            let job = setInterval(() => {
-                start(config);
-            }, config.interval);
-        
-            harvestingJobs[config.site] = job;
-
-            start(config);
-        });
-
+        requestAllSitesHarvesting();
         return done();
     }
+    else {
+        requestSingleSiteHarvesting(config)
+            .then(result => {
+                LOG.info(util.format('[OK] Sites harvesting finished'));
+                return done(null, result);
+            }, err => {
+                LOG.error(util.format('[ERROR] Sites harvesting failed', err));
+                return done(err);
+            });
+    }
+});
 
+/**
+ * Runs harvesting for all sites for defined interval.
+ * No clean-up performed
+ */
+function requestAllSitesHarvesting() {
+    _.each(_.keys(harvestingJobs), site => {
+        clearInterval(harvestingJobs[site]);
+    });
+
+    _.each(SITES, siteConfig => {
+        harvestingJobs[siteConfig.site] = setInterval(() => {
+            scheduleSiteHarvesting(siteConfig);
+        }, siteConfig.interval);
+
+        scheduleSiteHarvesting(siteConfig);
+    });
+}
+
+/**
+ * Starts defined site harvesting and schedules further harvesting requests with defined interval
+ *
+ * @param config
+ */
+function requestSingleSiteHarvesting(config) {
     clearInterval(harvestingJobs[config.site]);
 
-    let interval = setInterval(() => {
-        config.should_cleanup = false;
-        config.cleanup_uploads = false;
-        
-        start(config);
-    }, 1 * 60 * 60 * 1000);
-
-    harvestingJobs[config.site] = interval;
+    harvestingJobs[config.site] = setInterval(() => {
+        scheduleSiteHarvesting(_.extend({
+            should_cleanup: false,
+            cleanup_uploads: false
+        } as any, config));
+    }, 60 * 60 * 1000);
 
     // cleanup site only if job configuration requires it
     const cleanupPromise = harvester.cleanupSite(config)
@@ -109,15 +112,25 @@ worker.process('harvestSite', numParallel, function (job, done) {
             LOG.error(util.format('[ERROR] [%s] Getting latest offers failed', config.site, err));
         });
 
-    Promise.all([cleanupPromise, processSitePromise])
-        .then(result => {
-            LOG.info(util.format('[OK] Sites harvesting finished'));
-            return done(null, result);
-        }, err => {
-            LOG.error(util.format('[ERROR] Sites harvesting failed', err));
-            return done(err);
+    return Promise.all([cleanupPromise, processSitePromise]);
+}
+
+function scheduleSiteHarvesting(config) {
+    worker.createJob('harvestSite', config)
+        .attempts(3)
+        .backoff({
+            delay: 60 * 1000,
+            type: 'exponential'
+        })
+        .removeOnComplete(true)
+        .save(function (err) {
+            if (err) {
+                LOG.error(util.format('[ERROR] [%s] Site processing not scheduled', config.site, err));
+            }
+
+            LOG.info(util.format('[OK] [%s] Site processing scheduled', config.site));
         });
-});
+}
 
 worker.process('harvestIndexPage', numParallel, function (job, done) {
     let config = job.data;

@@ -1,11 +1,20 @@
-var tidy = require('htmltidy').tidy;
-var cheerio = require("cheerio");
-var Promise = require('promise');
-var request = require("request");
-var util = require("util");
+const tidy = require('htmltidy').tidy;
+const cheerio = require("cheerio");
+const request = require("request");
+const util = require("util");
 
-var LOG = require("../../lib/services/Logger");
+import LOG from "../../lib/services/Logger";
 
+
+export interface HarvestingRequestOptions {
+    readonly url: string;
+    readonly encoding?: string;
+    readonly headers: any;
+    readonly payload?: any;
+    readonly json?: any;
+    readonly onSuccess: (result?: any) => void;
+    readonly onError: (err: Error) => void;
+}
 
 class Crawler {
     private _config = {
@@ -54,16 +63,16 @@ class Crawler {
         }]
     };
 
-    public request = (options) => {
-        var retries = 3;
+    public request = (options: HarvestingRequestOptions) => {
+        let retries = 3;
 
-        var headers = options.headers || this._config.headers;
+        const headers = options.headers || this._config.headers;
 
         if (!headers.hasOwnProperty('User-Agent')) {
             headers['User-Agent'] = this._config.userAgents[Math.ceil(Math.random() * this._config.userAgents.length)];
         }
 
-        var requestOptions = {
+        const requestOptions = {
             uri: options.url,
             method: 'GET',
             gzip: true,
@@ -81,12 +90,12 @@ class Crawler {
             requestOptions.encoding = 'binary';
         }
 
-        var handler = (err, response, data) => {
+        const handler = (err, response, data) => {
             response = response || {};
 
             if (err || response.statusCode !== 200 || !data) {
                 if (retries) {
-                    var timeout = Math.ceil(Math.random() * 10000);
+                    const timeout = Math.ceil(Math.random() * 10000);
 
                     retries--;
 
@@ -121,7 +130,7 @@ class Crawler {
             else {
                 response = null;
 
-                var parsingFinishedCallback = function (err, result) {
+                const parsingFinishedCallback = function (err, result) {
                     data = null;
 
                     if (err) {
@@ -170,7 +179,7 @@ class Crawler {
         // TODO Warning: tidy uses 32 bit binary instead of 64, https://github.com/vavere/htmltidy/issues/11
         // TODO Needs manual update on production for libs
 
-        LOG.info(util.format('[OK] [%s] Cleaning up received data', options.url));
+        LOG.debug(util.format('[OK] [%s] Cleaning up received data', options.url));
 
         tidy(data, {
             doctype: 'html5',
@@ -183,14 +192,14 @@ class Crawler {
         }, (err, body) => {
             data = null;
 
-            LOG.info(util.format('[OK] [%s] Parsing received data to cheerio model', options.url));
+            LOG.debug(util.format('[OK] [%s] Parsing received data to cheerio model', options.url));
 
             if (err) {
                 LOG.error(util.format('[ERROR] [%s] Cleanup response body failed', options.url, err));
                 return callback(err);
             }
 
-            var dom = cheerio.load(body, {
+            const dom = cheerio.load(body, {
                 normalizeWhitespace: true,
                 lowerCaseTags: true,
                 lowerCaseAttributeNames: true,
@@ -204,6 +213,6 @@ class Crawler {
             return callback(null, dom);
         });
     };
-};
+}
 
 export default Crawler;

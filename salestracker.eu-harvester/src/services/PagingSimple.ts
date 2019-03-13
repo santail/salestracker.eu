@@ -1,35 +1,36 @@
-let _ = require('lodash');
-let util = require("util");
+const _ = require('lodash');
+const util = require("util");
+
+import LOG from "../../lib/services/Logger";
+import ParserFactory from '../../lib/services/ParserFactory';
 
 import WorkerService from "./WorkerService";
 
-let LOG = require("../../lib/services/Logger");
-let parserFactory = require("../../lib/services/ParserFactory");
 
 class PagingSimple {
 
     processPage(content, options) {
-        let parser = parserFactory.getParser(options.site);
+        let parser = ParserFactory.getParser(options.site);
 
-        LOG.info(util.format('[OK] [%s] [%s] Processing simple page. Getting offers hrefs.', options.site, options.href));
+        LOG.info(util.format('[OK] [%s] [%s] [%s] Processing simple paging page. Getting offers hrefs.', options.language, options.site, options.href));
 
         let offers = parser.getOffers(content);
 
-        LOG.info(util.format('[OK] [%s] [%s] Processing simple page. $d offers found.', options.site, options.href, offers.length));
+        LOG.info(util.format('[OK] [%s] [%s] [%s] Processing simple paging page. %d offers found.', options.language, options.site, options.href, offers.length));
 
         let offersHandlers = _.map(offers, offer => {
             offer = _.extend(offer, {
                 'site': options.site,
                 'language': parser.getMainLanguage(),
                 'origin_href': offer.href
-            });
+            } as any);
 
             return WorkerService.scheduleOfferHarvesting(offer)
                 .then(() => {
-                    LOG.info(util.format('[OK] [%s] [%s] Offer harvesting scheduled', options.site, offer.href));
+                    LOG.info(util.format('[OK] [%s] [%s] [%s] Offer harvesting scheduled', options.language, options.site, offer.href));
                 })
                 .catch(err => {
-                    LOG.error(util.format('[ERROR] [%s] [%s] Offer harvesting not scheduled', options.site, offer.href), err);
+                    LOG.error(util.format('[ERROR] [%s] [%s] [%s] Offer harvesting not scheduled', options.language, options.site, offer.href, err));
                 });
         });
 
@@ -37,7 +38,7 @@ class PagingSimple {
             if (process.env.NODE_ENV === 'development' && process.env.PAGING_PAGES_LIMIT && parseInt(process.env.PAGING_PAGES_LIMIT, 10) === options.page_index) {
                 LOG.info(util.format('[OK] [DEVELOPMENT] [%s] Last infinite paging page found. Stop processing.', options.site));
             } else if (_.isEmpty(offers) || _.last(offers).href === options.last_processed_offer) {
-                LOG.info(util.format('[OK] [%s] Last infinite paging page found. Stop processing.', options.site));
+                LOG.info(util.format('[OK] [%s] [%s] Last infinite paging page found. Stop processing.', options.language, options.site));
             }
             else {
                 offersHandlers.push(this._proceedWithNextInfinitePage(offers, options));
@@ -48,7 +49,7 @@ class PagingSimple {
     }
 
     private _proceedWithNextInfinitePage(offers, options) {
-        let parser = parserFactory.getParser(options.site);
+        let parser = ParserFactory.getParser(options.site);
 
         let href = parser.compileNextPageHref(options.page_index);
 
@@ -65,7 +66,7 @@ class PagingSimple {
                 LOG.info(util.format('[OK] [%s] [%s] Next infinite pagination page harvesting scheduled', options.site, href));
             })
             .catch(err => {
-                LOG.error(util.format('[ERROR] [%s] [%s] Next infinite pagination page harvesting not scheduled', options.site, href), err);
+                LOG.error(util.format('[ERROR] [%s] [%s] Next infinite pagination page harvesting not scheduled', options.site, href, err));
             });
     }
 }

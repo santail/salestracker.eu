@@ -110,7 +110,7 @@ exports.processPictures = function (req, res) {
     };
 
     jobs
-        .create('processPictures', job)
+        .create('requestPicturesHarvesting', job)
         .attempts(3)
         .backoff({ delay: 60 * 1000, type: 'exponential' })
         .removeOnComplete(true)

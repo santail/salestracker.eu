@@ -1,19 +1,16 @@
-import { ObjectId } from 'bson';
-var _ = require('lodash');
-var path = require('path');
-var slugify = require('slugify');
-var util = require('util');
-import { URL } from 'url';
+const _ = require('lodash');
+const path = require('path');
+const util = require('util');
 
-var LOG = require("../../lib/services/Logger");
-var parserFactory = require("../../lib/services/ParserFactory");
-var SessionFactory = require('../../lib/services/SessionFactory');
+import LOG from "../../lib/services/Logger";
+import SessionFactory from '../../lib/services/SessionFactory';
+import ParserFactory from '../../lib/services/ParserFactory';
 
 import WorkerService from './WorkerService';
 
 
 // should not process pictures if development environment and switched off
-var SHOULD_HARVEST_PICTURES = process.env.NODE_ENV !== 'development' || process.env.SHOULD_HARVEST_PICTURES !== 'false';
+const SHOULD_HARVEST_PICTURES = process.env.NODE_ENV !== 'development' || process.env.SHOULD_HARVEST_PICTURES !== 'false';
 
 class DataProcessor {
 
@@ -27,13 +24,13 @@ class DataProcessor {
         this._stopProcessingRequested = false;
 
         if (!_.isEmpty(options.origin_href)) {
-            LOG.info(util.format('[OK] [%s] [%s] Offer processing requested.', options.site, options.origin_href));
+            LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Offer data processing requested.', options.language, options.site, options.origin_href, options.href));
             this._processSingleOffer(options, callback);
         } else if (!_.isEmpty(options.site)) {
-            LOG.info(util.format('[OK] [%s] Site offers processing requested.', options.site));
+            LOG.info(util.format('[OK] [%s] Site offers data processing requested.', options.site));
             this._processSiteOffers(options, callback);
         } else {
-            LOG.info(util.format('[OK] [%s] All sites offers processing requested.', options.site));
+            LOG.info(util.format('[OK] [%s] All sites offers data processing requested.', options.site));
             this._processAllSitesOffers(options, callback);
         }
     };
@@ -58,7 +55,7 @@ class DataProcessor {
     private _stopProcessAllSitesOffers(callback) {
         _.each(_.keys(this._processorTimeout), site => {
             clearTimeout(this._processorTimeout[site]);
-        })
+        });
 
         return callback();
     }
@@ -81,7 +78,7 @@ class DataProcessor {
                 clearTimeout(this._processorTimeout['all']);
                 _.each(foundSites, site => {
                     clearTimeout(this._processorTimeout[site.href]);
-                })
+                });
 
                 LOG.info(util.format('[OK] [%s] All sites offers processing stop requested. Stopping.', options.site));
                 return callback();
@@ -89,7 +86,7 @@ class DataProcessor {
 
             _.each(foundSites, site => {
                 clearTimeout(this._processorTimeout[site.href]);
-            })
+            });
 
             this._processAllOffers(options);
 
@@ -111,9 +108,16 @@ class DataProcessor {
             }, (err, foundOffer) => {
                 if (err) {
                     // TODO reclaim event processing
-                    LOG.error(util.format('[ERROR] Checking offer failed', err));
+                    LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Finding main offer failed. Processing offer data failed.', options.language, options.site, options.origin_href, options.href, err));
                     return;
                 }
+
+                if (!foundOffer) {
+                    LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Main offer not found. Processing offer data failed.', options.language, options.site, options.origin_href, options.href));
+                    return;
+                }
+
+                LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Main offer found. Proceed with processing data.', options.language, options.site, options.origin_href, options.href));
 
                 this._processFoundOffer(options, foundOffer)
                     .then(() => {
@@ -138,7 +142,7 @@ class DataProcessor {
             site: options.site
         }];
 
-        var currentTime = new Date().getTime();
+        const currentTime = new Date().getTime();
     
         if (this._lastProcessedOfferId && this._lastProcessedOfferParsedTime) {
             criteria.push({
@@ -164,7 +168,7 @@ class DataProcessor {
         }, (err, foundOffer) => {            
             if (err) {
                 // TODO reclaim event processing
-                LOG.error(util.format('[ERROR] Next offer not found. Stop processing.'), err);
+                LOG.error(util.format('[ERROR] Next offer not found. Stop processing.', err));
                 clearTimeout(this._processorTimeout[options.site]);
                 return callback(err);
             }
@@ -204,9 +208,16 @@ class DataProcessor {
         }, (err, foundOffer) => {
             if (err) {
                 // TODO reclaim event processing
-                LOG.error(util.format('[ERROR] Checking offer failed', err));
+                LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Finding main offer failed. Processing offer data failed.', options.language, options.site, options.origin_href, options.href, err));
                 return callback(err);
             }
+
+            if (!foundOffer) {
+                LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Main offer not found. Processing offer data failed.', options.language, options.site, options.origin_href, options.href));
+                return callback(err);
+            }
+
+            LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Main offer found. Proceed with processing data.', options.language, options.site, options.origin_href, options.href));
 
             this._processFoundOffer(options, foundOffer)
                 .then(() => {
@@ -219,36 +230,36 @@ class DataProcessor {
     }
 
     private _processFoundOffer(options, foundOffer) {
-        if (!foundOffer) {
-            LOG.error(util.format('[ERROR] [%s] Offer not found. Processing data failed.', options.site, options.origin_href));
-            return Promise.resolve < void | {} > (void 0);
-        }
-
-        LOG.info(util.format('[OK] [%s] [%s] Processing data.', foundOffer.site, foundOffer.origin_href));
+        const parser = ParserFactory.getParser(options.site);
+        const isMainOffer = !options.language || parser.config.languages[options.language].main;
 
         let promises: Promise<void | {}>[] = [];
 
-        promises.push(this._requestTranslationsIfNeeded(options, foundOffer));
-
-        if (options.process_pictures) {
-            promises.push(this.processPictures(options, foundOffer));
+        if (isMainOffer) {
+            promises.push(this._requestTranslationsHarvesting(options, foundOffer));
         }
 
-        if (options.process_categories) {
-            promises.push(this.processCategories(options, foundOffer));
+        if (isMainOffer && options.process_pictures) {
+            promises.push(this.requestPicturesHarvesting(options, foundOffer));
         }
 
-        if (options.process_index) {
-            promises.push(this.processIndexes(options, foundOffer));
+        if (isMainOffer && options.process_categories) {
+            promises.push(this.requestCategoriesProcessing(options, foundOffer));
+        }
+
+        if (isMainOffer && options.process_index) {
+            promises.push(this.requestOfferContentIndexing(options, foundOffer));
         }
 
         return Promise.all(promises);
     }
 
-    private _requestTranslationsIfNeeded = (options, offer) => {
-        var parser = parserFactory.getParser(options.site);
+    private _requestTranslationsHarvesting = (options, offer) => {
+        const parser = ParserFactory.getParser(options.site);
 
-        LOG.info(util.format('[OK] [%s] [%s] Schedule offer translations', options.site, options.href));
+        LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Schedule offer translations', options.language, options.site, options.origin_href, options.href));
+
+        let delay = 30 * 1000; // Because of transaction issues for MongoDB, just skip some time to not overwrite offer missing some properties
 
         const translationsRequestPromises = _.map(_.keys(offer.translations), language => {
             const isMainOffer = parser.config.languages[language].main;
@@ -267,33 +278,35 @@ class DataProcessor {
                 'origin_href': options.origin_href,
             };
 
-            return WorkerService.scheduleOfferHarvesting(config)
+            return WorkerService.scheduleOfferHarvesting(config, delay)
                 .then(() => {
-                    LOG.info(util.format('[OK] [%s] [%s] [%s] Offer translation harvesting scheduled', options.site, options.href, language));                    
+                    LOG.info(util.format('[OK] [%s] [%s] [%s] Offer translation harvesting scheduled', language, options.site, options.href));
+                    delay += 60 * 1000;
                 })
                 .catch(err => {
-                    LOG.error(util.format('[ERROR] [%s] [%s] [%s] Offer translation harvesting not scheduled %s', options.site, options.href, language), err);
+                    LOG.error(util.format('[ERROR] [%s] [%s] [%s] Offer translation harvesting not scheduled %s', language, options.site, options.href, err));
                     // TODO Mark offer as failed due to missing translation
                 });
         });
 
         return Promise.all(translationsRequestPromises)
             .then(() => {
-                LOG.info(util.format('[OK] [%s] [%s] Offer translations scheduled', options.site, options.href));
+                LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Offer translations scheduled', options.language, options.site, options.origin_href, options.href));
             })
             .catch(err => {
-                LOG.error(util.format('[ERROR] [%s] [%s] Offer translations not scheduled %s', options.site, options.href), err);
+                LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Offer translations not scheduled %s', options.language, options.site, options.origin_href, options.href, err));
             })
     };
 
-    processPictures = (options, offer) => {
-        var parser = parserFactory.getParser(options.site);
+    requestPicturesHarvesting = (options, offer) => {
+        const parser = ParserFactory.getParser(options.site);
 
+        // process only main offer pictures
         if (options.language && options.origin_href && !parser.config.languages[options.language].main) {
             return Promise.resolve();
         }
 
-        LOG.info(util.format('[OK] [%s] [%s] Process pictures.', offer.site, offer.origin_href));
+        LOG.info(util.format('[OK] [%s] [%s] [%s] Process pictures.', options.language, offer.site, offer.origin_href,));
 
         if (!SHOULD_HARVEST_PICTURES) {
             return Promise.resolve();
@@ -308,10 +321,10 @@ class DataProcessor {
                 'picture_path': path.join(process.cwd(), './uploads/offers/' + options.site + '/' + picture.path)
             })
             .then(() => {
-                LOG.info(util.format('[OK] [%s] [%s] [%s] Picture harvesting scheduled.', offer.site, offer.origin_href, picture.origin_href));
+                LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Picture harvesting scheduled.', options.language, offer.site, offer.origin_href, picture.origin_href));
             })
             .catch(err => {
-                LOG.error(util.format('[ERROR] [%s] Picture harvesting not scheduled.', picture.origin_href), err);
+                LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Picture harvesting not scheduled.', options.language, offer.site, offer.origin_href, picture.origin_href, err));
             });
         });
 
@@ -320,15 +333,16 @@ class DataProcessor {
                 LOG.info(util.format('[OK] [%s] [%s] Offer pictures harvesting scheduled', options.site, options.href));
             })
             .catch(err => {
-                LOG.error(util.format('[ERROR] [%s] [%s] Offer pictures harvesting not scheduled %s', options.site, options.href), err);
+                LOG.error(util.format('[ERROR] [%s] [%s] Offer pictures harvesting not scheduled %s', options.site, options.href, err));
             });
     };
 
-    processCategories = (options, offer) => {
-        var parser = parserFactory.getParser(options.site);
+    requestCategoriesProcessing = (options, offer) => {
+        const parser = ParserFactory.getParser(options.site);
 
         LOG.info(util.format('[OK] [%s] [%s] Process categories.', options.site, offer.origin_href));
 
+        // process main offer only
         if (options.language && options.origin_href && !parser.config.languages[options.language].main) {
             return Promise.resolve();
         }
@@ -340,23 +354,23 @@ class DataProcessor {
             'origin_href': options.origin_href
         })
         .catch(err => {
-            LOG.error(util.format('[ERROR] [%s] Categories processing not scheduled.', options.origin_href), err);
+            LOG.error(util.format('[ERROR] [%s] Categories processing not scheduled.', options.origin_href, err));
         });
     };
 
-    processIndexes = (options, offer) => {
+    requestOfferContentIndexing = (options, offer) => {
         LOG.info(util.format('[OK] [%s] [%s] Process indexes.', options.site, offer.origin_href));
 
         // TODO should take language into account or just schedule all languages re-indexing
         return WorkerService.scheduleIndexing({
-                'site': options.site,
-                'language': options.language,
-                'href': options.href,
-                'origin_href': options.origin_href
-            })
-            .catch(err => {
-                LOG.error(util.format('[ERROR] [%s] Indexes processing not scheduled.', options.origin_href), err);
-            });
+            'site': options.site,
+            'language': options.language,
+            'href': options.href,
+            'origin_href': options.origin_href
+        })
+        .catch(err => {
+            LOG.error(util.format('[ERROR] [%s] Indexes processing not scheduled.', options.origin_href, err));
+        });
     };
 
 }

@@ -1,10 +1,11 @@
+const _ = require('lodash');
+const util = require('util');
+
+import LOG from "../../lib/services/Logger";
+import SessionFactory from '../../lib/services/SessionFactory';
+
 import WorkerService from "./WorkerService";
 
-var _ = require('lodash');
-var util = require('util');
-
-var LOG = require("../../lib/services/Logger");
-var SessionFactory = require('../../lib/services/SessionFactory');
 
 class CategoryProcessor {
 
@@ -83,7 +84,7 @@ class CategoryProcessor {
                 return callback();
             })
             .catch(err => {
-                LOG.error(util.format('[ERROR] [%s] Indexes processing not scheduled.', foundOffer.origin_href), err);
+                LOG.error(util.format('[ERROR] [%s] Indexes processing not scheduled.', foundOffer.origin_href, err));
                 return callback(err);
             });
         });

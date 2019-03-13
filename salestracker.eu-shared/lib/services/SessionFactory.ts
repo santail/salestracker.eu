@@ -4,7 +4,7 @@ const elasticsearch = require('elasticsearch');
 const kue = require('kue-scheduler');
 const mongojs = require('mongojs');
 
-class Sessionfactory {
+class SessionFactory {
   private readonly _db;
   private readonly _worker;
   private readonly _scheduler;
@@ -50,4 +50,4 @@ class Sessionfactory {
   };
 }
 
-export default new Sessionfactory();
+export default new SessionFactory();

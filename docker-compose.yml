@@ -10,7 +10,7 @@ services:
       - "8000:8000"
     volumes:
       - ./salestracker.eu-admin/:/usr/src/app/
-      - ./salestracker.eu-shared/uploads/:/usr/src/app/uploads/
+      - ./.data/uploads/:/usr/src/app/uploads/
       - web-admin-modules:/usr/src/app/node_modules # will statically map node_modules folder to container. Should clean-up on each package.json change with docker rm -v containerId
       - web-admin-public:/usr/src/app/public/lib # will statically map public/lib folder to container. Should clean-up on each bower.json change with docker rm -v containerId
     environment:
@@ -43,7 +43,7 @@ services:
       - "9000:9000"
     volumes:
       - ./salestracker.eu-public/:/usr/src/app/
-      - ./salestracker.eu-shared/uploads/:/usr/src/app/uploads/
+      - ./.data/uploads/:/usr/src/app/uploads/
       - web-public-modules:/usr/src/app/node_modules # will statically map node_modules folder to container. Should clean-up on each package.json change with docker rm -v containerId
       - web-public-public:/usr/src/app/public/lib # will statically map public/lib folder to container. Should clean-up on each bower.json change with docker rm -v containerId
     environment:
@@ -100,7 +100,7 @@ services:
       - ./salestracker.eu-harvester/:/usr/src/app/
       - ./salestracker.eu-shared/config/:/usr/src/app/config/
       - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
-      - ./salestracker.eu-shared/uploads/:/usr/src/app/uploads/
+      - ./.data/uploads/:/usr/src/app/uploads/
       - backend-harvester-modules:/usr/src/app/node_modules
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
@@ -191,7 +191,7 @@ services:
       - ./salestracker.eu-processor/:/usr/src/app/
       - ./salestracker.eu-shared/config/:/usr/src/app/config/
       - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
-      - ./salestracker.eu-shared/uploads/:/usr/src/app/uploads/
+      - ./.data/uploads/:/usr/src/app/uploads/
       - backend-processor-modules:/usr/src/app/node_modules
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200

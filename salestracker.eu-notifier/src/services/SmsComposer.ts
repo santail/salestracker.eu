@@ -1,5 +1,5 @@
-var _ = require('lodash');
-var util = require("util");
+const _ = require('lodash');
+const util = require("util");
 
 import Composer from './Composer';
 import { Notification } from './Messenger';
@@ -8,7 +8,7 @@ import { Notification } from './Messenger';
 class SmsComposer extends Composer {
 
     composeMessage(notification: Notification) {
-        var body = "";
+        let body = "";
 
         _.each(notification.offers, function (offer) {
             body += util.format("%s -%s%\r\nOli %s€, nüüd %s€\r\n%s\r\n\r\n", 

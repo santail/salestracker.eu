@@ -1,15 +1,15 @@
-var util = require('util');
+const util = require('util');
 
-var LOG = require('../lib/services/Logger');
-var SessionFactory = require('../lib/services/SessionFactory');
+import LOG from "../lib/services/Logger";
+import SessionFactory from '../lib/services/SessionFactory';
 
 import Messenger, { Notification } from './services/Messenger';
 
 
-var worker = SessionFactory.getQueueConnection();
+const worker = SessionFactory.getQueueConnection();
 
 worker.process('sendNotification', 10, function (job, done) {
-    var data = job.data;
+    const data = job.data;
 
     const wish = data.wish;
     const offers = data.offers;
@@ -41,5 +41,4 @@ worker.process('sendNotification', 10, function (job, done) {
         LOG.info(util.format('[OK] Notification sent'));
         return done();
     });
-
-})
+});

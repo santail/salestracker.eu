@@ -1,19 +1,16 @@
-let _ = require('lodash');
-let mongojs = require('mongojs');
-let util = require('util');
+const _ = require('lodash');
+const mongojs = require('mongojs');
+const util = require('util');
 
-let LOG = require('../lib/services/Logger');
-let SessionFactory = require("../lib/services/SessionFactory");
+import LOG from "../lib/services/Logger";
+import SessionFactory from '../lib/services/SessionFactory';
 
-
-let db = SessionFactory.getDbConnection();
-let worker = SessionFactory.getQueueConnection();
 
 const WISH_CHECK_PERIOD = process.env.WISH_CHECK_PERIOD ? parseInt(process.env.WISH_CHECK_PERIOD, 10) : 60 * 60 * 1000;
 const DEFAULT_LANGUAGE = 'est';
 
 const performSearch = function () {
-    const checkTime = new Date();
+    const checkTime = new Date().getTime();
 
     SessionFactory.getDbConnection().wishes.findOne({
         $and: [{
@@ -31,7 +28,7 @@ const performSearch = function () {
                 }
             }]
         }]
-    }, function (err, foundWish) {
+    }, (err, foundWish) => {
         if (err) {
             LOG.error(util.format('[ERROR] Checking wish failed', err));
         } else if (foundWish) {
@@ -135,7 +132,7 @@ function _handleSearchResult(response, foundWish, checkTime) {
         offers: offers
     };
 
-    worker.create('sendNotification', notification)
+    SessionFactory.getQueueConnection().create('sendNotification', notification)
         .attempts(3).backoff({
         delay: 60 * 1000,
         type: 'exponential'

@@ -1,13 +1,18 @@
+const util = require('util');
 
-var util = require('util');
+import LOG from "../../lib/services/Logger";
+import SessionFactory from '../../lib/services/SessionFactory';
 
 
-var LOG = require("../../lib/services/Logger");
-var SessionFactory = require('../../lib/services/SessionFactory');
-
+interface DataProcessingOptions {
+    site: string,
+    language: string,
+    href: string,
+    origin_href: string
+}
 
 class WorkerService {
-    scheduleOfferHarvesting = (options) => {
+    scheduleOfferHarvesting = (options, delay) => {
         return new Promise((fulfill, reject) => {
             SessionFactory.getQueueConnection().create('harvestOffer', options)
                 .attempts(3)
@@ -15,10 +20,11 @@ class WorkerService {
                     delay: 60 * 1000,
                     type: 'exponential'
                 })
+                .delay(delay)
                 .removeOnComplete(true)
                 .save(function (err) {
                     if (err) {
-                        LOG.error(util.format('[ERROR] [%s] [%s] Offer processing schedule failed', options.site, options.href), err);
+                        LOG.error(util.format('[ERROR] [%s] [%s] Offer processing schedule failed', options.site, options.href, err));
                         return reject(err);
                     }
 
@@ -26,9 +32,9 @@ class WorkerService {
                     return fulfill();
                 });
         });
-    }
+    };
     
-    schedulePictureHarvesting(options) {
+    schedulePictureHarvesting = (options) => {
         return new Promise((fulfill, reject) => {
             SessionFactory.getQueueConnection().create('harvestPicture', options)
                 .attempts(3)
@@ -47,9 +53,9 @@ class WorkerService {
                     return fulfill();
                 });
         });
-    }
+    };
 
-    scheduleCategoriesProcessing(options) {
+    scheduleCategoriesProcessing = (options) => {
         return new Promise((fulfill, reject) => {
             SessionFactory.getQueueConnection().create('processCategories', options)
                 .attempts(3)
@@ -68,9 +74,9 @@ class WorkerService {
                     return fulfill();
                 });
         });
-    }
+    };
 
-    scheduleIndexing(options) {
+    scheduleIndexing = (options) => {
         return new Promise((fulfill, reject) => {
             SessionFactory.getQueueConnection().create('processIndexing', options)
                 .attempts(3)
@@ -89,9 +95,9 @@ class WorkerService {
                     return fulfill();
                 });
         });
-    }
+    };
 
-    scheduleDataProcessing(options) {
+    scheduleDataProcessing = (options: DataProcessingOptions) => {
         return new Promise((fulfill, reject) => {
             SessionFactory.getQueueConnection().create('processData', options)
                 .attempts(3)
@@ -110,7 +116,7 @@ class WorkerService {
                     return fulfill();
                 });
         });
-    }
-};
+    };
+}
 
 export default new WorkerService();

@@ -1,8 +1,7 @@
-var util = require('util');
+const util = require('util');
 
-
-var LOG = require("../lib/services/Logger");
-var SessionFactory = require('../lib/services/SessionFactory');
+import LOG from "../lib/services/Logger";
+import SessionFactory from '../lib/services/SessionFactory';
 
 import ElasticIndexer from './services/ElasticIndexer';
 import DataProcessor from './services/DataProcessor';
@@ -10,8 +9,9 @@ import ImageProcessor from './services/ImageProcessor';
 import CategoryProcessor from './services/CategoryProcessor';
 import ContentProcessor from './services/ContentProcessor';
 
-var worker = SessionFactory.getQueueConnection();
-var elastic = SessionFactory.getElasticsearchConnection();
+
+const worker = SessionFactory.getQueueConnection();
+const elastic = SessionFactory.getElasticsearchConnection();
 
 elastic.ping({ // test
     requestTimeout: Infinity
@@ -26,7 +26,7 @@ elastic.ping({ // test
                 LOG.info(util.format('[OK] Initializing indexes succeeded'));
                 
                 worker.process('processContent', 10, function (job, done) {
-                    var data = job.data;
+                    const data = job.data;
 
                     ContentProcessor.process(data, done);
                 });
@@ -51,7 +51,7 @@ elastic.ping({ // test
                     DataProcessor.process(data, done);
                 });
 
-                worker.process('processPictures', 10, function (job, done) {
+                worker.process('requestPicturesHarvesting', 10, function (job, done) {
                     var data = job.data;
 
                     data.process_pictures = true;

@@ -1,9 +1,10 @@
 const path = require('path');
 const sharp = require('sharp');
-var util = require('util');
+const util = require('util');
 
-var LOG = require("../../lib/services/Logger");
-var SessionFactory = require('../../lib/services/SessionFactory');
+import LOG from "../../lib/services/Logger";
+import SessionFactory from '../../lib/services/SessionFactory';
+
 
 class ImageProcessor {
 
@@ -14,7 +15,7 @@ class ImageProcessor {
             origin_href: options.origin_href
         }, (err, foundOffer) => {
             if (err) {
-                LOG.error(util.format('[ERROR] [%s] [%s] [%s] Offer image processing failed. Offer not found.', options.site, options.origin_href, options.href), err);
+                LOG.error(util.format('[ERROR] [%s] [%s] [%s] Offer image processing failed. Offer not found.', options.site, options.origin_href, options.href, err));
                 return callback(err);
             }
 
@@ -33,7 +34,7 @@ class ImageProcessor {
                     return callback();
                 })
                 .catch(err => {
-                    LOG.error(util.format('[ERROR] [%s] [%s] [%s] Offer image processing failed.', options.site, options.origin_href, options.href), err);
+                    LOG.error(util.format('[ERROR] [%s] [%s] [%s] Offer image processing failed.', options.site, options.origin_href, options.href, err));
                     return callback(new Error('Offer processing failed: ' + options.origin_href + ' ' + options.href));
                 });
         });
@@ -60,9 +61,9 @@ class ImageProcessor {
             .toFile(destinationPath)
             .catch(err => {
                 LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Offer image processing failed.', 
-                    options.site, options.picture_path, util.format('%dx%d', height, width), destinationPath), err);
+                    options.site, options.picture_path, util.format('%dx%d', height, width), destinationPath, err));
             });
     }
-};
+}
 
 export default new ImageProcessor();

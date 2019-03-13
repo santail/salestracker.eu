@@ -1,8 +1,8 @@
-var _ = require('lodash');
-var util = require('util');
+const _ = require('lodash');
+const util = require('util');
 
-var LOG = require("../../lib/services/Logger");
-var SessionFactory = require('../../lib/services/SessionFactory');
+import LOG from "../../lib/services/Logger";
+import SessionFactory from '../../lib/services/SessionFactory';
 
 
 class ElasticIndexer {
@@ -88,7 +88,7 @@ class ElasticIndexer {
                 }
             }
         }
-    }
+    };
 
     initializeIndexes = () => {
         const promises = _.map(_.keys(this._indexes), language => {
@@ -97,13 +97,13 @@ class ElasticIndexer {
                     LOG.info(util.format('[OK] [%s] Index created', language));
                 })
                 .catch(err => {
-                    LOG.info(util.format('[OK] [%s] Index creation failed', language), err);
+                    LOG.info(util.format('[OK] [%s] Index creation failed', language, err));
                     return Promise.reject(err);
                 });
-        })
+        });
 
         return Promise.all(promises);
-    }
+    };
 
     private _checkIndexExists(language: string) {
         const indexName = `salestracker-${language}`;
@@ -241,7 +241,7 @@ class ElasticIndexer {
             }
 
             if (foundOffer) {
-                LOG.info(util.format('[OK] [%s] [%s] Offer content found. Proceed with indexing.', options.site, options.origin_href));
+                LOG.info(util.format('[OK] [%s] [%s] [%s] Offer content found. Proceed with indexing.', options.language, options.site, options.origin_href));
 
                 let promises: Promise<void | {}>[] = [];
 
@@ -255,20 +255,20 @@ class ElasticIndexer {
 
                 Promise.all(promises)
                     .then(() => {
-                        LOG.info(util.format('[OK] [%s] [%s] Offer indexing succeded.', foundOffer.site, foundOffer.origin_href));
+                        LOG.info(util.format('[OK] [%s] [%s] [%s] Offer indexing succeeded.', options.language, foundOffer.site, foundOffer.origin_href));
                         return callback();
                     })
                     .catch(err => {
-                        LOG.error(util.format('[ERROR] [%s] [%s] Offer indexing failed', foundOffer.site, foundOffer.origin_href), err);
+                        LOG.error(util.format('[ERROR] [%s] [%s] [%s] Offer indexing failed', options.language, foundOffer.site, foundOffer.origin_href, err));
                         return callback();
                     });
             }
             else {
-                LOG.error(util.format('[ERROR] [%s] Offer not found. Indexing failed.', options.site, options.origin_href));
+                LOG.error(util.format('[ERROR] [%s] [%s] [%s] Offer not found. Indexing failed.', options.language, options.site, options.origin_href));
                 return callback();
-            };
+            }
         });
-    }
+    };
 
     private _indexFoundOffer(language, foundOffer) {
         let data = _.cloneDeep(foundOffer);
@@ -287,7 +287,7 @@ class ElasticIndexer {
         delete data.translations;
         delete data.language;
 
-        LOG.info(util.format('[OK] [%s] [%s] [%s] Remove existing indexed document.', data.site, data.origin_href, language));
+        LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Remove existing indexed document.', language, data.site, data.origin_href, data.href));
 
         return new Promise((fulfill, reject) => {
             SessionFactory.getElasticsearchConnection().deleteByQuery({
@@ -298,25 +298,25 @@ class ElasticIndexer {
                         term: { origin_href: data.origin_href }
                     }
                 }
-            }, function (err, resp) {
+            }, function (err) {
                 if (err) {
-                    LOG.error(util.format('[ERROR] [%s] [%s] Removing indexed document failed', data.site, data.href), err);
+                    LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Removing indexed document failed', language, data.site, data.origin_href, data.href, err));
                     return reject(err);
                 }
 
-                LOG.info(util.format('[OK] [%s] [%s] [%s] Adding new document to index.', data.site, data.origin_href, language));
+                LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Adding new document to index.', language, data.site, data.origin_href, data.href));
 
                 SessionFactory.getElasticsearchConnection().index({
                     index: 'salestracker-' + language,
                     type: 'offers',
                     body: data
-                }, function (err, resp) {
+                }, function (err) {
                     if (err) {
-                        LOG.error(util.format('[ERROR] [%s] [%s] Adding new document do index failed', data.site, data.href), err);
+                        LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Adding new document do index failed', language, data.site, data.origin_href, data.href, err));
                         return reject(err);
                     }
 
-                    LOG.info(util.format('[OK] [%s] [%s ] Adding new document succeeded', data.site, data.href));
+                    LOG.info(util.format('[OK] [%s] [%s] [%s] [%s ] Adding new document succeeded', language, data.site, data.origin_href, data.href));
                     return fulfill();
                 });
             });

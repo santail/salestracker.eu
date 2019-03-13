@@ -1,36 +1,36 @@
-var util = require("util");
+const util = require("util");
+
+import LOG from "../../lib/services/Logger";
+import ParserFactory from '../../lib/services/ParserFactory';
 
 import Crawler from "./Crawler";
 import PagingSimple from "./PagingSimple";
 
-var LOG = require("../../lib/services/Logger");
-var parserFactory = require("../../lib/services/ParserFactory");
-
 
 class PagingHarvester {
   public harvestPage = (options, callback) => {
-    var parser = parserFactory.getParser(options.site);
+    const parser = ParserFactory.getParser(options.site);
 
-    LOG.info(util.format('[OK] [%s] [%s] Page harvesting started', options.site, options.href));
+    LOG.info(util.format('[OK] [%s] [%s] Paging page harvesting started', options.site, options.href));
 
-    var crawler = new Crawler();
+    const crawler = new Crawler();
     crawler.request({
       url: options.href,
       json: parser.config.json,
       headers: parser.config.headers,
       payload: options.payload,
       onError: (err) => {
-        LOG.error(util.format('[ERROR] [%s] [%s] Harvest page failed', options.site, options.href), err);
+        LOG.error(util.format('[ERROR] [%s] [%s] Harvest page failed', options.site, options.href, err));
         return callback(err);
       },
       onSuccess: (content) => {
         PagingSimple.processPage(content, options)
           .then(() => {
-            LOG.info(util.format('[OK] [%s] Offers processing scheduled', options.site));
+            LOG.info(util.format('[OK] [%s] [%s] Offers processing scheduled', options.site, options.href));
             return callback();
           })
           .catch(err => {
-            LOG.error(util.format('[ERROR] [%s] Offers processing not scheduled', options.site, err));
+            LOG.error(util.format('[ERROR] [%s] [%s] Offers processing not scheduled', options.site, options.href, err));
             return callback(err);
           });
       }

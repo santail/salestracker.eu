@@ -1,5 +1,5 @@
-var _ = require('lodash');
-var util = require("util");
+const _ = require('lodash');
+const util = require("util");
 
 import Composer from './Composer';
 import { Notification } from './Messenger';
@@ -8,12 +8,12 @@ import { Notification } from './Messenger';
 class SmsComposer extends Composer {
 
     composeMessage(notification: Notification) {
-        var content = "<h1>SalesTracker.eu has found something</h1> what could be potentially interesting to you";
+        let content = "<h1>SalesTracker.eu has found something</h1> what could be potentially interesting to you";
 
         content += util.format("<h2>You have been searching for <i>'%s'</i></h2>", notification.criterion);
       
         _.each(notification.offers, function (offer) {
-          var details = '';
+          let details = '';
       
           if (offer.vendor) {
             details += util.format('<span>%s</span>', offer.vendor);

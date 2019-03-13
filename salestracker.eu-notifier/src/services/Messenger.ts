@@ -1,15 +1,17 @@
-var config = require('../config/config');
+const config = require('../config/config');
 
-var util = require("util");
-var _ = require('underscore')._;
-var Mailgun = require('mailgun-js');
-var Telegram = require('telegraf/telegram')
-var twilio = require('twilio')(config.notifier.twilio.AccountSID, config.notifier.twilio.AuthToken);
+const util = require("util");
+const Mailgun = require('mailgun-js');
+const Telegram = require('telegraf/telegram')
+const twilio = require('twilio')(config.notifier.twilio.AccountSID, config.notifier.twilio.AuthToken);
 
-var LOG = require('../../lib/services/Logger');
+import LOG from "../../lib/services/Logger";
+
+
 import EmailComposer from './EmailComposer';
 import SmsComposer from './SmsComposer';
 import TelegramComposer from './TelegramComposer';
+
 
 export interface Notification {
   criterion: string;
@@ -45,16 +47,16 @@ class Messenger {
   };
 
   sendEmail(notification: Notification) {
-    var email = notification.contacts.email;
+    const email = notification.contacts.email;
 
-    var mailgun = new Mailgun({
+    const mailgun = new Mailgun({
       apiKey: config.notifier.mailgun.api_key,
       domain: config.notifier.mailgun.domain
     });
   
     LOG.debug(util.format('[Sending] [email] [%s] Sending email', email));
   
-    var data = {
+    const data = {
       from: 'notifier-robot@salestracker.eu',
       to: email,
       subject: util.format('Salestracker.eu Found offers notification', ''),
@@ -72,7 +74,7 @@ class Messenger {
   };
 
   sendSms(notification: Notification) {
-    var phone = notification.contacts.phone;
+    const phone = notification.contacts.phone;
   
     LOG.debug(util.format('[Sending] [SMS] [%s] Sending SMS', phone));
   
@@ -98,6 +100,6 @@ class Messenger {
   sendTelegram(notification: Notification) {
     this._TelegramBot.sendMessage('@goodlooking_test', TelegramComposer.composeMessage(notification), { parse_mode: 'HTML'});
   };
-};
+}
   
 export default new Messenger();

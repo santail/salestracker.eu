@@ -1,15 +1,15 @@
+import _ from "lodash";
+import fs from "fs-extra";
+import path from "path";
+import request from "request-promise";
+import util from "util";
+
+const readdir = util.promisify(fs.readdir);
+const writeFile = util.promisify(fs.writeFile);
+
+import LOG from "../../lib/services/Logger";
+
 import WorkerService from "./WorkerService";
-
-var _ = require('lodash');
-var fs = require('fs-extra');
-var path = require('path');
-var request = require('request-promise');
-var util = require("util");
-
-const readdir = util.promisify(fs.readdir)
-const writeFile = util.promisify(fs.writeFile)
-
-var LOG = require("../../lib/services/Logger");
 
 
 class ImageHarvester {
@@ -17,14 +17,12 @@ class ImageHarvester {
     public harvestImage = (options) => {
         return new Promise((fulfill, reject) => {
 
-            fs.open(options.picture_path, 'wx', (err, fd) => {
+            fs.open(options.picture_path, 'wx', (err) => {
                 if (err) {
                     if (err.code === 'EEXIST') {
                         LOG.info(util.format('[OK] [%s] [%s] [%s] Image already stored. Skipping', options.site, options.picture_href, options.picture_path));
                         return fulfill();
                     }
-
-                    throw err;
                 }
 
                 LOG.info(util.format('[OK] [%s] [%s] Downloading image', options.site, options.picture_href));
@@ -83,13 +81,14 @@ class ImageHarvester {
     };
 
     public cleanUploadedImages = (site) => {
-        var uploadsPath = path.join(process.cwd(), './uploads/offers/' + site);
+        const uploadsPath = path.join(process.cwd(), './uploads/offers/' + site);
 
         readdir(uploadsPath)
             .then(files => {
                 if (files.length !== 0) {
                     _.each(files, function (file) {
-                        var filePath = uploadsPath + file;
+                        const filePath = uploadsPath + file;
+
                         fs.stat(filePath, function (err, stats) {
                             if (err) {
                                 LOG.error(util.format('[ERROR] Error reading uploaded file', err));
