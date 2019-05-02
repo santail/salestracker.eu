@@ -183,7 +183,7 @@ exports.list = function (req, res) {
                 if (!offer.downloads || !offer.downloads.pictures) {
                     offer.downloads = {
                         pictures: []
-                    }
+                    };
                 }
     
                 offer.downloads.pictures = _.map(offer.downloads.pictures, picture => {
@@ -208,7 +208,7 @@ exports.list = function (req, res) {
             return res.status(400).send({
                 message: JSON.stringify(err)
             });
-        })
+        });
 };
 
 /**

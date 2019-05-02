@@ -75,18 +75,27 @@ class CategoryProcessor {
                 return callback(err);
             }
 
-            return WorkerService.scheduleIndexing({
-                'site': foundOffer.site,
-                'origin_href': foundOffer.origin_href
-            })
-            .then(() => {
-                LOG.info(util.format('[OK] [%s] [%s] Offer updated with found category %s', foundOffer.site, foundOffer.origin_href, categories));
-                return callback();
-            })
-            .catch(err => {
-                LOG.error(util.format('[ERROR] [%s] Indexes processing not scheduled.', foundOffer.origin_href, err));
-                return callback(err);
-            });
+            LOG.info(util.format('[OK] [%s] [%s] Offer updated with found categories', foundOffer.site, foundOffer.origin_href));
+
+            if (options.process_categories) {
+                LOG.info(util.format('[OK] [%s] [%s] Updating indexed offer with new categories', foundOffer.site, foundOffer.origin_href));
+
+                // TODO Should update all indexes, not only main language index
+                return WorkerService.scheduleIndexing({
+                    'site': foundOffer.site,
+                    'origin_href': foundOffer.origin_href
+                })
+                .then(() => {
+                    LOG.info(util.format('[OK] [%s] [%s] Update offer index with found categories scheduled %s', foundOffer.site, foundOffer.origin_href, categories));
+                    return callback();
+                })
+                .catch(err => {
+                    LOG.error(util.format('[ERROR] [%s] Indexes processing not scheduled.', foundOffer.origin_href, err));
+                    return callback(err);
+                });
+            }
+
+            return Promise.resolve();
         });
     }
 

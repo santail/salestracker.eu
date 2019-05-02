@@ -42,11 +42,11 @@ class ContentProcessor {
             LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Main offer found. Proceed with processing content.', options.language, options.site, options.origin_href, options.href));
 
             this._parseOfferContent(options, foundOffer)
-                .then(offer => {
-                    return this._processOfferPictures(options, offer);
+                .then(data => {
+                    return this._processOfferPictures(options, data);
                 })
-                .then(offer => {
-                    return this._updateOfferData(options, offer);
+                .then(data => {
+                    return this._updateOfferData(options, data);
                 })
                 .then(offer => {
                     return this._validateOfferProperties(options, offer);
@@ -128,15 +128,15 @@ class ContentProcessor {
         return Promise.resolve(offer);
     };
 
-    private _updateOfferData = (options, offer) => {
+    private _updateOfferData = (options, data) => {
         LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Update offer with new data', options.language, options.site, options.origin_href, options.href));
 
         return new Promise((fulfill, reject) => {
             SessionFactory.getDbConnection().offers.update({
                 origin_href: options.origin_href
-            }, offer, function (err, updatedOffer) {
+            }, data, function (err, updatedOffer) {
                 if (err) {
-                    LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Update offer with new data failed', options.language, options.site, options.origin_href, options.href, offer, err));
+                    LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Update offer with new data failed', options.language, options.site, options.origin_href, options.href, data, err));
                     return reject(err);
                 }
 
@@ -163,12 +163,12 @@ class ContentProcessor {
         });
     };
 
-    private _processOfferPictures = (options, offer) => {
+    private _processOfferPictures = (options, data) => {
         const parser = ParserFactory.getParser(options.site);
         const isMainOffer = parser.config.languages[options.language].main;
 
         if (!isMainOffer) {
-            return Promise.resolve(offer);
+            return Promise.resolve(data);
         }
 
         LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Processing offer pictures', options.language, options.site, options.origin_href, options.href));
@@ -177,8 +177,8 @@ class ContentProcessor {
             pictures: []
         };
 
-        downloads.pictures = _.map(offer.pictures, pictureHref => {
-            const offerHref = new URL(offer.origin_href);
+        downloads.pictures = _.map(data.pictures, pictureHref => {
+            const offerHref = new URL(data.origin_href);
             let picturePath = path.join(slugify(offerHref.pathname), path.basename(pictureHref));
             
             if (options.site === 'www.barbora.ee') {
@@ -195,11 +195,11 @@ class ContentProcessor {
             }
         });
 
-        offer.downloads = downloads;
+        data.downloads = downloads;
 
         LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Offer pictures processed', options.language, options.site, options.origin_href, options.href));
 
-        return Promise.resolve(offer);
+        return Promise.resolve(data);
     }
 }
 

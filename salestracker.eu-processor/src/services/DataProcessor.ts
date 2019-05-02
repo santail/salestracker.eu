@@ -237,19 +237,11 @@ class DataProcessor {
 
         if (isMainOffer) {
             promises.push(this._requestTranslationsHarvesting(options, foundOffer));
-        }
-
-        if (isMainOffer && options.process_pictures) {
             promises.push(this.requestPicturesHarvesting(options, foundOffer));
-        }
-
-        if (isMainOffer && options.process_categories) {
             promises.push(this.requestCategoriesProcessing(options, foundOffer));
         }
 
-        if (isMainOffer && options.process_index) {
-            promises.push(this.requestOfferContentIndexing(options, foundOffer));
-        }
+        promises.push(this._requestOfferContentIndexing(options, foundOffer));
 
         return Promise.all(promises);
     }
@@ -278,10 +270,11 @@ class DataProcessor {
                 'origin_href': options.origin_href,
             };
 
+            delay += 60 * 1000;
+
             return WorkerService.scheduleOfferHarvesting(config, delay)
                 .then(() => {
                     LOG.info(util.format('[OK] [%s] [%s] [%s] Offer translation harvesting scheduled', language, options.site, options.href));
-                    delay += 60 * 1000;
                 })
                 .catch(err => {
                     LOG.error(util.format('[ERROR] [%s] [%s] [%s] Offer translation harvesting not scheduled %s', language, options.site, options.href, err));
@@ -358,7 +351,7 @@ class DataProcessor {
         });
     };
 
-    requestOfferContentIndexing = (options, offer) => {
+    _requestOfferContentIndexing = (options, offer) => {
         LOG.info(util.format('[OK] [%s] [%s] Process indexes.', options.site, offer.origin_href));
 
         // TODO should take language into account or just schedule all languages re-indexing

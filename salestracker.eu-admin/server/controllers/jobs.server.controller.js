@@ -33,7 +33,7 @@ exports.processSite = function (req, res) {
         .save(function (err) {
             if (err) {
                 console.error(util.format('[ERROR] [%s] Job not scheduled', JSON.stringify(job), err));
-                res.json({ status: 'failed' })
+                res.json({ status: 'failed' });
                 return;
             }
 
@@ -61,7 +61,7 @@ exports.processContent = function (req, res) {
         .save(function (err) {
             if (err) {
                 console.error(util.format('[ERROR] [%s] Job not scheduled', JSON.stringify(job), err));
-                res.json({ status: 'failed' })
+                res.json({ status: 'failed' });
                 return;
             }
 
@@ -89,7 +89,7 @@ exports.processData = function (req, res) {
         .save(function (err) {
             if (err) {
                 console.error(util.format('[ERROR] [%s] Job not scheduled', JSON.stringify(job), err));
-                res.json({ status: 'failed' })
+                res.json({ status: 'failed' });
                 return;
             }
 
@@ -117,7 +117,7 @@ exports.processPictures = function (req, res) {
         .save(function (err) {
             if (err) {
                 console.error(util.format('[ERROR] [%s] Job not scheduled', JSON.stringify(job), err));
-                res.json({ status: 'failed' })
+                res.json({ status: 'failed' });
                 return;
             }
 
@@ -146,7 +146,7 @@ exports.stopProcessPictures = function (req, res) {
         .save(function (err) {
             if (err) {
                 console.error(util.format('[ERROR] [%s] Job not scheduled', JSON.stringify(job), err));
-                res.json({ status: 'failed' })
+                res.json({ status: 'failed' });
                 return;
             }
 
@@ -163,7 +163,8 @@ exports.processCategories = function (req, res) {
         'site': req.body.site,
         'language': req.body.language,
         'href': req.body.href,
-        'origin_href': req.body.origin_href
+        'origin_href': req.body.origin_href,
+        'process_categories': true
     };
 
     jobs
@@ -174,7 +175,7 @@ exports.processCategories = function (req, res) {
         .save(function (err) {
             if (err) {
                 console.error(util.format('[ERROR] [%s] Job not scheduled', JSON.stringify(job), err));
-                res.json({ status: 'failed' })
+                res.json({ status: 'failed' });
                 return;
             }
 
@@ -202,7 +203,7 @@ exports.processIndexing = function (req, res) {
         .save(function (err) {
             if (err) {
                 console.error(util.format('[ERROR] [%s] Job not scheduled', JSON.stringify(job), err));
-                res.json({ status: 'failed' })
+                res.json({ status: 'failed' });
                 return;
             }
 
