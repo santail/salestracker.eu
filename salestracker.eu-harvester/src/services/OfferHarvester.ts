@@ -91,7 +91,7 @@ class OfferHarvester {
                             })
                             .catch(err => {
                                 LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Offer translation harvesting failed', options.language, options.site, options.origin_href, options.href, err));
-                                return callback(err);
+                                return callback();
                             });
                     }
                 }

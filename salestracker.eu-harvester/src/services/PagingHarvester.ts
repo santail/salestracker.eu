@@ -21,7 +21,7 @@ class PagingHarvester {
       payload: options.payload,
       onError: (err) => {
         LOG.error(util.format('[ERROR] [%s] [%s] Harvest page failed', options.site, options.href, err));
-        return callback(err);
+        return callback();
       },
       onSuccess: (content) => {
         PagingSimple.processPage(content, options)
@@ -31,7 +31,7 @@ class PagingHarvester {
           })
           .catch(err => {
             LOG.error(util.format('[ERROR] [%s] [%s] Offers processing not scheduled', options.site, options.href, err));
-            return callback(err);
+            return callback();
           });
       }
     });

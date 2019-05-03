@@ -93,7 +93,7 @@ class IndexPageHarvester {
             payload: options.payload,
             onError: (err) => {
                 LOG.error(util.format('[ERROR] [%s] [%s] Fetching index page failed', options.site, options.href, err));
-                return callback(err);
+                return callback();
             },
             onSuccess: (content) => {
                 if (options.hierarchy) { // if this is initial index page containing first level of hierarchical catalog links

@@ -42,17 +42,13 @@ elastic.ping({ // test
                 });
 
                 worker.process('processData', 10, function (job, done) {
-                    var data = job.data;
-
-                    data.process_pictures = true;
-                    data.process_categories = true;
-                    data.process_index = true;
+                    let data = job.data;
 
                     DataProcessor.process(data, done);
                 });
 
                 worker.process('requestPicturesHarvesting', 10, function (job, done) {
-                    var data = job.data;
+                    let data = job.data;
 
                     data.process_pictures = true;
 
@@ -60,9 +56,7 @@ elastic.ping({ // test
                 });
 
                 worker.process('processCategories', 10, function (job, done) {
-                    var data = job.data;
-
-                    data.process_categories = true;
+                    let data = job.data;
 
                     CategoryProcessor.process(data, done);
                 });

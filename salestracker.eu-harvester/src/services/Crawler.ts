@@ -125,7 +125,7 @@ class Crawler {
             else if (response.statusCode === 404) {
                 LOG.error(util.format('[ERROR] [%s] [%s] Fetching href failed', options.url, response.statusCode));
                 
-                return options.onSuccess();
+                return options.onError(new Error('Error fetching page. Page not found.'));
             }
             else {
                 response = null;
