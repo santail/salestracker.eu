@@ -73,3 +73,17 @@ mocha -r ts-node/register tests/parsers.spec.js
 
 curl -XPOST 'localhost:9200/salestracker-eng/offers/_delete_by_query?conflicts=proceed&pretty' -d'
 { "query": { "match_all": {} } }'
+
+
+
+### to run elasticsearch 
+
+# change permissions for data folder
+chmod g+rwx .data/elasticsearch
+chgrp 1000 .data/elasticsearch
+
+# edit /etc/sysctl.conf, setting 
+vm.max_map_count=524288
+
+# run 
+sudo sysctl -w vm.max_map_count=524288
