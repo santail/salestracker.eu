@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 echo 'Creating web-admin application user and db'
 
@@ -27,3 +27,4 @@ mongo salestracker --host localhost --port 27017 -u ${MONGO_ROOT_USERNAME} -p ${
 echo 'Creating backend-processor application user and db'
 
 mongo salestracker --host localhost --port 27017 -u ${MONGO_ROOT_USERNAME} -p ${MONGO_ROOT_PASSWORD} --authenticationDatabase admin --eval "db.createUser({user: '${APP_BACKEND_PROCESSOR_MONGO_USER}', pwd: '${APP_BACKEND_PROCESSOR_MONGO_PASSWORD}', roles:[{role:'dbOwner', db: '${APP_MONGO_DB}'}]});"
+
