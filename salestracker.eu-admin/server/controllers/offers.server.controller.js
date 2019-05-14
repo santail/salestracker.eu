@@ -144,7 +144,7 @@ exports.list = function (req, res) {
             "bool": bool
         },
         "sort" : [{
-            "price.discount.amount" : {
+            "price.original" : {
                 "order" : "desc",
                 "nested": {
                     "path": "price"
@@ -152,6 +152,13 @@ exports.list = function (req, res) {
             }
         }, {
             "price.discount.percents" : {
+                "order" : "desc",
+                "nested": {
+                    "path": "price"
+                }
+            }
+        }, {
+            "price.discount.amount" : {
                 "order" : "desc",
                 "nested": {
                     "path": "price"
