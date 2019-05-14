@@ -144,23 +144,17 @@ exports.list = function (req, res) {
             "bool": bool
         },
         "sort" : [{
-            "price" : {
+            "price.discount.amount" : {
+                "order" : "desc",
                 "nested": {
-                    "path": "price.discount",
-                    "nested": {
-                        "path": "price.discount.amount",
-                        "order": "desc"
-                    }
+                    "path": "price"
                 }
             }
         }, {
-            "price" : {
+            "price.discount.percents" : {
+                "order" : "desc",
                 "nested": {
-                    "path": "price.discount",
-                    "nested": {
-                        "path": "price.discount.percents",
-                        "order": "asc"
-                    }
+                    "path": "price"
                 }
             }
         }]
@@ -172,11 +166,11 @@ exports.list = function (req, res) {
             type: 'offers',
             body: body
         })
-            .then(response => {
-                response.language = language;
+        .then(response => {
+            response.language = language;
 
-                return Promise.resolve(response);
-            });
+            return Promise.resolve(response);
+        });
     });
 
     Promise.all(promises)
