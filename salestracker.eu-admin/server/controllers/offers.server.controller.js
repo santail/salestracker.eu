@@ -143,10 +143,27 @@ exports.list = function (req, res) {
         "query": {
             "bool": bool
         },
-        "sort": [
-            { "price.discount.amount":   { "order": "desc" }},
-            { "price.discount.percents": { "order": "desc" }}
-        ]
+        "sort" : [{
+            "price" : {
+                "nested": {
+                    "path": "price.discount",
+                    "nested": {
+                        "path": "price.discount.amount",
+                        "order": "desc"
+                    }
+                }
+            }
+        }, {
+            "price" : {
+                "nested": {
+                    "path": "price.discount",
+                    "nested": {
+                        "path": "price.discount.percents",
+                        "order": "asc"
+                    }
+                }
+            }
+        }]
     };
 
     let promises = _.map(['est', 'eng', 'rus'], language => {
