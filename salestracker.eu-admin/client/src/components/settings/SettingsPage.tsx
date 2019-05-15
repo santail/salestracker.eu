@@ -36,23 +36,24 @@ class SettingsPage extends ComponentBase<{}, SettingsPageState> {
                 </div>
 
                 <Tabs
-                    id={ 'settingsGrid' }
-                    activeKey={ this.state.setting }
-                    className={ "nav nav-tabs nav-justified" }
+                    id={'settingsGrid'}
+                    activeKey={this.state.setting}
+                    className={"nav nav-tabs nav-justified"}
                 >
-                    <Tab eventKey={ 'sites' } title="Сайты">
-                        <textarea rows={20} cols={5} className="form-control" value={ this.state.sites }
-                            onChange={ this._onSitesChange }>
+                    <Tab eventKey={'sites'} title="Сайты">
+                        <textarea rows={20} cols={5} className="form-control" value={this.state.sites}
+                            onChange={this._onSitesChange}>
                         </textarea>
                     </Tab>
-                    <Tab eventKey={ 'categories' } title="Категории">
-                        <textarea rows={20} cols={5} className="form-control" value={ this.state.categories }>
+                    <Tab eventKey={'categories'} title="Категории">
+                        <textarea rows={20} cols={5} className="form-control" value={this.state.categories}
+                            onChange={this._onCategoriesChange}>
                         </textarea>
                     </Tab>
                 </Tabs>
 
-                <Button onClick={ this._onSaveSettings }>
-                    { 'Сохранить' }
+                <Button onClick={this._onSaveSettings}>
+                    {'Сохранить'}
                 </Button>
             </div>
         );
@@ -65,8 +66,12 @@ class SettingsPage extends ComponentBase<{}, SettingsPageState> {
     }
 
     private _onSitesChange = (e: React.FormEvent<HTMLTextAreaElement>) => {
-        this.setState({sites: e.currentTarget.value });
+        this.setState({ sites: e.currentTarget.value });
     };
+
+    private _onCategoriesChange = (e: React.FormEvent<HTMLTextAreaElement>) => {
+        this.setState({ categories: e.currentTarget.value });
+    }
 
     private _onSaveSettings = () => {
         SettingsStore.saveSettings({
@@ -75,6 +80,5 @@ class SettingsPage extends ComponentBase<{}, SettingsPageState> {
         });
     }
 }
-
 
 export = SettingsPage;
