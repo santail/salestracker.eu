@@ -81,19 +81,19 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
                 <ul className="row stats">
                     <li className="col-xs-3"><a href="#" className="btn btn-default">{this.state.total}</a> <span>товаров найдено</span></li>
                     <li className="col-xs-3">
-                        <button className="btn btn-sm btn-info" type="button" onClick={ this._onProcessSite }><i className="fa fa-tasks"></i> Harvest site</button>
-                        <button className="btn btn-sm btn-info" type="button" onClick={ this._onProcessPictures }><i className="fa fa-tasks"></i> Harvest pictures</button>
-                        <button className="btn btn-sm btn-info" type="button" onClick={ this._onProcessPicturesStop }><i className="fa fa-tasks"></i> Stop harvest pictures</button>
+                        <button className="btn btn-sm btn-info" type="button" onClick={this._onProcessSite}><i className="fa fa-tasks"></i> Harvest site</button>
+                        <button className="btn btn-sm btn-info" type="button" onClick={this._onProcessPictures}><i className="fa fa-tasks"></i> Harvest pictures</button>
+                        <button className="btn btn-sm btn-info" type="button" onClick={this._onProcessPicturesStop}><i className="fa fa-tasks"></i> Stop harvest pictures</button>
                     </li>
                 </ul>
 
                 <FormGroup>
                     <InputGroup>
                         <InputGroup.Addon>@</InputGroup.Addon>
-                        <FormControl type="text" onChange={ this._onFilterChange } value={this.state.filter} />
+                        <FormControl type="text" onChange={this._onFilterChange} value={this.state.filter} />
                     </InputGroup>
                 </FormGroup>
-                
+
                 <div className="row paging">
                     <div className="col-md-2">
                         <select className="form-control" value={this.state.site} onChange={this._onSiteChange}>
@@ -132,30 +132,30 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
                 </div>
 
                 <Tabs
-                    id={ 'offersGrid' }
+                    id={'offersGrid'}
                     activeKey={this.state.category}
                     onSelect={this._handleCategorySelect}
-                    className={ "nav nav-tabs nav-justified" }
+                    className={"nav nav-tabs nav-justified"}
                 >
-                    <Tab eventKey={ 'all' } title="All">
+                    <Tab eventKey={'all'} title="All">
                         {widgetsRows}
                     </Tab>
-                    <Tab eventKey={ 'cosmetics' } title="Cosmetics">
+                    <Tab eventKey={'cosmetics'} title="Cosmetics">
                         {widgetsRows}
                     </Tab>
-                    <Tab eventKey={ 'alcohol' } title="Alcohol">
+                    <Tab eventKey={'alcohol'} title="Alcohol">
                         {widgetsRows}
                     </Tab>
-                    <Tab eventKey={ 'fashion' } title="Fashion">
+                    <Tab eventKey={'fashion'} title="Fashion">
                         {widgetsRows}
                     </Tab>
-                    <Tab eventKey={ 'toys' } title="Toys">
+                    <Tab eventKey={'toys'} title="Toys">
                         {widgetsRows}
                     </Tab>
-                    <Tab eventKey={ 'pets' } title="Pets">
+                    <Tab eventKey={'pets'} title="Pets">
                         {widgetsRows}
                     </Tab>
-                    <Tab eventKey={ 'children' } title="Children">
+                    <Tab eventKey={'children'} title="Children">
                         {widgetsRows}
                     </Tab>
                 </Tabs>
@@ -190,7 +190,7 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
         super.componentDidMount();
 
         OfferStore.loadOffers({
-            activePage: 0, 
+            activePage: 0,
             pageSize: 72
         });
     }
@@ -226,7 +226,7 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
         this.setState({ activePage: selectedItem.selected });
 
         OfferStore.loadOffers({
-            activePage: selectedItem.selected, 
+            activePage: selectedItem.selected,
             pageSize: this.state.pageSize,
             site: this.state.site,
             category: this.state.category
@@ -237,7 +237,7 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
         this.setState({ filter: e.currentTarget.value });
 
         OfferStore.loadOffers({
-            activePage: 0, 
+            activePage: 0,
             pageSize: this.state.pageSize,
             site: this.state.site,
             category: this.state.category,
@@ -249,7 +249,7 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
         this.setState({ site: e.currentTarget.value });
 
         OfferStore.loadOffers({
-            activePage: 0, 
+            activePage: 0,
             pageSize: this.state.pageSize,
             site: e.currentTarget.value,
             category: this.state.category
@@ -265,7 +265,7 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
         this.setState({ pageSize: pageSize });
 
         OfferStore.loadOffers({
-            activePage: this.state.activePage, 
+            activePage: this.state.activePage,
             pageSize: pageSize,
             site: this.state.site,
             category: this.state.category
@@ -276,12 +276,12 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
         this.setState({ category: category });
 
         OfferStore.loadOffers({
-            activePage: 0, 
+            activePage: 0,
             pageSize: this.state.pageSize,
             site: this.state.site,
             category: category
         });
-      }
+    }
 }
 
 export default OffersPage;

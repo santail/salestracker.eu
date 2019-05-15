@@ -1,7 +1,5 @@
 const _ = require('lodash');
 
-import SyncTasks = require('synctasks');
-
 import { StoreBase, AutoSubscribeStore, autoSubscribe, autoSubscribeWithKey } from 'resub';
 import { IOffer } from './OfferStore';
 

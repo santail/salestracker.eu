@@ -18,6 +18,8 @@ export const App: StatelessComponent = () => {
               <li><Link to='/offers'><i className="fa fa-tshirt"></i> Товары</Link></li>
               <li><Link to='/bundles'><i className="fa fa-newspaper"></i> Публикации</Link></li>
               <li><Link to='/archive'><i className="fa fa-archive"></i> Архив</Link></li>
+              <li><Link to='/users'><i className="fa fa-config"></i> Пользователи</Link></li>
+              <li><Link to='/settings'><i className="fa fa-config"></i> Настройки</Link></li>
             </ul>
           </div>
 
