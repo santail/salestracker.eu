@@ -5,6 +5,24 @@ import SessionFactory from '../../lib/services/SessionFactory';
 
 
 class WorkerService {
+    
+    scheduleSiteHarvesting = (options) => {
+        SessionFactory.getQueueConnection().create('harvestSite', options)
+            .attempts(3)
+            .backoff({
+                delay: 60 * 1000,
+                type: 'exponential'
+            })
+            .removeOnComplete(true)
+            .save(err => {
+                if (err) {
+                    LOG.error(util.format('[ERROR] [%s] Site processing not scheduled', options.site, err));
+                }
+
+                LOG.info(util.format('[OK] [%s] Site processing scheduled', options.site));
+            });
+    }
+
     scheduleOfferHarvesting = (options) => {
         return new Promise((fulfill, reject) => {
             SessionFactory.getQueueConnection().create('harvestOffer', options)
@@ -14,7 +32,7 @@ class WorkerService {
                     type: 'exponential'
                 })
                 .removeOnComplete(true)
-                .save(function (err) {
+                .save(err => {
                     if (err) {
                         LOG.error(util.format('[ERROR] [%s] [%s] Offer processing schedule failed', options.site, options.href, err));
                         return reject(err);

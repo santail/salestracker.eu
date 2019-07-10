@@ -4,105 +4,109 @@ const util = require('util');
 import LOG from "../../lib/services/Logger";
 import SessionFactory from '../../lib/services/SessionFactory';
 
+const _indexes = {
+    'est': {
+        'filter': {
+            "finnish_stop": {
+                "type": "stop",
+                "stopwords": "_finnish_"
+            },
+            "finnish_stemmer": {
+                "type": "stemmer",
+                "language": "finnish"
+            }
+        },
+        'analyzer': {
+            "rebuilt_estonian": {
+                "tokenizer": "standard",
+                "char_filter": [
+                    "html_strip"
+                ],
+                "filter": [
+                    "lowercase",
+                    "finnish_stop",
+                    "finnish_stemmer"
+                ]
+            }
+        }
+    },
+    'eng': {
+        'filter': {
+            "english_stop": {
+                "type": "stop",
+                "stopwords": "_english_"
+            },
+            "english_stemmer": {
+                "type": "stemmer",
+                "language": "english"
+            },
+            "english_possessive_stemmer": {
+                "type": "stemmer",
+                "language": "possessive_english"
+            }
+        },
+        'analyzer': {
+            "rebuilt_english": {
+                "tokenizer": "standard",
+                "char_filter": [
+                    "html_strip"
+                ],
+                "filter": [
+                    "english_possessive_stemmer",
+                    "lowercase",
+                    "english_stop",
+                    "english_stemmer"
+                ]
+            }
+        }
+    },
+    'rus': {
+        'filter': {
+            "russian_stop": {
+                "type": "stop",
+                "stopwords": "_russian_"
+            },
+            "russian_stemmer": {
+                "type": "stemmer",
+                "language": "russian"
+            }
+        },
+        'analyzer': {
+            "rebuilt_russian": {
+                "tokenizer": "standard",
+                "char_filter": [
+                    "html_strip"
+                ],
+                "filter": [
+                    "lowercase",
+                    "russian_stop",
+                    "russian_stemmer"
+                ]
+            }
+        }
+    }
+};
 
 class ElasticIndexer {
 
-    private _indexes = {
-        'est': {
-            'filter': {
-                "finnish_stop": {
-                    "type": "stop",
-                    "stopwords": "_finnish_"
-                },
-                "finnish_stemmer": {
-                    "type": "stemmer",
-                    "language": "finnish"
-                }
-            },
-            'analyzer': {
-                "rebuilt_estonian": {
-                    "tokenizer": "standard",
-                    "char_filter": [
-                        "html_strip"
-                    ],
-                    "filter": [
-                        "lowercase",
-                        "finnish_stop",
-                        "finnish_stemmer"
-                    ]
-                }
-            }
-        },
-        'eng': {
-            'filter': {
-                "english_stop": {
-                    "type": "stop",
-                    "stopwords": "_english_"
-                },
-                "english_stemmer": {
-                    "type": "stemmer",
-                    "language": "english"
-                },
-                "english_possessive_stemmer": {
-                    "type": "stemmer",
-                    "language": "possessive_english"
-                }
-            },
-            'analyzer': {
-                "rebuilt_english": {
-                    "tokenizer": "standard",
-                    "char_filter": [
-                        "html_strip"
-                    ],
-                    "filter": [
-                        "english_possessive_stemmer",
-                        "lowercase",
-                        "english_stop",
-                        "english_stemmer"
-                    ]
-                }
-            }
-        },
-        'rus': {
-            'filter': {
-                "russian_stop": {
-                    "type": "stop",
-                    "stopwords": "_russian_"
-                },
-                "russian_stemmer": {
-                    "type": "stemmer",
-                    "language": "russian"
-                }
-            },
-            'analyzer': {
-                "rebuilt_russian": {
-                    "tokenizer": "standard",
-                    "char_filter": [
-                        "html_strip"
-                    ],
-                    "filter": [
-                        "lowercase",
-                        "russian_stop",
-                        "russian_stemmer"
-                    ]
-                }
-            }
-        }
-    };
-
     initializeIndexes = () => {
-        const promises = _.map(_.keys(this._indexes), language => {
+        const promises = _.map(_.keys(_indexes), language => {
             return this._checkIndexExists(language)
                 .then(() => {
                     LOG.info(util.format('[OK] [%s] Index created', language));
                 })
                 .catch(err => {
                     LOG.info(util.format('[OK] [%s] Index creation failed', language, err));
-                    return Promise.reject(err);
                 });
         });
 
-        return Promise.all(promises);
+        return Promise.all(promises)
+            .then(() => {
+                LOG.info(util.format('[OK] [%s] Indexes created'));
+            })
+            .catch(err => {
+                LOG.info(util.format('[OK] [%s] Indexes creation failed', err));
+            });
     };
 
     private _checkIndexExists(language: string) {
@@ -137,8 +141,8 @@ class ElasticIndexer {
                     index: indexName,
                     body: {
                         "analysis": {
-                            "filter": this._indexes[language].filter,
-                            "analyzer": this._indexes[language].analyzer
+                            "filter": _indexes[language].filter,
+                            "analyzer": _indexes[language].analyzer
                         }
                     }
                 });
@@ -153,19 +157,19 @@ class ElasticIndexer {
                         properties: {
                             "additional": {
                                 "type": "text",
-                                "analyzer": _.first(_.keys(this._indexes[language].analyzer))
+                                "analyzer": _.first(_.keys(_indexes[language].analyzer))
                             },
                             "description": {
                                 "type": "text",
-                                "analyzer": _.first(_.keys(this._indexes[language].analyzer))
+                                "analyzer": _.first(_.keys(_indexes[language].analyzer))
                             },
                             "details": {
                                 "type": "text",
-                                "analyzer": _.first(_.keys(this._indexes[language].analyzer))
+                                "analyzer": _.first(_.keys(_indexes[language].analyzer))
                             },
                             "title": {
                                 "type": "text",
-                                "analyzer": _.first(_.keys(this._indexes[language].analyzer))                                
+                                "analyzer": _.first(_.keys(_indexes[language].analyzer))                                
                             },
                             "price": {
                                 "type": "nested",
@@ -179,6 +183,7 @@ class ElasticIndexer {
                                         "scaling_factor": 100
                                     },
                                     "discount": {
+                                        "type": "nested",
                                         "properties": {
                                             "amount": {
                                                 "type": "float"
@@ -230,66 +235,70 @@ class ElasticIndexer {
             })
     }
 
-    indexOffer = (options, callback) => {
-        SessionFactory.getDbConnection().offers.findOne({
-            "origin_href": options.origin_href
-        }, (err, foundOffer) => {
-            if (err) {
-                // TODO reclaim event processing
-                LOG.error(util.format('[ERROR] Checking offer failed', err));
-                return callback(err);
-            }
-
-            if (foundOffer) {
-                LOG.info(util.format('[OK] [%s] [%s] [%s] Offer content found. Proceed with indexing.', options.language, options.site, options.origin_href));
-
-                let promises: Promise<void | {}>[] = [];
-
-                if (!options.language) {
-                    _.each(_.keys(foundOffer.translations), language => {
-                        promises.push(this._indexFoundOffer(language, foundOffer));
-                    })
-                } else {
-                    promises.push(this._indexFoundOffer(options.language, foundOffer));
+    indexOffer = (options) => {
+        return new Promise((resolve, reject) => {
+            SessionFactory.getDbConnection().offers.findOne({
+                "origin_href": options.origin_href
+            }, (err, foundOffer) => {
+                if (err) {
+                    // TODO reclaim event processing
+                    LOG.error(util.format('[ERROR] Checking offer failed', err));
+                    return reject(err);
                 }
 
-                Promise.all(promises)
-                    .then(() => {
-                        LOG.info(util.format('[OK] [%s] [%s] [%s] Offer indexing succeeded.', options.language, foundOffer.site, foundOffer.origin_href));
-                        return callback();
-                    })
-                    .catch(err => {
-                        LOG.error(util.format('[ERROR] [%s] [%s] [%s] Offer indexing failed', options.language, foundOffer.site, foundOffer.origin_href, err));
-                        return callback();
-                    });
-            }
-            else {
-                LOG.error(util.format('[ERROR] [%s] [%s] [%s] Offer not found. Indexing failed.', options.language, options.site, options.origin_href));
-                return callback();
-            }
+                if (foundOffer) {
+                    LOG.info(util.format('[OK] [%s] [%s] [%s] Offer content found. Proceed with indexing.', options.language, options.site, options.origin_href));
+
+                    let promises: Promise<void | {}>[] = [];
+
+                    if (!options.language) {
+                        _.each(_.keys(foundOffer.translations), language => {
+                            promises.push(this._indexFoundOffer(language, foundOffer));
+                        })
+                    } else {
+                        promises.push(this._indexFoundOffer(options.language, foundOffer));
+                    }
+
+                    return Promise.all(promises)
+                        .then(() => {
+                            LOG.info(util.format('[OK] [%s] [%s] [%s] Offer indexing succeeded.', options.language, foundOffer.site, foundOffer.origin_href));
+                            return resolve();
+                        })
+                        .catch(err => {
+                            LOG.error(util.format('[ERROR] [%s] [%s] [%s] Offer indexing failed', options.language, foundOffer.site, foundOffer.origin_href, err));
+                            return reject(err);
+                        });
+                }
+                else {
+                    LOG.error(util.format('[ERROR] [%s] [%s] [%s] Offer not found. Indexing failed.', options.language, options.site, options.origin_href));
+                    return resolve();
+                }
+            });
         });
     };
 
     private _indexFoundOffer(language, foundOffer) {
-        let data = _.cloneDeep(foundOffer);
-        let translations = data.translations[language];
+        LOG.info(util.format('[OK] [%s] [%s] [%s] Re-index offer content.', language, foundOffer.site, foundOffer.origin_href));
 
-        if (!translations) {
-            return Promise.reject(new Error('No translation found for ' + language));
-        }
-
-        delete translations.content;
-
-        data = _.extend(data, translations);
-
-        delete data._id;
-        delete data.pictures;
-        delete data.translations;
-        delete data.language;
-
-        LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Remove existing indexed document.', language, data.site, data.origin_href, data.href));
-
-        return new Promise((fulfill, reject) => {
+        return new Promise((resolve, reject) => {
+            let data = _.cloneDeep(foundOffer);
+            let translations = data.translations[language];
+    
+            if (!translations) {
+                return reject(new Error('No translation found for ' + language));
+            }
+    
+            delete translations.content;
+    
+            data = _.extend(data, translations);
+    
+            delete data._id;
+            delete data.pictures;
+            delete data.translations;
+            delete data.language;
+    
+            LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Remove existing indexed document.', language, data.site, data.origin_href, data.href));
+    
             SessionFactory.getElasticsearchConnection().deleteByQuery({
                 index: 'salestracker-' + language,
                 type: 'offers',
@@ -298,7 +307,7 @@ class ElasticIndexer {
                         term: { origin_href: data.origin_href }
                     }
                 }
-            }, function (err) {
+            }, err => {
                 if (err) {
                     LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Removing indexed document failed', language, data.site, data.origin_href, data.href, err));
                     return reject(err);
@@ -317,7 +326,7 @@ class ElasticIndexer {
                     }
 
                     LOG.info(util.format('[OK] [%s] [%s] [%s] [%s ] Adding new document succeeded', language, data.site, data.origin_href, data.href));
-                    return fulfill();
+                    return resolve();
                 });
             });
         });

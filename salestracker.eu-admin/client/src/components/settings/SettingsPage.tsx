@@ -1,4 +1,5 @@
 
+import _ = require('lodash');
 import * as React from 'react';
 import { Button, InputGroup, Tabs, Tab, FormGroup, FormControl, FormControlProps } from 'react-bootstrap';
 import { ComponentBase } from 'resub';
@@ -23,8 +24,8 @@ class SettingsPage extends ComponentBase<{}, SettingsPageState> {
         const categories = SettingsStore.getCategories();
 
         return {
-            sites,
-            categories
+            sites: JSON.stringify(sites, undefined, 4),
+            categories: JSON.stringify(categories, undefined, 4)
         };
     }
 

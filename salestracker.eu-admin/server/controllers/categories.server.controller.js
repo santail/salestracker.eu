@@ -45,7 +45,7 @@ exports.update = function (req, res) {
                 if (category._id) {
                     delete category._id;
                 }
-
+        
                 return new Category(category);
             });
 

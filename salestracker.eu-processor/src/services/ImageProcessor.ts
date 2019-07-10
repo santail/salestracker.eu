@@ -8,35 +8,37 @@ import SessionFactory from '../../lib/services/SessionFactory';
 
 class ImageProcessor {
 
-    process(options, callback) {
+    process(options) {
         LOG.info(util.format('[OK] [%s] [%s] [%s] Offer image processing started', options.site, options.origin_href, options.href));
 
-        SessionFactory.getDbConnection().offers.findOne({
-            origin_href: options.origin_href
-        }, (err, foundOffer) => {
-            if (err) {
-                LOG.error(util.format('[ERROR] [%s] [%s] [%s] Offer image processing failed. Offer not found.', options.site, options.origin_href, options.href, err));
-                return callback(err);
-            }
+        return new Promise((resolve, reject) => {
+            SessionFactory.getDbConnection().offers.findOne({
+                origin_href: options.origin_href
+            }, (err, foundOffer) => {
+                if (err) {
+                    LOG.error(util.format('[ERROR] [%s] [%s] [%s] Offer image processing failed. Offer not found.', options.site, options.origin_href, options.href, err));
+                    return reject(err);
+                }
 
-            if (!foundOffer) {
-                // TODO Mark somehow failed offer and re-run harvesting
-                LOG.error(util.format('[ERROR] [%s] [%s] [%s] Offer image processing failed. Offer not found.', options.site, options.origin_href, options.href));
-                return callback(new Error('Offer not found for update: ' + options.origin_href));
-            }
+                if (!foundOffer) {
+                    // TODO Mark somehow failed offer and re-run harvesting
+                    LOG.error(util.format('[ERROR] [%s] [%s] [%s] Offer image processing failed. Offer not found.', options.site, options.origin_href, options.href));
+                    return reject(new Error('Offer not found for update: ' + options.origin_href));
+                }
 
-            Promise.all([
-                this._resizeImage(options, 100, 100),
-                this._resizeImage(options, 200, 200)
-            ])
+                return Promise.all([
+                    this._resizeImage(options, 100, 100),
+                    this._resizeImage(options, 200, 200)
+                ])
                 .then(() => {
                     LOG.info(util.format('[OK] [%s] [%s] [%s] Offer image processed. ', options.site, options.origin_href, options.href));
-                    return callback();
+                    return resolve();
                 })
                 .catch(err => {
                     LOG.error(util.format('[ERROR] [%s] [%s] [%s] Offer image processing failed.', options.site, options.origin_href, options.href, err));
-                    return callback(new Error('Offer processing failed: ' + options.origin_href + ' ' + options.href));
+                    return reject(err);
                 });
+            });
         });
     }
 

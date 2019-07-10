@@ -11,7 +11,7 @@ import ParserFactory from '../../lib/services/ParserFactory';
 
 class IndexPageHarvester {
 
-    public processFirstPage = (options, callback) => {
+    public processFirstPage = (options) => {
         const parser = ParserFactory.getParser(options.site);
 
         options.language = parser.getMainLanguage();
@@ -20,30 +20,32 @@ class IndexPageHarvester {
             options.hierarchy = 1;
         }
 
+        LOG.info(util.format('[OK] [%s] [%s] Site first page processing started', options.language, options.site));
+
         if (parser.config.has_index_page) {
-            this._processSiteWithIndexPage(options, callback);
+            return this._processSiteWithIndexPage(options);
         } else {
-            this._processSiteWithoutIndexPage(options, callback);
+            return this._processSiteWithoutIndexPage(options);
         }
     };
 
-    private _processSiteWithIndexPage(options, callback) {
+    private _processSiteWithIndexPage(options) {
         const parser = ParserFactory.getParser(options.site);
 
         options.href = parser.config.index_page;
 
-        this.harvestIndexPage(options, (err, offers) => {
-            if (err) {
-                LOG.error(util.format('[ERROR] [%s] Site index page harvesting failed', options.site, err));
-                return callback(err);
-            }
+        LOG.info(util.format('[OK] [%s] [%s] [%s] Site first page containing index processing started', options.language, options.site, options.href));
 
-            LOG.info(util.format('[OK] [%s] Site index page harvesting finished', options.site));
-            return callback(null, offers);
-        });
+        return this.harvestIndexPage(options)
+            .then(() => {
+                LOG.info(util.format('[OK] [%s] [%s] [%s] Site first page containing index processing finished', options.language, options.site, options.href));
+            })
+            .catch(err => {
+                LOG.error(util.format('[ERROR] [%s] [%s] [%s] Site first page containing index processing failed', options.language, options.site, options.href, err));
+            });
     }
 
-    private _processSiteWithoutIndexPage(options, callback) {
+    private _processSiteWithoutIndexPage(options) {
         const parser = ParserFactory.getParser(options.site);
 
         const href = parser.compileNextPageHref();
@@ -52,7 +54,7 @@ class IndexPageHarvester {
 
         if (!parser.config.paging) {
             LOG.info(util.format('[OK] [%s] No paging found', options.site));
-            return callback();
+            return Promise.resolve();
         }
 
         let config = {
@@ -65,18 +67,16 @@ class IndexPageHarvester {
             config.infinite_pagination = true;
         }
 
-        WorkerService.schedulePageProcessing(config, 1000)
+        return WorkerService.schedulePageProcessing(config, 1000)
             .then(() => {
                 LOG.info(util.format('[OK] [%s] [%s] Next infinite pagination page harvesting scheduled', options.site, href));
-                return callback();
             })
             .catch(err => {
                 LOG.error(util.format('[ERROR] [%s] [%s] Next infinite pagination page harvesting not scheduled', options.site, href, err));
-                return callback(err);
             });
     }
 
-    public harvestIndexPage = (options, callback) => {
+    public harvestIndexPage = (options) => {
         LOG.info(util.format('[OK] [%s] [%s] Fetching index page', options.site, options.href));
 
         const parser = ParserFactory.getParser(options.site);
@@ -86,39 +86,68 @@ class IndexPageHarvester {
         }
 
         const crawler = new Crawler();
-        crawler.request({
-            url: options.href,
-            json: parser.config.json,
-            headers: parser.config.headers,
-            payload: options.payload,
-            onError: (err) => {
-                LOG.error(util.format('[ERROR] [%s] [%s] Fetching index page failed', options.site, options.href, err));
-                return callback();
-            },
-            onSuccess: (content) => {
-                if (options.hierarchy) { // if this is initial index page containing first level of hierarchical catalog links
-                    this._processHierarchicalIndexPage(options, content, callback);
-                } else if (parser.config.paging) {
-                    this._startPaginatedIndexPageProcessing(options, content, callback);
-                } else {
-                    this._startSimpleIndexPageProcessing(options, content, callback);
+
+        return new Promise((resolve, reject) => {
+            crawler.request({
+                url: options.href,
+                json: parser.config.json,
+                headers: parser.config.headers,
+                payload: options.payload,
+                onError: err => {
+                    LOG.error(util.format('[ERROR] [%s] [%s] [%s] Fetching index page failed', options.language, options.site, options.href, err));
+                    return reject(err);
+                },
+                onSuccess: (content) => {
+                    if (options.hierarchy) { // if this is initial index page containing first level of hierarchical catalog links
+                        return this._processHierarchicalIndexPage(options, content)
+                            .then(() => {
+                                LOG.info(util.format('[OK] [%s] [%s] [%s] Index page with hierarchy processing finished', options.language, options.site, options.href));
+                                return resolve();
+                            })
+                            .catch(err => {
+                                LOG.error(util.format('[ERROR] [%s] [%s] [%s] Index page with hierarchy processing failed', options.language, options.site, options.href, err));
+                                return reject();
+                            });
+                    } else if (parser.config.paging) {
+                        return this._startPaginatedIndexPageProcessing(options, content)
+                            .then(() => {
+                                LOG.info(util.format('[OK] [%s] [%s] [%s] Index page with paging processing finished', options.language, options.site, options.href));
+                                return resolve();
+                            })
+                            .catch(err => {
+                                LOG.error(util.format('[ERROR] [%s] [%s] [%s] Index page with paging processing failed', options.language, options.site, options.href, err));
+                                return reject();
+                            });
+                    } else {
+                        return this._startSimpleIndexPageProcessing(options, content)
+                            .then(() => {
+                                LOG.info(util.format('[OK] [%s] [%s] [%s] Index page with no hierarchy and paging processing finished', options.language, options.site, options.href));
+                                return resolve();
+                            })
+                            .catch(err => {
+                                LOG.error(util.format('[ERROR] [%s] [%s] [%s] Index page with no hierarchy and paging processing failed', options.language, options.site, options.href, err));
+                                return reject();
+                            });
+                    }
                 }
-            }
+            });
         });
     };
 
-    private _processHierarchicalIndexPage = (options, content, callback) => {
+    private _processHierarchicalIndexPage = (options, content) => {
+        LOG.info(util.format('[OK] [%s] [%s] Index page with hierarchy processing started', options.site, options.href));
+
         const parser = ParserFactory.getParser(options.site);
         const hierarchicalIndexPages = parser.getHierarchicalIndexPages(options, content);
 
         if (hierarchicalIndexPages.length) {
-            this._processHierarchicalPageWithCategories(options, hierarchicalIndexPages, callback);
+            return this._processHierarchicalPageWithCategories(options, hierarchicalIndexPages);
         } else {
-            this._processHierarchicalPageWithOffers(options, callback);
+            return this._processHierarchicalPageWithOffers(options);
         }
     };
 
-    private _processHierarchicalPageWithCategories(options, hrefs, callback) {
+    private _processHierarchicalPageWithCategories(options, hrefs) {
         const parser = ParserFactory.getParser(options.site);
 
         LOG.info(util.format('[OK] [%s] [%s] Next hiearchical page reached. Process as index page.', options.site, options.href));
@@ -144,47 +173,43 @@ class IndexPageHarvester {
                 });
         });
 
-        Promise.all(categorizedIndexesHandlers)
+        return Promise.all(categorizedIndexesHandlers)
             .then(() => {
-                LOG.info(util.format('[OK] [%s] Pages processing scheduled', options.site));
-                return callback();
+                LOG.info(util.format('[OK] [%s] Hierarhical index pages processing scheduled', options.site));
             })
             .catch(err => {
-                LOG.error(util.format('[ERROR] [%s] Pages processing not scheduled', options.site, err));
-                return callback(err);
+                LOG.error(util.format('[ERROR] [%s] Hierarhical index pages processing not scheduled', options.site, err));
             });
     }
 
-    private _processHierarchicalPageWithOffers(options, callback) {
+    private _processHierarchicalPageWithOffers(options) {
         LOG.info(util.format('[OK] [%s] [%s] Lowest hiearchical page reached. Process as index page.', options.site, options.href));
 
-        WorkerService.scheduleIndexPageProcessing({
-                'site': options.site,
-                'href': options.href
-            })
-            .then(() => {
-                LOG.info(util.format('[OK] [%s] [%s] Lowest hiearchical page harvesting scheduled', options.site, options.href));
-                return callback();
-            })
-            .catch(err => {
-                LOG.error(util.format('[ERROR] [%s] [%s] Lowest hiearchical page harvesting not scheduled', options.site, options.href, err));
-                return callback(err);
-            });
+        return WorkerService.scheduleIndexPageProcessing({
+            'site': options.site,
+            'href': options.href
+        })
+        .then(() => {
+            LOG.info(util.format('[OK] [%s] [%s] Lowest hiearchical page harvesting scheduled', options.site, options.href));
+        })
+        .catch(err => {
+            LOG.error(util.format('[ERROR] [%s] [%s] Lowest hiearchical page harvesting not scheduled', options.site, options.href, err));
+        });
     }
 
-    private _startPaginatedIndexPageProcessing = (options, content, callback) => {
+    private _startPaginatedIndexPageProcessing = (options, content) => {
         const parser = ParserFactory.getParser(options.site);
 
         LOG.info(util.format('[OK] [%s] Paging found', options.site));
 
         if (parser.config.paging.finite) {
-            this._processFinitePaginationIndexPage(options, content, callback);
+            return this._processFinitePaginationIndexPage(options, content);
         } else {
-            this._processInfinitePaginationIndexPage(options, callback);
+            return this._processInfinitePaginationIndexPage(options);
         }
     };
 
-    private _processFinitePaginationIndexPage(options, content, callback): any {
+    private _processFinitePaginationIndexPage(options, content): any {
         const parser = ParserFactory.getParser(options.site);
         const pagingParams = parser.compilePagingParameters(content, options);
 
@@ -225,50 +250,44 @@ class IndexPageHarvester {
             });
         }
 
-        Promise.all(paginatedIndexesHandlers)
+        return Promise.all(paginatedIndexesHandlers)
             .then(() => {
-                LOG.info(util.format('[OK] [%s] Pages processing scheduled', options.site));
-                return callback();
+                LOG.info(util.format('[OK] [%s] Finite pagination pages processing scheduled', options.site));
             })
             .catch(err => {
-                LOG.error(util.format('[ERROR] [%s] Pages processing not scheduled', options.site, err));
-                return callback(err);
+                LOG.error(util.format('[ERROR] [%s] Finite pagination pages processing not scheduled', options.site, err));
             })
     };
 
-    private _processInfinitePaginationIndexPage(options: any, callback: any): any {
+    private _processInfinitePaginationIndexPage(options: any): any {
         const parser = ParserFactory.getParser(options.site);
         const href = parser.compileNextPageHref();
 
         LOG.info(util.format('[OK] [%s] [%s] Next infinite pagination page processing started', options.site, href));
 
-        WorkerService.schedulePageProcessing({
-                'site': options.site,
-                'href': href,
-                'page_index': 1,
-                'infinite_pagination': true
-            }, 1000)
-            .then(() => {
-                LOG.info(util.format('[OK] [%s] [%s] Next infinite pagination page harvesting scheduled', options.site, href));
-                return callback();
-            })
-            .catch(err => {
-                LOG.error(util.format('[ERROR] [%s] [%s] Next infinite pagination page harvesting not scheduled', options.site, href, err));
-                return callback(err);
-            });
+        return WorkerService.schedulePageProcessing({
+            'site': options.site,
+            'href': href,
+            'page_index': 1,
+            'infinite_pagination': true
+        }, 1000)
+        .then(() => {
+            LOG.info(util.format('[OK] [%s] [%s] Next infinite pagination page harvesting scheduled', options.site, href));
+        })
+        .catch(err => {
+            LOG.error(util.format('[ERROR] [%s] [%s] Next infinite pagination page harvesting not scheduled', options.site, href, err));
+        });
     };
 
-    private _startSimpleIndexPageProcessing = function (options, content, callback) {
+    private _startSimpleIndexPageProcessing = function (options, content) {
         LOG.info(util.format('[OK] [%s] [%s] Simple page without paging processing started', options.site, options.href));
 
-        PagingSimple.processPage(content, options)
+        return PagingSimple.processPage(content, options)
             .then(() => {
-                LOG.info(util.format('[OK] [%s] Offers processing scheduled', options.site));
-                return callback();
+                LOG.info(util.format('[OK] [%s] [%s] Simple page without paging processing finished', options.site, options.href));
             })
             .catch(err => {
-                LOG.error(util.format('[ERROR] [%s] Offers processing not scheduled', options.site, err));
-                return callback(err);
+                LOG.error(util.format('[ERROR] [%s] [%s] Simple page without paging processing failed', options.site, options.href, err));
             });
     };
 }

@@ -1,5 +1,4 @@
 const _ = require('lodash');
-
 import { StoreBase, AutoSubscribeStore, autoSubscribe } from 'resub';
 
 export interface IOffersRequestResult {
@@ -7,8 +6,24 @@ export interface IOffersRequestResult {
     categories: string;
 };
 
+export interface ISite {
+    name: string;
+    href: string;
+    active?: boolean;
+};
+
+export interface ICategory {
+    category: string;
+    tags: string[];
+};
+
+export interface ISettings {
+    sites: ISite[];
+    categories: ICategory[];
+};
+
 @AutoSubscribeStore
-export class OfferStore extends StoreBase {
+export class SettingsStore extends StoreBase {
     private _sites: string = '';
     private _categories: string = '';
 
@@ -48,7 +63,7 @@ export class OfferStore extends StoreBase {
         })
         .then((response) => response.json())
         .then((responseJson) => {
-            this._sites = JSON.stringify(responseJson, undefined, 4);
+            this._sites = responseJson;
             this.trigger();
         })
         .catch((error) => {
@@ -66,7 +81,7 @@ export class OfferStore extends StoreBase {
         })
         .then((response) => response.json())
         .then((responseJson) => {
-            this._categories = JSON.stringify(responseJson, undefined, 4);
+            this._categories = responseJson;
             this.trigger();
         })
         .catch((error) => {
@@ -123,4 +138,4 @@ export class OfferStore extends StoreBase {
     }
 }
 
-export default new OfferStore();
+export default new SettingsStore();

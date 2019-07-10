@@ -26,7 +26,7 @@ exports.processSite = function (req, res) {
     };
 
     jobs
-        .create('harvestSite', job)
+        .create(job.site ? 'harvestSite' : 'harvestSites', job)
         .attempts(3)
         .backoff({ delay: 60 * 1000, type: 'exponential' })
         .removeOnComplete(true)

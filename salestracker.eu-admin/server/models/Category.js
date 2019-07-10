@@ -11,7 +11,7 @@ var mongoose = require('mongoose'),
  */
 var CategorySchema = new Schema({
 	category: String,
-    tags: String
+    tags: [String]
 }, {
 	autoIndex: process.env.NODE_ENV === 'development'
 });

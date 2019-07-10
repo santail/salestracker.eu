@@ -78,9 +78,11 @@ curl -XPOST 'localhost:9200/salestracker-eng/offers/_delete_by_query?conflicts=p
 
 ### to run elasticsearch 
 
+sudo chown salestracker:salestracker .data/elasticsearch/
+
 # change permissions for data folder
-chmod g+rwx .data/elasticsearch
-chgrp 1000 .data/elasticsearch
+sudo chmod g+rwx .data/elasticsearch
+sudo chgrp 1000 .data/elasticsearch
 
 # edit /etc/sysctl.conf, setting 
 vm.max_map_count=524288

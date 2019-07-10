@@ -25,20 +25,30 @@ class Harvester {
    */
   public cleanupSite = (options): Promise<void> => {
     if (!options.should_cleanup) {
+      LOG.info(util.format('[OK] [%s] Site cleanup skipped', options.site));
+
       return Promise.resolve();
     }
 
-    LOG.info(util.format('[OK] [%s] Cleanup started', options.site));
+    LOG.info(util.format('[OK] [%s] Site cleanup started', options.site));
 
     let promises = [
       this._clearDatabase(options),
       this._clearIndex(options)
     ];
 
-    return Promise.all(promises);
+    return Promise.all(promises)
+      .then(() => {
+          LOG.info(util.format('[OK] [%s] Site clean-up finished', options.site));
+      })
+      .catch(err => {
+          LOG.error(util.format('[ERROR] [%s] Site clean-up failed', options.site, err));
+      });
   };
 
   private _clearDatabase(options): Promise<void> {
+    LOG.info(util.format('[OK] [%s] Database clean-up started', options.site));
+
     try {
       this._db.offers.remove({
         'site': options.site
@@ -46,13 +56,16 @@ class Harvester {
 
       LOG.info(util.format('[OK] [%s] Database clean-up finished', options.site));
       return Promise.resolve();
-    } catch (err) {
+    } 
+    catch (err) {
       LOG.error(util.format('[ERROR] [%s] Database clean-up failed', options.site, err));
       return Promise.reject();
     }
   }
 
   private _clearIndex(options): Promise<void> {
+    LOG.info(util.format('[OK] [%s] Indexes clean-up started', options.site));
+
     let promises = _.map(['est', 'eng', 'rus'], language => {
       LOG.info(util.format('[OK] [%s] [%s] Clearing index', options.site, language));
 
@@ -75,7 +88,13 @@ class Harvester {
         });
     });
 
-    return Promise.all(promises);
+    return Promise.all(promises)
+      .then(() => {
+        LOG.info(util.format('[OK] [%s] Indexes clean-up finished', options.site));
+      })
+      .catch(err => {
+        LOG.error(util.format('[ERROR] [%s] Indexes clean-up failed', options.site, err));
+      });
   }
 
   /*
@@ -84,52 +103,58 @@ class Harvester {
   public harvestSite = (options) => {
     LOG.info(util.format('[OK] [%s] Site processing started', options.site));
 
-    return new Promise((fulfill, reject) => {
-      IndexPageHarvester.processFirstPage(options, (err, offers) => {
-        if (err) {
-          LOG.error(util.format('[ERROR] [%s] First page processing failed', options.site, err));
-          return reject(err);
-        }
-
+    return IndexPageHarvester.processFirstPage(options)
+      .then(() => {
         LOG.info(util.format('[OK] [%s] Processing first page finished', options.site));
-        return fulfill(offers);
+      })
+      .catch(err => {
+        LOG.error(util.format('[ERROR] [%s] First page processing failed', options.site, err));
       });
-    });
   };
 
   /*
    *
    */
-  public harvestIndexPage = (options, callback) => {
+  public harvestIndexPage = (options) => {
     LOG.info(util.format('[OK] [%s] [%s] Index page processing started', options.site, options.href));
 
-    IndexPageHarvester.harvestIndexPage(options, (err, offers) => {
-      if (err) {
+    return IndexPageHarvester.harvestIndexPage(options)
+      .then(() => {
+        LOG.info(util.format('[OK] [%s] Index page processing finished', options.site));
+      })
+      .catch(err => {
         LOG.error(util.format('[ERROR] [%s] Index page processing failed', options.site, err));
-        return callback(err);
-      }
-
-      LOG.info(util.format('[OK] [%s] Index page processing finished', options.site));
-      return callback(null, offers);
-    });
+      });
   };
 
   /*
    *
    */
-  public harvestPage = (options, callback) => {
+  public harvestPage = (options) => {
     LOG.info(util.format('[OK] [%s] Page harvesting %s of %s started', options.site, options.page_index, options.total_pages));
 
-    return PagingHarvester.harvestPage(options, callback);
+    return PagingHarvester.harvestPage(options)
+      .then(() => {
+        LOG.info(util.format('[OK] [%s] Page harvesting %s of %s finished', options.site, options.page_index, options.total_pages));
+      })
+      .catch(err => {
+        LOG.error(util.format('[ERROR] [%s] Page harvesting %s of %s failed', options.site, options.page_index, options.total_pages, err));
+      });
   };
 
   /*
    *
    */
-  public harvestOffer = (options, callback) => {
+  public harvestOffer = (options) => {
     LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Offer page harvesting started', options.language, options.site, options.origin_href, options.href));
 
-    return OfferHarvester.harvestOffer(options, callback);
+    return OfferHarvester.harvestOffer(options)
+      .then(() => {
+        LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Offer page harvesting finished', options.language, options.site, options.origin_href, options.href));
+      })
+      .catch(err => {
+        LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Offer page harvesting failed', options.language, options.site, options.origin_href, options.href, err));
+      });
   };
 
   /*
@@ -138,7 +163,13 @@ class Harvester {
   public harvestPicture = (options) => {
     LOG.info(util.format('[OK] [%s] [%s] [%s] Image harvesting started', options.site, options.origin_href, options.picture_href));
 
-    return ImageHarvester.harvestImage(options);
+    return ImageHarvester.harvestImage(options)
+      .then(() => {
+        LOG.info(util.format('[OK] [%s] [%s] [%s] Image harvesting finished', options.site, options.origin_href, options.picture_href));
+      })
+      .catch(err => {
+        LOG.error(util.format('[ERROR] [%s] [%s] [%s] Image harvesting failed', options.site, options.origin_href, options.picture_href, err));
+      });
   };
 }
 

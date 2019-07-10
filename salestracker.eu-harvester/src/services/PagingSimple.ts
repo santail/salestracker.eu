@@ -45,7 +45,13 @@ class PagingSimple {
             }
         }
 
-        return Promise.all(offersHandlers);
+        return Promise.all(offersHandlers)
+            .then(() => {
+                LOG.info(util.format('[OK] [%s] [%s] Offers harvesting scheduled', options.language, options.site));
+            })
+            .catch(err => {
+                LOG.error(util.format('[ERROR] [%s] [%s] Offers harvesting not scheduled', options.language, options.site, err));
+            });
     }
 
     private _proceedWithNextInfinitePage(offers, options) {

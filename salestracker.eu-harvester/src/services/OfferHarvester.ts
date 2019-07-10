@@ -38,7 +38,7 @@ interface OfferHarvestOptions {
 }
 
 class OfferHarvester {
-    public harvestOffer = (options: OfferHarvestOptions, callback) => {
+    public harvestOffer = (options: OfferHarvestOptions) => {
         const runningTime = new Date();
         const parser = ParserFactory.getParser(options.site);
 
@@ -50,71 +50,73 @@ class OfferHarvester {
             LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Offer translation harvesting requested', options.language, options.site, options.origin_href, options.href));
         }
 
-        SessionFactory.getDbConnection().offers.findOne({
-            "origin_href": options.origin_href
-        }, (err, foundOffer) => {
-            if (err) {
-                // TODO reclaim event processing
-                LOG.error(util.format('[OK] [%s] [%s] [%s] [%s] Offer not found in DB. Error occurred', options.language, options.site, options.origin_href, options.href, err));
-                return callback(err);
-            }
-
-            if (foundOffer) {
-                if (isMainOffer) {
-                    LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Main offer found in DB. Proceed with extending expiration time.', options.language, options.site, options.origin_href, options.href));
-
-                    this._extendExpirationTime(options, new Date(runningTime + parser.config.ttl))
-                        .then(() => {
-                            LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Main offer expiration time extended', options.language, options.site, options.origin_href, options.href));
-                            return callback();
-                        })
-                        .catch(err => {
-                            LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Main offer expiration time not extended', options.language, options.site, options.origin_href, options.href, err));
-                            return callback();
-                        });
+        return new Promise((resolve, reject) => {
+            SessionFactory.getDbConnection().offers.findOne({
+                "origin_href": options.origin_href
+            }, (err, foundOffer) => {
+                if (err) {
+                    // TODO reclaim event processing
+                    LOG.error(util.format('[OK] [%s] [%s] [%s] [%s] Offer not found in DB. Error occurred', options.language, options.site, options.origin_href, options.href, err));
+                    return reject(err);
                 }
-                else {
-                    const hasTranslationContent = !_.isUndefined(foundOffer.translations[options.language].content);
 
-                    if (hasTranslationContent) {
-                        LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Main offer found in DB. Offer already translated with current content. Skipping.', options.language, options.site, options.origin_href, options.href));
-                        callback();
-                    }
-                    else {
-                        LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Main offer found in DB. Offer translation not found. Proceed with harvesting',
-                            options.language, options.site, options.origin_href, options.href));
+                if (foundOffer) {
+                    if (isMainOffer) {
+                        LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Main offer found in DB. Proceed with extending expiration time.', options.language, options.site, options.origin_href, options.href));
 
-                        this._proceedWithTranslationHarvesting(options)
+                        return this._extendExpirationTime(options, new Date(runningTime + parser.config.ttl))
                             .then(() => {
-                                LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Offer translation harvested', options.language, options.site, options.origin_href, options.href));
-                                return callback();
+                                LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Main offer expiration time extended', options.language, options.site, options.origin_href, options.href));
+                                return resolve();
                             })
                             .catch(err => {
-                                LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Offer translation harvesting failed', options.language, options.site, options.origin_href, options.href, err));
-                                return callback();
+                                LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Main offer expiration time not extended', options.language, options.site, options.origin_href, options.href, err));
+                                return reject(err);
                             });
                     }
-                }
-            }
-            else {
-                if (isMainOffer) {
-                    LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Main offer not found in DB. Proceed with main offer harvesting', options.language, options.site, options.origin_href, options.href));
+                    else {
+                        const hasTranslationContent = !_.isUndefined(foundOffer.translations[options.language].content);
 
-                    this._proceedWithMainOfferHarvesting(options)
-                        .then(() => {
-                            LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Main offer harvested', options.language, options.site, options.origin_href, options.href));
-                            return callback();
-                        })
-                        .catch(err => {
-                            LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Main offer harvesting failed', options.language, options.site, options.origin_href, options.href, err));
-                            return callback(err);
-                        });
+                        if (hasTranslationContent) {
+                            LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Main offer found in DB. Offer already translated with current content. Skipping.', options.language, options.site, options.origin_href, options.href));
+                            return resolve();
+                        }
+                        else {
+                            LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Main offer found in DB. Offer translation not found. Proceed with harvesting',
+                                options.language, options.site, options.origin_href, options.href));
+
+                            return this._proceedWithTranslationHarvesting(options)
+                                .then(() => {
+                                    LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Offer translation harvested', options.language, options.site, options.origin_href, options.href));
+                                    return resolve();
+                                })
+                                .catch(err => {
+                                    LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Offer translation harvesting failed', options.language, options.site, options.origin_href, options.href, err));
+                                    return reject(err);
+                                });
+                        }
+                    }
                 }
                 else {
-                    LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Main offer not found in DB. Skip offer translation processing', options.language, options.site, options.origin_href, options.href));
-                    callback();
+                    if (isMainOffer) {
+                        LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Main offer not found in DB. Proceed with main offer harvesting', options.language, options.site, options.origin_href, options.href));
+
+                        return this._proceedWithMainOfferHarvesting(options)
+                            .then(() => {
+                                LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Main offer harvested', options.language, options.site, options.origin_href, options.href));
+                                return resolve();
+                            })
+                            .catch(err => {
+                                LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Main offer harvesting failed', options.language, options.site, options.origin_href, options.href, err));
+                                return reject(err);
+                            });
+                    }
+                    else {
+                        LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Main offer not found in DB. Skip offer translation processing', options.language, options.site, options.origin_href, options.href));
+                        return resolve();
+                    }
                 }
-            }
+            });
         });
     };
 
@@ -140,7 +142,7 @@ class OfferHarvester {
                     'href': options.href
                 };
 
-                return Promise.resolve(_.extend(translations, translationHrefs));
+                return _.extend(translations, translationHrefs);
             })
             .then(translations => {
                 LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Saving main offer page content', options.language, options.site, options.origin_href, options.href));
@@ -148,8 +150,7 @@ class OfferHarvester {
                 return this._storeOfferContent(options, translations);
             })
             .then(offer => {
-                LOG.debug(util.format('[OK] [%s] [%s] Main offer page content saved', options.site, options.href, offer));
-                LOG.info(util.format('[OK] [%s] [%s] Scheduling main offer page content processing', options.site, options.href));
+                LOG.info(util.format('[OK] [%s] [%s] [%s] Scheduling main offer page content processing', options.language, options.site, options.href));
 
                 return WorkerService.scheduleContentProcessing({
                     site: options.site,
@@ -158,10 +159,10 @@ class OfferHarvester {
                     origin_href: options.href
                 })
                 .then(() => {
-                    LOG.info(util.format('[OK] [%s] [%s] Main offer page content processing scheduled', options.site, options.href));
+                    LOG.info(util.format('[OK][%s] [%s] [%s] Main offer page content processing scheduled', options.language, options.site, options.href));
                 })
                 .catch(err => {
-                    LOG.error(util.format('[ERROR] [%s] [%s] Main offer page content processing not scheduled', options.site, options.href, err));
+                    LOG.error(util.format('[ERROR] [%s] [%s] [%s] Main offer page content processing not scheduled', options.language, options.site, options.href, err));
                 });
             });
     }
@@ -206,7 +207,7 @@ class OfferHarvester {
 
                 LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Parsing offer translation page content', options.language, options.site, options.origin_href, options.href));
 
-                return Promise.resolve(content);
+                return content;
             })
             .then(content => {
                 LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Updating offer with translation page content', options.language, options.site, options.origin_href, options.href));
@@ -237,9 +238,9 @@ class OfferHarvester {
 
         const parser = ParserFactory.getParser(options.site);
 
-        return new Promise((fulfill, reject) => {
+        return new Promise((resolve, reject) => {
             if (parser.config.json) {
-                return fulfill(options);
+                return resolve(options);
             } else {
                 const crawler = new Crawler();
                 crawler.request({
@@ -250,7 +251,7 @@ class OfferHarvester {
                         return reject(err);
                     },
                     onSuccess: data => {
-                        return fulfill(data);
+                        return resolve(data);
                     }
                 });
             }
@@ -260,7 +261,7 @@ class OfferHarvester {
     private _extendExpirationTime(options, expirationTime) {
         LOG.debug(util.format('[OK] [%s] [%s] [%s] [%s] Offers expiration time extending', options.language, options.site, options.origin_href, options.href));
 
-        return new Promise((fulfill, reject) => {
+        return new Promise((resolve, reject) => {
             SessionFactory.getDbConnection().offers.update({
                 origin_href: options.origin_href
             }, {
@@ -294,7 +295,7 @@ class OfferHarvester {
                     return Promise.all(promises)
                         .then(() => {
                             LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Offers expiration time in index extended', options.language, options.site, options.origin_href, options.href));
-                            return fulfill();
+                            return resolve();
                         })
                         .catch(err => {
                             LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Offers expiration time in index extending failed', options.language, options.site, options.origin_href, options.href));
@@ -305,7 +306,7 @@ class OfferHarvester {
     }
 
     private _extendIndexedOfferExpirationTime = (language, offer, expirationTime) => {
-        return new Promise((fulfill, reject) => {
+        return new Promise((resolve, reject) => {
             SessionFactory.getElasticsearchConnection().updateByQuery({
                 index: 'salestracker-' + language,
                 type: 'offers',
@@ -326,7 +327,7 @@ class OfferHarvester {
                 }
 
                 LOG.info(util.format('[OK] [%s] [%s] [%s] Updating indexed document succeeded', offer.site, offer.origin_href, language));
-                return fulfill();
+                return resolve();
             });
         });
     };
@@ -343,7 +344,7 @@ class OfferHarvester {
             'translations': translations
         } as any;
 
-        return new Promise((fulfill, reject) => {
+        return new Promise((resolve, reject) => {
             SessionFactory.getDbConnection().offers.save(offer, (err, savedOffer) => {
                 if (err) {
                     LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Saving offer page content failed', options.language, options.site, options.origin_href, options.href, err));
@@ -356,7 +357,7 @@ class OfferHarvester {
                 }
 
                 LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Offer page content saved', options.language, options.site, options.origin_href, options.href));
-                return fulfill(savedOffer);
+                return resolve(savedOffer);
             });
         });
     };
@@ -365,7 +366,7 @@ class OfferHarvester {
      * Here original offer could already be changed
      */
     private _updateOfferWithTranslatedContent = (options, content) => {
-        return new Promise((fulfill, reject) => {
+        return new Promise((resolve, reject) => {
             SessionFactory.getDbConnection().offers.findOne({
                 "origin_href": options.origin_href
             }, (err, foundOffer) => {
@@ -402,7 +403,7 @@ class OfferHarvester {
                     }
 
                     LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Offer translation page content saved', options.language, options.site, options.origin_href, options.href));
-                    return fulfill(updatedOffer);
+                    return resolve(updatedOffer);
                 });
             });
         });

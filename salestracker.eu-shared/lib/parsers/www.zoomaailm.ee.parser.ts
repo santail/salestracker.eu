@@ -9,7 +9,7 @@ class ZoomaailmParser extends AbstractParser {
   protected config: ParserConfiguration = {
         'site': 'https://www.zoomaailm.ee/',
         'has_index_page': true,
-        'index_page': 'https://www.zoomaailm.ee/ee/specials/',
+        'index_page': 'https://www.zoomaailm.ee/ee/tovary-dnya',
         'ttl': 2 * 60 * 60 * 1000,
         'languages': {
             'est': {
@@ -32,7 +32,7 @@ class ZoomaailmParser extends AbstractParser {
         },
         'paging': {
             'finite': true,
-            'pattern': '&limit=12&p={paging_pagenumber}',
+            'pattern': '?limit=12&p={paging_pagenumber}',
             'first': function ($) {
                 var controls = this.controls!!($);
                 if (!controls.length) {

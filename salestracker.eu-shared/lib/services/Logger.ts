@@ -1,6 +1,6 @@
 "use strict";
 
-const winston = require('winston');
+import * as winston from 'winston';
 
 let Logger = winston.createLogger({
   transports: [

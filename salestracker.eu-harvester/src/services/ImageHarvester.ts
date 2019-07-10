@@ -15,13 +15,12 @@ import WorkerService from "./WorkerService";
 class ImageHarvester {
 
     public harvestImage = (options) => {
-        return new Promise((fulfill, reject) => {
-
+        return new Promise((resolve, reject) => {
             fs.open(options.picture_path, 'wx', (err) => {
                 if (err) {
                     if (err.code === 'EEXIST') {
                         LOG.info(util.format('[OK] [%s] [%s] [%s] Image already stored. Skipping', options.site, options.picture_href, options.picture_path));
-                        return fulfill();
+                        return resolve();
                     }
                 }
 
@@ -35,27 +34,35 @@ class ImageHarvester {
                 })
                     .then(res => {
                         if (res.body && res.statusCode === 200) {
-                            fs.ensureDir(path.dirname(options.picture_path), '0777', (err) => {
+                            fs.ensureDir(path.dirname(options.picture_path), '0777', err => {
                                 if (err) {
                                     if (err.code == 'EEXIST') {
-                                        // do nothing 
+                                        // do nothing as directory already exists
                                     }
                                 }
 
                                 LOG.info(util.format('[OK] [%s] [%s] Storing image', options.site, options.picture_href, options.picture_path));
 
-                                writeFile(options.picture_path, res.body, 'binary')
+                                return writeFile(options.picture_path, res.body, 'binary')
                                     .then(() => {
                                         return WorkerService.scheduleImageProcessing({
                                             site: options.site,
                                             href: options.picture_href,
                                             origin_href: options.origin_href,
                                             picture_path: options.picture_path
+                                        })
+                                        .then(() => {
+                                            LOG.info(util.format('[OK] [%s] [%s] Image processing scheduled %s', options.site, options.picture_href, options.picture_path));
+                                            return resolve();
+                                        })
+                                        .catch(err => {
+                                            LOG.error(util.format('[ERROR] [%s] Image processing not scheduled.', options.site, options.picture_href, options.picture_path, err));
+                                            return reject(err);
                                         });
                                     })
                                     .then(() => {
                                         LOG.info(util.format('[OK] [%s] [%s] Storing image succeeded', options.site, options.picture_href, options.picture_path));
-                                        return fulfill();
+                                        return resolve();
                                     })
                                     .catch(err => {
                                         LOG.error(util.format('[ERROR] [%s] Image storing failed %s', options.site, options.picture_href, err));
@@ -65,18 +72,18 @@ class ImageHarvester {
                         }
                         else if (res.statusCode === 404) {
                             LOG.error(util.format('[ERROR] [%s] Image was not found %s', options.site, options.picture_href));
-                            return fulfill(); // no image found, just log and complete job
+                            return resolve(); // no image found, just log and complete job
                         }
                         else {
+                            LOG.error(util.format('[ERROR] [%s] Image harvesting failed %s', options.site, options.picture_href));
                             return reject();
                         }
                     })
                     .catch(err => {
-                        LOG.error(util.format('[ERROR] [%s] Image retrieving failed %s', options.site, options.picture_href));
+                        LOG.error(util.format('[ERROR] [%s] Image retrieving failed %s', options.site, options.picture_href, err));
                         return reject(err);
                     });
             });
-
         });
     };
 

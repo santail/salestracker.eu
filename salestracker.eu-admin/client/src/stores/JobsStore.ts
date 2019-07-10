@@ -1,10 +1,12 @@
 const _ = require('lodash');
+import { StoreBase, AutoSubscribeStore, autoSubscribe } from 'resub';
 
-import { StoreBase, AutoSubscribeStore, autoSubscribe, autoSubscribeWithKey } from 'resub';
 import { IOffer } from './OfferStore';
+import SettingsStore, { ISite } from './SettingsStore';
 
 export interface ISite {
-    site?: string;
+    name?: string;
+    href: string;
 };
 
 export interface IJob {
@@ -62,21 +64,26 @@ export class JobsStore extends StoreBase {
         this.trigger();
     }
 
-    processSite = (site: ISite): void => {
-        const job = {
-            'site': site.site,
-            'should_cleanup': true,
-            'cleanup_uploads': true
-        };
+    processSites = (sites: any, options: any): void => {
+        const siteConfigs = !sites.length ? SettingsStore.getSites() : sites;
 
-        fetch('/api/jobs/process/site', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(job)
-        })
+        const jobs = _.map(siteConfigs, (config: ISite) => {
+            return {
+                'site': config.href,
+                'should_cleanup': options.shouldCleanup,
+                'cleanup_uploads': options.cleanupUploads
+            };
+        });
+
+        _.each(jobs, (job: any) => {
+            fetch('/api/jobs/process/site', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(job)
+            })
             .then((response) => response.json())
             .then((responseJson) => {
                 console.log(responseJson);
@@ -84,6 +91,7 @@ export class JobsStore extends StoreBase {
             .catch((error) => {
                 console.error(error);
             });
+        });
     }
 
     processOfferContent = (offer: IOffer): void => {

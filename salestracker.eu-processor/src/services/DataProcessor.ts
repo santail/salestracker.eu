@@ -20,77 +20,89 @@ class DataProcessor {
 
     private _stopProcessingRequested;
 
-    process = (options, callback): any => {
+    process = (options): any => {
         this._stopProcessingRequested = false;
 
         if (!_.isEmpty(options.origin_href)) {
             LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Offer data processing requested.', options.language, options.site, options.origin_href, options.href));
-            this._processSingleOffer(options, callback);
+            return this._processSingleOffer(options);
         } else if (!_.isEmpty(options.site)) {
             LOG.info(util.format('[OK] [%s] Site offers data processing requested.', options.site));
-            this._processSiteOffers(options, callback);
+            return this._processSiteOffers(options);
         } else {
             LOG.info(util.format('[OK] [%s] All sites offers data processing requested.', options.site));
-            this._processAllSitesOffers(options, callback);
+            return this._processAllSitesOffers(options);
         }
     };
 
-    stopProcess = (options, callback): any => {
+    stopProcess = (options): any => {
         this._stopProcessingRequested = true;
 
         if (options.site) {
             LOG.info(util.format('[OK] [%s] Site offers processing stopped.', options.site));
-            this._stopProcessSiteOffers(options, callback);
+            return this._stopProcessSiteOffers(options);
         } else {
             LOG.info(util.format('[OK] All sites offers processing stopped.'));
-            this._stopProcessAllSitesOffers(callback);
+            return this._stopProcessAllSitesOffers();
         }
     };
 
-    private _stopProcessSiteOffers(options, callback) {
-        clearTimeout(this._processorTimeout[options.site]);
-        return callback();
-    }
+    requestCategoriesProcessing = (options, offer) => {
+        const parser = ParserFactory.getParser(options.site);
 
-    private _stopProcessAllSitesOffers(callback) {
-        _.each(_.keys(this._processorTimeout), site => {
-            clearTimeout(this._processorTimeout[site]);
+        LOG.info(util.format('[OK] [%s] [%s] [%s] Process categories.', options.language, options.site, offer.origin_href));
+
+        // process main offer only
+        if (options.language && options.origin_href && !parser.config.languages[options.language].main) {
+            LOG.info(util.format('[OK] [%s] [%s] [%s] Offer translation. Skip categories processing.', options.language, options.site, offer.origin_href));
+
+            return Promise.resolve();
+        }
+
+        return WorkerService.scheduleCategoriesProcessing({
+            'site': options.site,
+            'language': options.language,
+            'href': options.href,
+            'origin_href': options.origin_href
+        })
+        .catch(err => {
+            LOG.error(util.format('[ERROR] [%s] Categories processing not scheduled.', options.origin_href, err));
         });
+    };
 
-        return callback();
-    }
+    private _processAllSitesOffers(options) {
+        // find all sites
+        return new Promise((fulfill, reject) => {
+            SessionFactory.getDbConnection().sites.find({
+                "$query": {
+                    active: true
+                }
+            }, (err, foundSites) => {
+                if (err) {
+                    // TODO reclaim event processing
+                    LOG.error(util.format('[ERROR] Checking offer failed', err));
+                    return reject();
+                }
 
-    private _processAllSitesOffers(options, callback) {
-        SessionFactory.getDbConnection().sites.find({
-            "$query": {
-                active: true
-            }
-        }, (err, foundSites) => {
-            if (err) {
-                // TODO reclaim event processing
-                LOG.error(util.format('[ERROR] Checking offer failed', err));
-                return callback(err);
-            }
+                if (this._stopProcessingRequested) {
+                    LOG.info(util.format('[OK] [%s] All sites offers processing stop requested. Clearing timeout.', options.site));
 
-            if (this._stopProcessingRequested) {
-                LOG.info(util.format('[OK] [%s] All sites offers processing stop requested. Clearing timeout.', options.site));
+                    clearTimeout(this._processorTimeout['all']);
+                    _.each(foundSites, site => {
+                        clearTimeout(this._processorTimeout[site.href]);
+                    });
 
-                clearTimeout(this._processorTimeout['all']);
+                    LOG.info(util.format('[OK] [%s] All sites offers processing stop requested. Stopping.', options.site));
+                    return fulfill();
+                }
+
                 _.each(foundSites, site => {
                     clearTimeout(this._processorTimeout[site.href]);
                 });
 
-                LOG.info(util.format('[OK] [%s] All sites offers processing stop requested. Stopping.', options.site));
-                return callback();
-            }
-
-            _.each(foundSites, site => {
-                clearTimeout(this._processorTimeout[site.href]);
+                this._processAllOffers(options);
+                return fulfill();
             });
-
-            this._processAllOffers(options);
-
-            return callback();
         });
     };
 
@@ -121,7 +133,7 @@ class DataProcessor {
 
                 this._processFoundOffer(options, foundOffer)
                     .then(() => {
-                        this._processAllOffers(options);
+                        return this._processAllOffers(options);
                     })
                     .catch(() => {
                         LOG.error(util.format('[ERROR] Checking offer failed', err));
@@ -130,102 +142,111 @@ class DataProcessor {
         }, 0)
     };
 
-    private _processSiteOffers(options, callback) {
-        if (this._stopProcessingRequested) {
-            LOG.info(util.format('[OK] [%s] Site offers processing stop requested. Clearing timeout.', options.site));
-            clearTimeout(this._processorTimeout[options.site]);
-            LOG.info(util.format('[OK] [%s] Site offers processing stop requested. Stopping.', options.site));
-            return callback();
-        }
-
-        let criteria: any[] = [{
-            site: options.site
-        }];
-
-        const currentTime = new Date().getTime();
+    private _processSiteOffers(options) {
+        return new Promise((resolve, reject) => {
+            if (this._stopProcessingRequested) {
+                LOG.info(util.format('[OK] [%s] Site offers processing stop requested. Clearing timeout.', options.site));
+                clearTimeout(this._processorTimeout[options.site]);
     
-        if (this._lastProcessedOfferId && this._lastProcessedOfferParsedTime) {
-            criteria.push({
-                _id: {
-                    "$ne": this._lastProcessedOfferId
-                },
-                parsed: {
-                    "$gt": new Date(this._lastProcessedOfferParsedTime)
-                },
-                expires: { 
-                    "$gt":  new Date(currentTime - 2 * 60 * 60 * 1000) 
-                }
-            });
-        }
-
-        SessionFactory.getDbConnection().offers.findOne({ 
-            "$query": {
-                $and: criteria
-            }, 
-            "$orderBy": { 
-                "parsed": 1 
+                LOG.info(util.format('[OK] [%s] Site offers processing stop requested. Stopping.', options.site));
+                return resolve();
             }
-        }, (err, foundOffer) => {            
-            if (err) {
-                // TODO reclaim event processing
-                LOG.error(util.format('[ERROR] Next offer not found. Stop processing.', err));
-                clearTimeout(this._processorTimeout[options.site]);
-                return callback(err);
-            }
-
-            if (!foundOffer) {
-                LOG.error(util.format('[ERROR] Next offer not found. Stop processing.'));
-                clearTimeout(this._processorTimeout[options.site]);
-
-                this._lastProcessedOfferId = null;
-                this._lastProcessedOfferParsedTime = null;
-                return callback();
-            }
-
-            LOG.info(util.format('[OK] [%s] [%s] Offer found. Proceed with processing data.', foundOffer.site, foundOffer.origin_href));
-
-            this._lastProcessedOfferId = foundOffer._id;
-            this._lastProcessedOfferParsedTime = foundOffer.parsed;
-
-            this._processFoundOffer(options, foundOffer)
-                .then(() => {
-                    LOG.info(util.format('[OK] [%s] [%s] Processing offer data finished. Next offer.', foundOffer.site, foundOffer.origin_href));
-
-                    this._processorTimeout[options.site] = setTimeout(() => {
-                        this._processSiteOffers(options, callback);
-                    }, 0)
-                })
-                .catch(() => {
-                    LOG.error(util.format('[ERROR] Checking offer failed', err));
-                    callback();
+    
+            let criteria: any[] = [{
+                site: options.site
+            }];
+    
+            const currentTime = new Date().getTime();
+        
+            if (this._lastProcessedOfferId && this._lastProcessedOfferParsedTime) {
+                criteria.push({
+                    _id: {
+                        "$ne": this._lastProcessedOfferId
+                    },
+                    parsed: {
+                        "$gt": new Date(this._lastProcessedOfferParsedTime)
+                    },
+                    expires: { 
+                        "$gt":  new Date(currentTime - 2 * 60 * 60 * 1000) 
+                    }
                 });
+            }
+
+            SessionFactory.getDbConnection().offers.findOne({ 
+                "$query": {
+                    $and: criteria
+                }, 
+                "$orderBy": { 
+                    "parsed": 1 
+                }
+            }, (err, foundOffer) => {            
+                if (err) {
+                    // TODO reclaim event processing
+                    LOG.error(util.format('[ERROR] Next offer not found. Stop processing.', err));
+                    clearTimeout(this._processorTimeout[options.site]);
+                    return reject(new Error(''));
+                }
+
+                if (!foundOffer) {
+                    LOG.error(util.format('[OK] Next offer not found. Stop processing.'));
+                    clearTimeout(this._processorTimeout[options.site]);
+
+                    this._lastProcessedOfferId = null;
+                    this._lastProcessedOfferParsedTime = null;
+                    return resolve();
+                }
+
+                LOG.info(util.format('[OK] [%s] [%s] Offer found. Proceed with processing data.', foundOffer.site, foundOffer.origin_href));
+
+                this._lastProcessedOfferId = foundOffer._id;
+                this._lastProcessedOfferParsedTime = foundOffer.parsed;
+
+                return this._processFoundOffer(options, foundOffer)
+                    .then(() => {
+                        LOG.info(util.format('[OK] [%s] [%s] Processing offer data finished. Next offer.', foundOffer.site, foundOffer.origin_href));
+
+                        this._processorTimeout[options.site] = setTimeout(() => {
+                            this._processSiteOffers(options);
+                        }, 0)
+
+                        return resolve();
+                    })
+                    .catch(() => {
+                        LOG.error(util.format('[ERROR] Checking offer failed', err));
+                        reject();
+                    });
+            });
         });
     };
 
-    private _processSingleOffer(options, callback) {
-        SessionFactory.getDbConnection().offers.findOne({
-            "origin_href": options.origin_href
-        }, (err, foundOffer) => {
-            if (err) {
-                // TODO reclaim event processing
-                LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Finding main offer failed. Processing offer data failed.', options.language, options.site, options.origin_href, options.href, err));
-                return callback(err);
-            }
+    private _processSingleOffer(options) {
+        return new Promise((resolve, reject) => {
+            SessionFactory.getDbConnection().offers.findOne({
+                "origin_href": options.origin_href
+            }, (err, foundOffer) => {
+                if (err) {
+                    // TODO reclaim event processing
+                    LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Finding main offer failed. Processing offer data failed.', options.language, options.site, options.origin_href, options.href, err));
+                    return reject(new Error('Finding main offer failed. Processing offer data failed.'));
+                }
 
-            if (!foundOffer) {
-                LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Main offer not found. Processing offer data failed.', options.language, options.site, options.origin_href, options.href));
-                return callback(err);
-            }
+                if (!foundOffer) {
+                    LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Main offer not found. Processing offer data failed.', options.language, options.site, options.origin_href, options.href));
+                    return reject(new Error('Main offer not found. Processing offer data failed.'));
+                }
 
-            LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Main offer found. Proceed with processing data.', options.language, options.site, options.origin_href, options.href));
+                LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Main offer found. Proceed with processing data.', options.language, options.site, options.origin_href, options.href));
 
-            this._processFoundOffer(options, foundOffer)
-                .then(() => {
-                    return callback();
-                })
-                .catch(() => {
-                    return callback();
-                });
+                return this._processFoundOffer(options, foundOffer)
+                    .then(() => {
+                        LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Main offer found. Processing data finished.', options.language, options.site, options.origin_href, options.href));
+                        return resolve();
+                    })
+                    .catch(() => {
+                        LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Main offer found. Processing data failed.', options.language, options.site, options.origin_href, options.href, err));
+                        return reject(err);
+                    });
+            });
         });
     }
 
@@ -243,13 +264,20 @@ class DataProcessor {
 
         promises.push(this._requestOfferContentIndexing(options, foundOffer));
 
-        return Promise.all(promises);
+        return Promise.all(promises)
+            .then(() => {
+                LOG.info(util.format('[OK] [%s] [%s] [%s] Offer processing finished', options.language, options.site, options.origin_href, options.href));
+            })
+            .catch(err => {
+                LOG.error(util.format('[ERROR] [%s] [%s] [%s] Offer processing failed', options.language, options.site, options.origin_href, options.href, err));
+                // TODO Mark offer as failed due to missing translation
+            });
     }
 
     private _requestTranslationsHarvesting = (options, offer) => {
         const parser = ParserFactory.getParser(options.site);
 
-        LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Schedule offer translations', options.language, options.site, options.origin_href, options.href));
+        LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Schedule offer translations if needed', options.language, options.site, options.origin_href, options.href));
 
         let delay = 30 * 1000; // Because of transaction issues for MongoDB, just skip some time to not overwrite offer missing some properties
 
@@ -258,8 +286,11 @@ class DataProcessor {
 
             // do not request main language translation harvesting as it is already there
             if (isMainOffer) {
+                LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Main offer. Translation not required.', options.language, options.site, options.origin_href, options.href));
                 return;
             }
+
+            LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Schedule offer translations for %s', options.language, options.site, options.origin_href, options.href, language));
 
             const translation = offer.translations[language];
 
@@ -315,44 +346,27 @@ class DataProcessor {
             })
             .then(() => {
                 LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Picture harvesting scheduled.', options.language, offer.site, offer.origin_href, picture.origin_href));
+                return Promise.resolve();
             })
             .catch(err => {
                 LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Picture harvesting not scheduled.', options.language, offer.site, offer.origin_href, picture.origin_href, err));
+                return Promise.reject();
             });
         });
 
         return Promise.all(picturesProcessPromises)
             .then(() => {
                 LOG.info(util.format('[OK] [%s] [%s] Offer pictures harvesting scheduled', options.site, options.href));
+                return Promise.resolve();
             })
             .catch(err => {
                 LOG.error(util.format('[ERROR] [%s] [%s] Offer pictures harvesting not scheduled %s', options.site, options.href, err));
+                return Promise.reject();
             });
     };
 
-    requestCategoriesProcessing = (options, offer) => {
-        const parser = ParserFactory.getParser(options.site);
-
-        LOG.info(util.format('[OK] [%s] [%s] Process categories.', options.site, offer.origin_href));
-
-        // process main offer only
-        if (options.language && options.origin_href && !parser.config.languages[options.language].main) {
-            return Promise.resolve();
-        }
-
-        return WorkerService.scheduleCategoriesProcessing({
-            'site': options.site,
-            'language': options.language,
-            'href': options.href,
-            'origin_href': options.origin_href
-        })
-        .catch(err => {
-            LOG.error(util.format('[ERROR] [%s] Categories processing not scheduled.', options.origin_href, err));
-        });
-    };
-
     _requestOfferContentIndexing = (options, offer) => {
-        LOG.info(util.format('[OK] [%s] [%s] Process indexes.', options.site, offer.origin_href));
+        LOG.info(util.format('[OK] [%s] [%s] [%s] Process indexes.', options.language, options.site, offer.origin_href));
 
         // TODO should take language into account or just schedule all languages re-indexing
         return WorkerService.scheduleIndexing({
@@ -366,6 +380,19 @@ class DataProcessor {
         });
     };
 
+    private _stopProcessSiteOffers(options) {
+        clearTimeout(this._processorTimeout[options.site]);
+
+        return Promise.resolve();
+    }
+
+    private _stopProcessAllSitesOffers() {
+        _.each(_.keys(this._processorTimeout), site => {
+            clearTimeout(this._processorTimeout[site]);
+        });
+
+        return Promise.resolve();
+    }
 }
 
 export default new DataProcessor();

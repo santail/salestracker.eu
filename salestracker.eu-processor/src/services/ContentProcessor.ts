@@ -15,7 +15,7 @@ import WorkerService from "./WorkerService";
 
 class ContentProcessor {
 
-    process(options, callback) {
+    process(options) {
         const parser = ParserFactory.getParser(options.site);
         const isMainOffer = parser.config.languages[options.language].main;
 
@@ -25,43 +25,45 @@ class ContentProcessor {
             LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Offer translation content processing', options.language, options.site, options.origin_href, options.href));
         }
 
-        SessionFactory.getDbConnection().offers.findOne({
-            "origin_href": options.origin_href
-        }, (err, foundOffer) => {
-            if (err) {
-                // TODO reclaim event processing
-                LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Finding main offer failed. Offer content processing failed.', options.language, options.site, options.origin_href, options.href, err));
-                return callback(err);
-            }
+        return new Promise((resolve, reject) => {
+            SessionFactory.getDbConnection().offers.findOne({
+                "origin_href": options.origin_href
+            }, (err, foundOffer) => {
+                if (err) {
+                    // TODO reclaim event processing
+                    LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Finding main offer failed. Offer content processing failed.', options.language, options.site, options.origin_href, options.href, err));
+                    return reject(new Error('Finding main offer failed. Offer content processing failed.'));
+                }
 
-            if (!foundOffer) {
-                LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Main offer not found. Offer content processing failed.', options.language, options.site, options.origin_href, options.href));
-                return callback(err);
-            }
+                if (!foundOffer) {
+                    LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Main offer not found. Offer content processing failed.', options.language, options.site, options.origin_href, options.href));
+                    return reject(new Error('Main offer not found. Offer content processing failed.'));
+                }
 
-            LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Main offer found. Proceed with processing content.', options.language, options.site, options.origin_href, options.href));
+                LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Main offer found. Proceed with processing content.', options.language, options.site, options.origin_href, options.href));
 
-            this._parseOfferContent(options, foundOffer)
-                .then(data => {
-                    return this._processOfferPictures(options, data);
-                })
-                .then(data => {
-                    return this._updateOfferData(options, data);
-                })
-                .then(offer => {
-                    return this._validateOfferProperties(options, offer);
-                })
-                .then(() => {
-                    return this._requestOfferDataProcessing(options);
-                })
-                .then(() => {
-                    LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Offer content processing finished.', options.language, options.site, options.origin_href, options.href));
-                    return callback();
-                })
-                .catch(err => {
-                    LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Offer content processing failed', options.language, options.site, options.origin_href, options.href, err));
-                    return callback(err);
-                });
+                return this._parseOfferContent(options, foundOffer)
+                    .then(data => {
+                        return this._processOfferPictures(options, data);
+                    })
+                    .then(data => {
+                        return this._updateOfferData(options, data);
+                    })
+                    .then(offer => {
+                        return this._validateOfferProperties(options, offer);
+                    })
+                    .then(() => {
+                        return this._requestOfferDataProcessing(options);
+                    })
+                    .then(() => {
+                        LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Offer content processing finished.', options.language, options.site, options.origin_href, options.href));
+                        return resolve();
+                    })
+                    .catch(err => {
+                        LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Offer content processing failed.', options.language, options.site, options.origin_href, options.href, err));
+                        return reject(err);
+                    });
+            });
         });
     }
 
@@ -119,50 +121,7 @@ class ContentProcessor {
             return Promise.reject(err);
         });
     };
-
-    private _validateOfferProperties = (options, offer) => {
-        const parser = ParserFactory.getParser(options.site);
-
-        parser.validateOfferProperties(offer); // TODO check translations
-
-        return Promise.resolve(offer);
-    };
-
-    private _updateOfferData = (options, data) => {
-        LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Update offer with new data', options.language, options.site, options.origin_href, options.href));
-
-        return new Promise((fulfill, reject) => {
-            SessionFactory.getDbConnection().offers.update({
-                origin_href: options.origin_href
-            }, data, function (err, updatedOffer) {
-                if (err) {
-                    LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Update offer with new data failed', options.language, options.site, options.origin_href, options.href, data, err));
-                    return reject(err);
-                }
-
-                LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Update offer with new data succeeded', options.language, options.site, options.origin_href, options.href));
-                return fulfill(updatedOffer);
-            });
-        });
-    };
-
-    private _requestOfferDataProcessing = (options) => {
-        LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Offer translation content updated.', options.language, options.site, options.origin_href, options.href));
-
-        return WorkerService.scheduleDataProcessing({
-            'site': options.site,
-            'language': options.language,
-            'href': options.href,
-            'origin_href': options.origin_href ? options.origin_href : options.href
-        })
-        .then(() => {
-            LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Offer translation data processing.', options.language, options.site, options.origin_href, options.href));
-        })
-        .catch(err => {
-            LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Offer translation data processing not scheduled.', options.language, options.site, options.origin_href, options.href, err));
-        });
-    };
-
+    
     private _processOfferPictures = (options, data) => {
         const parser = ParserFactory.getParser(options.site);
         const isMainOffer = parser.config.languages[options.language].main;
@@ -201,6 +160,50 @@ class ContentProcessor {
 
         return Promise.resolve(data);
     }
+
+    private _updateOfferData = (options, data) => {
+        LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Update offer with new data', options.language, options.site, options.origin_href, options.href));
+
+        return new Promise((fulfill, reject) => {
+            SessionFactory.getDbConnection().offers.update({
+                origin_href: options.origin_href
+            }, data, function (err, updatedOffer) {
+                if (err) {
+                    LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Update offer with new data failed', options.language, options.site, options.origin_href, options.href, data, err));
+                    return reject(err);
+                }
+
+                LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Update offer with new data succeeded', options.language, options.site, options.origin_href, options.href));
+                return fulfill(updatedOffer);
+            });
+        });
+    };
+
+    private _validateOfferProperties = (options, offer) => {
+        const parser = ParserFactory.getParser(options.site);
+
+        parser.validateOfferProperties(offer); // TODO check translations
+
+        return Promise.resolve(offer);
+    };
+
+    private _requestOfferDataProcessing = (options) => {
+        LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Offer translation content updated.', options.language, options.site, options.origin_href, options.href));
+
+        return WorkerService.scheduleDataProcessing({
+            'site': options.site,
+            'language': options.language,
+            'href': options.href,
+            'origin_href': options.origin_href ? options.origin_href : options.href
+        })
+        .then(() => {
+            LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Offer translation data processing.', options.language, options.site, options.origin_href, options.href));
+        })
+        .catch(err => {
+            LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Offer translation data processing not scheduled.', options.language, options.site, options.origin_href, options.href, err));
+        });
+    };
+
 }
 
 export default new ContentProcessor();

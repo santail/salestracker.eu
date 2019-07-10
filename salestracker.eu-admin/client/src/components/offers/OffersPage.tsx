@@ -1,10 +1,11 @@
 import _ = require('lodash');
 import * as React from 'react';
-import { InputGroup, Tabs, Tab, FormGroup, FormControl, FormControlProps } from 'react-bootstrap';
+import { Checkbox, InputGroup, Tabs, Tab, FormGroup, FormControl, FormControlProps } from 'react-bootstrap';
 import ReactPaginate from 'react-paginate';
 import { ComponentBase } from 'resub';
 
 import OfferStore, { IOffer } from '../../stores/OfferStore';
+import SettingsStore, { ISite } from '../../stores/SettingsStore';
 
 import OfferItem = require('./OfferItem');
 import JobsStore from '../../stores/JobsStore';
@@ -21,12 +22,15 @@ interface OffersPageState {
     site?: string;
     category?: string;
     pagesTotal: number;
+    sites: ISite[];
 }
 
 class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
 
     protected _buildState(props: OffersPageProps, initialBuild: boolean): Partial<OffersPageState> {
         const offersWithPaging = OfferStore.getOffersWithPaging();
+        const sites = SettingsStore.getSites();
+
         const paging = offersWithPaging.paging;
 
         let newState: OffersPageState = {
@@ -35,6 +39,7 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
             activePage: paging.activePage,
             pageSize: paging.pageSize,
             pagesTotal: paging.pagesTotal,
+            sites: sites
         };
 
         if (initialBuild) {
@@ -84,6 +89,9 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
                         <button className="btn btn-sm btn-info" type="button" onClick={this._onProcessSite}><i className="fa fa-tasks"></i> Harvest site</button>
                         <button className="btn btn-sm btn-info" type="button" onClick={this._onProcessPictures}><i className="fa fa-tasks"></i> Harvest pictures</button>
                         <button className="btn btn-sm btn-info" type="button" onClick={this._onProcessPicturesStop}><i className="fa fa-tasks"></i> Stop harvest pictures</button>
+                    </li>
+                    <li className="col-xs-3">
+                        <Checkbox checked> Clean-up </Checkbox>
                     </li>
                 </ul>
 
@@ -193,14 +201,21 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
             activePage: 0,
             pageSize: 72
         });
+
+        SettingsStore.loadSettings();
     }
 
     private _onProcessSite = (e: React.MouseEvent<HTMLButtonElement>): void => {
         e.preventDefault();
         e.stopPropagation();
 
-        JobsStore.processSite({
-            site: this.state.site
+        const sites = this.state.site ? [{
+            href: this.state.site,
+        }] : [];
+
+        JobsStore.processSites(sites, {
+            shouldCleanup: true,
+            cleanupUploads: true
         });
     }
 
