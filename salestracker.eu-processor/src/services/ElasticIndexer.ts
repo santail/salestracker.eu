@@ -249,7 +249,7 @@ class ElasticIndexer {
                 if (foundOffer) {
                     LOG.info(util.format('[OK] [%s] [%s] [%s] Offer content found. Proceed with indexing.', options.language, options.site, options.origin_href));
 
-                    let promises: Promise<void | {}>[] = [];
+                    let promises: Promise<unknown>[] = [];
 
                     if (!options.language) {
                         _.each(_.keys(foundOffer.translations), language => {

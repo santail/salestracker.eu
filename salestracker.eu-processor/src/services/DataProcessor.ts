@@ -254,7 +254,7 @@ class DataProcessor {
         const parser = ParserFactory.getParser(options.site);
         const isMainOffer = !options.language || parser.config.languages[options.language].main;
 
-        let promises: Promise<void | {}>[] = [];
+        let promises: Promise<unknown>[] = [];
 
         if (isMainOffer) {
             promises.push(this._requestTranslationsHarvesting(options, foundOffer));
@@ -327,6 +327,7 @@ class DataProcessor {
 
         // process only main offer pictures
         if (options.language && options.origin_href && !parser.config.languages[options.language].main) {
+            LOG.info(util.format('[OK] [%s] [%s] [%s] Offer translation. Skip pictures processing.', options.language, options.site, offer.origin_href));
             return Promise.resolve();
         }
 

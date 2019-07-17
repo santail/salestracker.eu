@@ -17,6 +17,8 @@ interface OffersPageState {
     offers: IOffer[];
     total: number;
     activePage: number;
+    shouldCleanUp: boolean;
+    shouldCleanupUploads: boolean;
     pageSize: number;
     filter?: string | number | string[];
     site?: string;
@@ -26,14 +28,14 @@ interface OffersPageState {
 }
 
 class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
-
+ 
     protected _buildState(props: OffersPageProps, initialBuild: boolean): Partial<OffersPageState> {
         const offersWithPaging = OfferStore.getOffersWithPaging();
         const sites = SettingsStore.getSites();
 
         const paging = offersWithPaging.paging;
 
-        let newState: OffersPageState = {
+        let newState: Partial<OffersPageState> = {
             offers: offersWithPaging.offers,
             total: offersWithPaging.total,
             activePage: paging.activePage,
@@ -91,7 +93,8 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
                         <button className="btn btn-sm btn-info" type="button" onClick={this._onProcessPicturesStop}><i className="fa fa-tasks"></i> Stop harvest pictures</button>
                     </li>
                     <li className="col-xs-3">
-                        <Checkbox checked> Clean-up </Checkbox>
+                        <Checkbox inline checked={ this.state.shouldCleanUp } onChange={this._handleCleanUpChange}>clean-up</Checkbox>
+                        <Checkbox inline checked={ this.state.shouldCleanupUploads } onChange={this._handleCleanUploadsChange}>clean-up uploads</Checkbox>
                     </li>
                 </ul>
 
@@ -205,17 +208,29 @@ class OffersPage extends ComponentBase<OffersPageProps, OffersPageState> {
         SettingsStore.loadSettings();
     }
 
+    private _handleCleanUpChange = (e: React.FormEvent<Checkbox>): void => {
+        this.setState({
+            shouldCleanUp: e.target.checked
+        });
+    }
+
+    private _handleCleanUploadsChange = (e: React.FormEvent<Checkbox>): void => {
+        this.setState({
+            shouldCleanupUploads: e.target.checked
+        });
+    }
+
     private _onProcessSite = (e: React.MouseEvent<HTMLButtonElement>): void => {
         e.preventDefault();
         e.stopPropagation();
 
         const sites = this.state.site ? [{
-            href: this.state.site,
+            href: this.state.site
         }] : [];
 
         JobsStore.processSites(sites, {
-            shouldCleanup: true,
-            cleanupUploads: true
+            shouldCleanup: this.state.shouldCleanUp,
+            shouldCleanupUploads: this.state.shouldCleanupUploads
         });
     }
 

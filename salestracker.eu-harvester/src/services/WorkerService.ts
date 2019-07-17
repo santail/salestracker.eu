@@ -128,6 +128,27 @@ class WorkerService {
                 });
         });
     }
+
+    scheduleIndexing = (options) => {
+        return new Promise((fulfill, reject) => {
+            SessionFactory.getQueueConnection().create('processIndexing', options)
+                .attempts(3)
+                .backoff({
+                    delay: 60 * 1000,
+                    type: 'exponential'
+                })
+                .removeOnComplete(true)
+                .save(function (err) {
+                    if (err) {
+                        LOG.error(util.format('[ERROR] [%s] %s Offer indexes processing schedule failed', options.site, options.href, err));
+                        return reject(err);
+                    }
+
+                    LOG.debug(util.format('[OK] [%s] %s Offer indexes processing scheduled', options.site, options.href));
+                    return fulfill();
+                });
+        });
+    };
 }
 
 export default new WorkerService();

@@ -268,69 +268,35 @@ class OfferHarvester {
                     $set: {
                         expires: new Date(expirationTime)
                     }
-                }, (err, updatedOffer) => {
+                }, (err, result) => {
                     if (err) {
                         // TODO Mark somehow offer that was excluded from processing
                         LOG.error(util.format('[ERROR] [%s] [%s] [%s] [%s] Offers expiration time update failed', options.language, options.site, options.origin_href, options.href, err));
                         return reject(err);
                     }
 
-                    if (!updatedOffer) {
+                    if (!result) {
                         LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Offer not updated. Skip processing.', options.language, options.site, options.origin_href, options.href));
                         return reject(new Error('DB update query failed'));
                     }
 
                     LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Offers expiration time in database extended', options.language, options.site, options.origin_href, options.href));
 
-                    let promises: Promise<void | {}>[] = [];
-
-                    if (!options.language) {
-                        _.each(_.keys(updatedOffer.translations), language => {
-                            promises.push(this._extendIndexedOfferExpirationTime(language, updatedOffer, expirationTime));
-                        })
-                    } else {
-                        promises.push(this._extendIndexedOfferExpirationTime(options.language, updatedOffer, expirationTime));
-                    }
-
-                    return Promise.all(promises)
-                        .then(() => {
-                            LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Offers expiration time in index extended', options.language, options.site, options.origin_href, options.href));
-                            return resolve();
-                        })
-                        .catch(err => {
-                            LOG.info(util.format('[OK] [%s] [%s] [%s] [%s] Offers expiration time in index extending failed', options.language, options.site, options.origin_href, options.href));
-                            return reject(err);
-                        });
+                    return WorkerService.scheduleIndexing({
+                        'site': options.site,
+                        'origin_href': options.origin_href
+                    })
+                    .then(() => {
+                        LOG.info(util.format('[OK] [%s] [%s] Extending expiration time scheduled %s', options.site, options.origin_href, expirationTime));
+                        return resolve();
+                    })
+                    .catch(err => {
+                        LOG.error(util.format('[ERROR] [%s] Extending expiration time not scheduled.', options.origin_href, err));
+                        return reject(err);
+                    });
                 });
         });
     }
-
-    private _extendIndexedOfferExpirationTime = (language, offer, expirationTime) => {
-        return new Promise((resolve, reject) => {
-            SessionFactory.getElasticsearchConnection().updateByQuery({
-                index: 'salestracker-' + language,
-                type: 'offers',
-                body: {
-                    query: {
-                        "term": { 
-                            "origin_href": offer.origin_href 
-                        }
-                    },
-                    script: {
-                        source: "ctx._source.expires = '" + new Date(expirationTime).getTime() + "'"
-                    }
-                }
-            }, function (err) {
-                if (err) {
-                    LOG.error(util.format('[ERROR] [%s] [%s] [%s] Updating indexed document failed', offer.site, offer.origin_href, language, err));
-                    return reject(err);
-                }
-
-                LOG.info(util.format('[OK] [%s] [%s] [%s] Updating indexed document succeeded', offer.site, offer.origin_href, language));
-                return resolve();
-            });
-        });
-    };
 
     private _storeOfferContent = (options, translations) => {
         const parser = ParserFactory.getParser(options.site);

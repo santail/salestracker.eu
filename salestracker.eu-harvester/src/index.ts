@@ -124,11 +124,11 @@ function harvestOffer(job, done) {
 
     harvester.harvestOffer(config)
         .then(() => {
-            LOG.info(util.format('[OK] [%s] Offer harvesting finished %s', config.site, config.href));
+            LOG.info(util.format('[OK] [%s] [%s] Offer harvesting finished', config.site, config.href));
             done();
         })
         .catch(err => {
-            LOG.error(util.format('[ERROR] [%s] Offer harvesting failed %s', config.site, config.href, err));
+            LOG.error(util.format('[ERROR] [%s] [%s] Offer harvesting failed', config.site, config.href, err));
             done();
         });
 };
