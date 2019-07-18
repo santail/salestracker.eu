@@ -29,9 +29,12 @@ export class BasketStore extends StoreBase {
     }
 
     addOffer = (offer: IOffer): void => {
-        this._bundle.items.push({
-            offer: offer
-        });
+        const bundleItem = {
+            offer: offer,
+            caption: this._compileBundleItemCaption(offer)
+        };
+
+        this._bundle.items.push(bundleItem);
 
         this.trigger(TriggerKeys.AddedToBasket);
         this.trigger();
@@ -61,23 +64,7 @@ export class BasketStore extends StoreBase {
         let offerWidgetsHTML: string = '';
 
         this._bundle.items.map((item, i) => {
-            const offer = item.offer;
-
-            let optionalImage: string = '';
-
-            if (offer.downloads && offer.downloads.pictures) {
-                offerWidgetsPlain += '​​​​​​​​​​​[​​​​​​​​​​​](http://159.89.24.202:8000/img/offers/' + offer.downloads.pictures[0] + ') ' + offer.title;
-            }
-
-            if (item.comment) {
-                offerWidgetsPlain += "\r\n\r\n" + item.comment;
-            }
-
-            offerWidgetsHTML += '<div>' + "\r\n" +
-                optionalImage + "\r\n" +
-                '<p><a href=' + item.offer.origin_href + ' title=' + item.offer.title + ' class="caption-title">' + item.offer.title + '</a></p>' + "\r\n" +
-                '<p>' + item.offer.title + '</p>' + "\r\n" +
-                '</div>';
+            offerWidgetsHTML += this._compileBundleItemCaption(item.offer);
         });
 
         return {
@@ -94,6 +81,15 @@ export class BasketStore extends StoreBase {
     toggleWithImages() {
         this._withImages = !this._withImages;
         this.trigger();
+    }
+
+    private _compileBundleItemCaption(offer: IOffer) {
+        return '<a href="' + offer.origin_href + '">' + offer.title + '</a>' +
+            "\r\n" +
+            'Red wine from Amarone della Valpolicella Classico · Italy, Vivino rating - 4.0' +
+            "\r\n" +
+            "\r\n" +
+            '<strong>' + offer.price.current + '€</strong> / ' + offer.price.original + '€ (you win ' + offer.price.discount.amount + '€ or ' + offer.price.discount.percents + '%)'
     }
 
 }

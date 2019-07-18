@@ -7,8 +7,7 @@ import { IOffer } from './OfferStore';
 
 export interface IBundleItem {
     offer: IOffer;
-    comment?: string;
-    title?: string;
+    caption?: string;
 };
 
 export interface IBundle {

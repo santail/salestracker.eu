@@ -1,6 +1,5 @@
-const path = require('path');
-
 import * as React from 'react';
+import { ControlLabel, FormGroup, FormControl, FormControlProps } from 'react-bootstrap';
 import { ComponentBase } from 'resub';
 
 import { IOffer } from '../../stores/OfferStore';
@@ -12,14 +11,21 @@ interface OfferItemProps extends React.Props<any> {
 }
 
 interface OfferItemState {
+    caption?: string;
     offerInBasket: boolean;
 }
 
 class OfferItem extends ComponentBase<OfferItemProps, OfferItemState> {
     protected _buildState(props: OfferItemProps, initialBuild: boolean): Partial<OfferItemState> {
-        return {
+        let newState: Partial<OfferItemState> = {
             offerInBasket: BasketStore.checkBasketContainsOffer(props.item.offer)
-        };
+        }
+
+        if (initialBuild) {
+            newState.caption = props.item.caption || '';
+        }
+
+        return newState;
     }
 
     render() {
@@ -43,11 +49,11 @@ class OfferItem extends ComponentBase<OfferItemProps, OfferItemState> {
                     <div className="caption">
                         <a href="#" title="" className="caption-title" onClick={this._onOfferClick(offer)}>{offer.title}</a>
                     </div>
-                    <div className="form-group">
-                        <label className="col-sm-2 control-label text-right">Описание: </label>
-                        <div className="col-sm-10">
-                            <textarea rows={2} cols={5} className="form-control"></textarea>
-                        </div>
+                    <div className="form-group col-sm-10">
+                        <FormGroup>
+                            <ControlLabel>Описание:</ControlLabel>
+                            <FormControl rows={10} cols={50} componentClass="textarea" value={ this.state.caption } onChange={ this._handleCaptionChange } />
+                        </FormGroup>
                     </div>
                 </div>
             </div>
@@ -70,6 +76,12 @@ class OfferItem extends ComponentBase<OfferItemProps, OfferItemState> {
             event.preventDefault();
             event.stopPropagation();
         }
+    }
+
+    private _handleCaptionChange = (e: React.FormEvent<FormControlProps>): void => {
+        this.setState({
+            caption: '' + e.currentTarget.value
+        });
     }
 }
 

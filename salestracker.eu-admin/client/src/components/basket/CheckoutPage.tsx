@@ -1,6 +1,7 @@
 import _ = require('lodash');
 
 import * as React from 'react';
+import { Checkbox } from 'react-bootstrap';
 import { ComponentBase } from 'resub';
 
 const Telegram = require('telegraf/telegram')
@@ -19,11 +20,14 @@ class CheckoutPage extends ComponentBase<{}, CheckoutPageState> {
     private _TelegramBot: any;
 
     protected _buildState(props: {}, initialBuild: boolean): Partial<CheckoutPageState> {
-        let newState: CheckoutPageState = {
+        let newState: Partial<CheckoutPageState> = {
             bundle: BasketStore.getBundle(),
-            withImages: BasketStore.showWithImages(),
             messageContent: BasketStore.getCompiledMessages()
-        };
+        }
+
+        if (initialBuild) {
+            newState.withImages = BasketStore.showWithImages()
+        }
 
         return newState;
     }
@@ -69,15 +73,12 @@ class CheckoutPage extends ComponentBase<{}, CheckoutPageState> {
                                         <div className="alert alert-info fade in widget-inner">
                                             <div className="checkbox">
                                                 <label>
-                                                    <input type="checkbox" checked={this.state.withImages} onChange={this._toggleWithImages} />
-                                                    Публиковать с картинками
-                                            </label>
+                                                    <Checkbox inline checked={ this.state.withImages } onChange={this._handleShowPicturesChange}>Публиковать с картинками</Checkbox>
+                                                </label>
                                             </div>
                                         </div>
 
-                                        <textarea rows={20} cols={5} className="form-control">
-                                            {this.state.messageContent['telegram']}
-                                        </textarea>
+                                        {this.state.messageContent['telegram']}
                                     </div>
 
                                     <div className="tab-pane fade" id="tab-email">
@@ -121,25 +122,22 @@ class CheckoutPage extends ComponentBase<{}, CheckoutPageState> {
     componentDidMount() {
         super.componentDidMount();
 
-        this._TelegramBot = new Telegram('527574719:AAE8yYNFlGnDhFfuh0Wx912UPUDfZ9i5ArY');
+        this._TelegramBot = new Telegram('772942397:AAHtIg7O9SYUfm_mp4euaSKZB7RhtM3bmXw');
     }
 
-    shouldComponentUpdate(nextProps: {}, nextState: CheckoutPageState, nextContext: any): boolean {
-        return !_.isEqual(this.state.bundle, nextState.bundle)
-            || this.state.withImages !== nextState.withImages
-            || super.shouldComponentUpdate(nextProps, nextState, nextContext);
-    }
-
-    private _toggleWithImages = (event: React.ChangeEvent<HTMLInputElement>): void => {
-        BasketStore.toggleWithImages();
-
-        event.preventDefault();
-        event.stopPropagation();
+    private _handleShowPicturesChange = (e: React.FormEvent<Checkbox>): void => {
+        this.setState({
+            withImages: e.target.checked
+        });
     }
 
     private _onPublicate = (event: React.MouseEvent<HTMLButtonElement>): void => {
-        this._TelegramBot.sendMessage('@goodlooking_test', this.state.messageContent['telegram']);
-        this._TelegramBot.sendMessage('@goodlooking_test', this.state.messageContent['blog']);
+        _.each(this.state.bundle.items, item => {
+            this._TelegramBot.sendPhoto('@salestracker_est_top10_test_bot', '/img/offers/' + item.offer.downloads.pictures[0], {
+                caption: item.caption,
+                parse_mode: 'HTML'
+            });
+        });
 
         event.preventDefault();
         event.stopPropagation();
