@@ -133,7 +133,7 @@ class CheckoutPage extends ComponentBase<{}, CheckoutPageState> {
 
     private _onPublicate = (event: React.MouseEvent<HTMLButtonElement>): void => {
         _.each(this.state.bundle.items, item => {
-            this._TelegramBot.sendPhoto('@salestracker_est_top10_test_bot', '/img/offers/' + item.offer.downloads.pictures[0], {
+            this._TelegramBot.sendPhoto('@soodustused_top10_test', window.location.href + '/../img/offers/' + item.offer.downloads.pictures[0], {
                 caption: item.caption,
                 parse_mode: 'HTML'
             });
