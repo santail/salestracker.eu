@@ -24,4 +24,7 @@ module.exports = function (app) {
 
   app.route('/api/jobs/index/offer')
     .post(jobs.processIndexing);
+
+  app.route('/api/jobs/publicate/bundle')
+    .post(jobs.publicateBundle);
 };

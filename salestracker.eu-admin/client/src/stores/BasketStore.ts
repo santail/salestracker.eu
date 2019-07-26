@@ -84,10 +84,7 @@ export class BasketStore extends StoreBase {
     }
 
     private _compileBundleItemCaption(offer: IOffer) {
-        return '<a href="' + offer.origin_href + '">' + offer.title + '</a>' +
-            "\r\n" +
-            'Red wine from Amarone della Valpolicella Classico · Italy, Vivino rating - 4.0' +
-            "\r\n" +
+        return '<a href="' + offer.origin_href + '">' + offer.title + '</a>' + "\r\n" +
             "\r\n" +
             '<strong>' + offer.price.current + '€</strong> / ' + offer.price.original + '€ (you win ' + offer.price.discount.amount + '€ or ' + offer.price.discount.percents + '%)'
     }

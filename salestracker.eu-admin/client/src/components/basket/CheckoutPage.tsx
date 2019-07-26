@@ -4,10 +4,9 @@ import * as React from 'react';
 import { Checkbox } from 'react-bootstrap';
 import { ComponentBase } from 'resub';
 
-const Telegram = require('telegraf/telegram')
-
 import BasketStore from '../../stores/BasketStore';
 import BundlesStore, { IBundle } from '../../stores/BundlesStore';
+import PublicationService from '../../services/PublicationService';
 
 interface CheckoutPageState {
     bundle: IBundle;
@@ -16,8 +15,6 @@ interface CheckoutPageState {
 }
 
 class CheckoutPage extends ComponentBase<{}, CheckoutPageState> {
-
-    private _TelegramBot: any;
 
     protected _buildState(props: {}, initialBuild: boolean): Partial<CheckoutPageState> {
         let newState: Partial<CheckoutPageState> = {
@@ -119,12 +116,6 @@ class CheckoutPage extends ComponentBase<{}, CheckoutPageState> {
         );
     }
 
-    componentDidMount() {
-        super.componentDidMount();
-
-        this._TelegramBot = new Telegram('772942397:AAHtIg7O9SYUfm_mp4euaSKZB7RhtM3bmXw');
-    }
-
     private _handleShowPicturesChange = (e: React.FormEvent<Checkbox>): void => {
         this.setState({
             withImages: e.target.checked
@@ -132,12 +123,7 @@ class CheckoutPage extends ComponentBase<{}, CheckoutPageState> {
     }
 
     private _onPublicate = (event: React.MouseEvent<HTMLButtonElement>): void => {
-        _.each(this.state.bundle.items, item => {
-            this._TelegramBot.sendPhoto('@soodustused_top10_test', window.location.href + '/../img/offers/' + item.offer.downloads.pictures[0], {
-                caption: item.caption,
-                parse_mode: 'HTML'
-            });
-        });
+        PublicationService.publicateBundle(this.state.bundle);
 
         event.preventDefault();
         event.stopPropagation();

@@ -2,6 +2,10 @@
 
 const util = require("util");
 
+var fs = require('fs');
+var path = require('path');
+const Telegram = require('telegraf/telegram')
+
 /**
  * Module dependencies.
  */
@@ -14,6 +18,8 @@ let REDIS_ADDR = process.env.REDIS_ADDR || '127.0.0.1:6379';
 const jobs = kue.createQueue({
     redis: `redis://${REDIS_ADDR}`
 });
+
+let TelegramBot = new Telegram('772942397:AAHtIg7O9SYUfm_mp4euaSKZB7RhtM3bmXw');;
 
 /**
  * Create a Offer
@@ -210,5 +216,20 @@ exports.processIndexing = function (req, res) {
             console.info(util.format('[OK] [%s] Job scheduled', JSON.stringify(job)));
             res.json( {status: 'ok' } );
         });
+    };
+
+exports.publicateBundle = function (req, res) {
+    console.log(req.body);
+
+    const item = req.body;
+
+    TelegramBot.sendPhoto('@soodustused_top10_test', {
+        source: fs.readFileSync(path.join(process.cwd(), './uploads/offers/' + item.offer.downloads.pictures[0]))
+    }, {
+        caption: item.caption,
+        parse_mode: 'HTML'
+    });
+
+    res.json( {status: 'ok' } );
 };
 
