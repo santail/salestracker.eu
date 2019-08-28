@@ -171,6 +171,10 @@ module.exports.initDefaultRoutes = function (app) {
   // Setting the app router and static folder
   app.use(express.static(path.join(process.cwd(), 'client/public/')));
 
+  app.get('/img/offers/*', function(req, res) {
+    res.sendFile(path.join(process.cwd(), 'client/public/images/interface/placeholder.png'));
+  });
+
   app.get('*', (req, res) => {
       res.sendFile(path.join(process.cwd(), 'client/public/index.html'));
   });
