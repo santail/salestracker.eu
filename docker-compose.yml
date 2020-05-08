@@ -58,8 +58,8 @@ services:
       - "server-mongodb:mongodb"
       - "server-redis:redis"
 
-  backend-finder:
-    container_name: backend-finder
+  salestracker.eu-finder:
+    container_name: salestracker.eu-finder
     build:
       context: ./salestracker.eu-finder/
       dockerfile: Dockerfile
@@ -69,7 +69,7 @@ services:
       - ./salestracker.eu-finder/:/usr/src/app/
       - ./salestracker.eu-shared/config/:/usr/src/app/config/
       - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
-      - backend-finder-modules:/usr/src/app/node_modules
+      - salestracker.eu-finder-modules:/usr/src/app/node_modules
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - MONGODB_URI=mongodb://mongodb:27017/salestracker-dev
@@ -334,7 +334,7 @@ volumes:
   web-admin-public:
   web-public-modules:
   web-public-public:
-  backend-finder-modules:
+  salestracker.eu-finder-modules:
   backend-harvester-modules:
   backend-janitor-modules:
   backend-notifier-modules:
