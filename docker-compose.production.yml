@@ -59,16 +59,12 @@ services:
   salestracker.eu-finder:
     container_name: salestracker.eu-finder
     image: salestracker/salestracker.eu-finder:latest
-    volumes:
-      - ./salestracker.eu-finder/:/usr/src/app/
-      - ./salestracker.eu-shared/config/:/usr/src/app/config/
-      - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
-      - salestracker.eu-finder-modules:/usr/src/app/node_modules
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - MONGODB_URI=mongodb://${APP_BACKEND_FINDER_MONGO_USER}:${APP_BACKEND_FINDER_MONGO_PASSWORD}@mongodb:27017/salestracker
       - NODE_ENV=production
-      - REDIS_ADDR=redis://redis:6379
+      - REDIS_ADDR=redis://redis
+      - REDIS_PORT=6379
     links:
       - "server-elasticsearch:elasticsearch"
       - "server-mongodb:mongodb"
