@@ -31,6 +31,6 @@ docker pull $DOCKER_IMAGE
 
 echo "Starting $CONTAINER_NAME using Docker Image name: $DOCKER_IMAGE"
 
-docker-compose -f docker-compose.production.yml up -d --force-recreate $CONTAINER_NAME
+docker-compose -f /usr/src/app/salestracker.eu/docker-compose.production.yml up -d --force-recreate $CONTAINER_NAME
 
 docker ps -a
