@@ -17,7 +17,8 @@ services:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - MONGODB_URI=mongodb://${APP_WEB_ADMIN_MONGO_USER}:${APP_WEB_ADMIN_MONGO_PASSWORD}@mongodb:27017/salestracker
       - PORT=8000
-      - REDIS_ADDR=redis://redis:6379
+      - REDIS_ADDR=redis
+      - REDIS_PORT=6379
       - NODE_ENV=production
     links:
       - "server-elasticsearch:elasticsearch"
@@ -49,7 +50,8 @@ services:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - MONGODB_URI=mongodb://${APP_WEB_PUBLIC_MONGO_USER}:${APP_WEB_PUBLIC_MONGO_PASSWORD}@mongodb:27017/salestracker
       - PORT=9000
-      - REDIS_ADDR=redis://redis:6379
+      - REDIS_ADDR=redis
+      - REDIS_PORT=6379
       - NODE_ENV=production
     links:
       - "server-elasticsearch:elasticsearch"
@@ -63,8 +65,9 @@ services:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - MONGODB_URI=mongodb://${APP_BACKEND_FINDER_MONGO_USER}:${APP_BACKEND_FINDER_MONGO_PASSWORD}@mongodb:27017/salestracker
       - NODE_ENV=production
-      - REDIS_ADDR=redis://redis
+      - REDIS_ADDR=redis
       - REDIS_PORT=6379
+      - NODE_ENV=production
     links:
       - "server-elasticsearch:elasticsearch"
       - "server-mongodb:mongodb"
@@ -94,7 +97,8 @@ services:
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - MONGODB_URI=mongodb://${APP_BACKEND_HARVESTER_MONGO_USER}:${APP_BACKEND_HARVESTER_MONGO_PASSWORD}@mongodb:27017/salestracker
-      - REDIS_ADDR=redis://redis:6379
+      - REDIS_ADDR=redis
+      - REDIS_PORT=6379
       - NODE_ENV=production
     links:
       - "server-elasticsearch:elasticsearch"
@@ -124,7 +128,8 @@ services:
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - MONGODB_URI=mongodb://${APP_BACKEND_JANITOR_MONGO_USER}:${APP_BACKEND_JANITOR_MONGO_PASSWORD}@mongodb:27017/salestracker
-      - REDIS_ADDR=redis://redis:6379
+      - REDIS_ADDR=redis
+      - REDIS_PORT=6379
       - NODE_ENV=production
     links:
       - "server-elasticsearch:elasticsearch"
@@ -153,8 +158,9 @@ services:
       - backend-notifier-modules:/usr/src/app/node_modules
     environment:
       - MONGODB_URI=mongodb://${APP_BACKEND_NOTIFIER_MONGO_USER}:${APP_BACKEND_NOTIFIER_MONGO_PASSWORD}@mongodb:27017/salestracker
-      - REDIS_ADDR=redis://redis:6379
       - TELEGRAM_API_TOKEN=${TELEGRAM_API_TOKEN}
+      - REDIS_ADDR=redis
+      - REDIS_PORT=6379
       - NODE_ENV=production
     links:
       - "server-mongodb:mongodb"
@@ -181,7 +187,8 @@ services:
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - MONGODB_URI=mongodb://${APP_BACKEND_PROCESSOR_MONGO_USER}:${APP_BACKEND_PROCESSOR_MONGO_PASSWORD}@mongodb:27017/salestracker
-      - REDIS_ADDR=redis://redis:6379
+      - REDIS_ADDR=redis
+      - REDIS_PORT=6379
       - NODE_ENV=production
     links:
       - "server-elasticsearch:elasticsearch"
