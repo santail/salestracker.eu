@@ -78,7 +78,7 @@ services:
       - server-mongodb
       - server-redis
       - backend-processor
-    restart: on-failure
+    restart: always
     networks:
       - networks-backend-elasticsearch
       - networks-backend-mongodb
