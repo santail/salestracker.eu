@@ -61,14 +61,14 @@ services:
   salestracker.eu-finder:
     container_name: salestracker.eu-finder
     build:
-      context: ./salestracker.eu-finder/
-      dockerfile: Dockerfile
+      context: ../salestracker.eu-finder/
+      dockerfile: Dockerfile.development
     ports:
       - "9229:9229"
     volumes:
-      - ./salestracker.eu-finder/:/usr/src/app/
-      - ./salestracker.eu-shared/config/:/usr/src/app/config/
-      - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
+      - ../salestracker.eu-finder/:/usr/src/app/
+      - ../salestracker.eu-shared/config/:/usr/src/app/config/
+      - ../salestracker.eu-shared/lib/:/usr/src/app/lib/
       - salestracker.eu-finder-modules:/usr/src/app/node_modules
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
