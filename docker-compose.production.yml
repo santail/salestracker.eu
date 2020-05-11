@@ -83,17 +83,9 @@ services:
       - networks-backend-mongodb
       - networks-backend-redis
 
-  backend-harvester:
-    container_name: backend-harvester
-    build:
-      context: ./salestracker.eu-harvester/
-      dockerfile: Dockerfile.production
-    volumes:
-      - ./salestracker.eu-harvester/:/usr/src/app/
-      - ./salestracker.eu-shared/config/:/usr/src/app/config/
-      - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
-      - ./.data/uploads/:/usr/src/app/uploads/
-      - backend-harvester-modules:/usr/src/app/node_modules
+  salestracker.eu-harvester:
+    container_name: salestracker.eu-harvester
+    image: salestracker/salestracker.eu-harvester:latest
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - MONGODB_URI=mongodb://${APP_BACKEND_HARVESTER_MONGO_USER}:${APP_BACKEND_HARVESTER_MONGO_PASSWORD}@mongodb:27017/salestracker
@@ -109,7 +101,7 @@ services:
       - server-mongodb
       - server-redis
       - backend-processor
-    restart: on-failure    
+    restart: always
     networks:
       - networks-backend-elasticsearch
       - networks-backend-mongodb

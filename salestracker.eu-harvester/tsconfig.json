@@ -17,11 +17,11 @@
     "emitDecoratorMetadata": true,
     "allowJs": true,
     "esModuleInterop": true,
-    "types" : ["node", "lodash"]
+    "types": ["node", "lodash"]
   },
   "include": [
-      "lib/**/*.ts",
-      "src/**/*.ts"
+    "lib/**/*.ts",
+    "src/**/*.ts"
   ],
   "exclude": [
     "node_modules"
