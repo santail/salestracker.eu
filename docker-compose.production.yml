@@ -64,7 +64,6 @@ services:
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - MONGODB_URI=mongodb://${APP_BACKEND_FINDER_MONGO_USER}:${APP_BACKEND_FINDER_MONGO_PASSWORD}@mongodb:27017/salestracker
-      - NODE_ENV=production
       - REDIS_ADDR=redis
       - REDIS_PORT=6379
       - NODE_ENV=production
@@ -165,17 +164,9 @@ services:
       - networks-backend-mongodb
       - networks-backend-redis
 
-  backend-processor:
-    container_name: backend-processor
-    build:
-      context: ./salestracker.eu-processor/
-      dockerfile: Dockerfile.production
-    volumes:
-      - ./salestracker.eu-processor/:/usr/src/app/
-      - ./salestracker.eu-shared/config/:/usr/src/app/config/
-      - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
-      - ./.data/uploads/:/usr/src/app/uploads/
-      - backend-processor-modules:/usr/src/app/node_modules
+  salestracker.eu-processor:
+    container_name: salestracker.eu-processor
+    image: salestracker/salestracker.eu-processor:latest
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - MONGODB_URI=mongodb://${APP_BACKEND_PROCESSOR_MONGO_USER}:${APP_BACKEND_PROCESSOR_MONGO_PASSWORD}@mongodb:27017/salestracker
@@ -281,7 +272,7 @@ volumes:
   web-public-modules:
   web-public-public:
   salestracker.eu-finder-modules:
-  backend-harvester-modules:
+  salestracker.eu-harvester-modules:
   backend-janitor-modules:
   backend-notifier-modules:
-  backend-processor-modules:
+  salestracker.eu-processor-modules:
