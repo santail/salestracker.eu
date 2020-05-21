@@ -85,6 +85,8 @@ services:
   salestracker.eu-harvester:
     container_name: salestracker.eu-harvester
     image: salestracker/salestracker.eu-harvester:latest
+    volumes:
+      - ./.data/uploads/:/usr/src/app/uploads/
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - MONGODB_URI=mongodb://${APP_BACKEND_HARVESTER_MONGO_USER}:${APP_BACKEND_HARVESTER_MONGO_PASSWORD}@mongodb:27017/salestracker
@@ -167,6 +169,8 @@ services:
   salestracker.eu-processor:
     container_name: salestracker.eu-processor
     image: salestracker/salestracker.eu-processor:latest
+    volumes:
+      - ./.data/uploads/:/usr/src/app/uploads/
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - MONGODB_URI=mongodb://${APP_BACKEND_PROCESSOR_MONGO_USER}:${APP_BACKEND_PROCESSOR_MONGO_PASSWORD}@mongodb:27017/salestracker
@@ -271,8 +275,5 @@ volumes:
   web-admin-public:
   web-public-modules:
   web-public-public:
-  salestracker.eu-finder-modules:
-  salestracker.eu-harvester-modules:
   backend-janitor-modules:
   backend-notifier-modules:
-  salestracker.eu-processor-modules:
