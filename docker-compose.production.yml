@@ -75,7 +75,7 @@ services:
       - server-elasticsearch
       - server-mongodb
       - server-redis
-      - backend-processor
+      - salestracker.eu-processor
     restart: always
     networks:
       - networks-backend-elasticsearch
@@ -101,7 +101,7 @@ services:
       - server-elasticsearch
       - server-mongodb
       - server-redis
-      - backend-processor
+      - salestracker.eu-processor
     restart: always
     networks:
       - networks-backend-elasticsearch
@@ -132,7 +132,7 @@ services:
       - server-elasticsearch
       - server-mongodb
       - server-redis
-      - backend-processor
+      - salestracker.eu-processor
     restart: on-failure    
     networks:
       - networks-backend-elasticsearch
