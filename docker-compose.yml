@@ -16,8 +16,8 @@ services:
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - MONGODB_URI=mongodb://mongodb:27017/salestracker-dev
-      - PORT=8000
-      - REDIS_ADDR=redis://redis:6379
+      - REDIS_ADDR=redis
+      - REDIS_PORT=6379
       - NODE_ENV=development
     links:
       - "server-elasticsearch:elasticsearch"
@@ -50,7 +50,8 @@ services:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - MONGODB_URI=mongodb://mongodb:27017/salestracker-dev
       - PORT=9000
-      - REDIS_ADDR=redis://redis:6379
+      - REDIS_ADDR=redis
+      - REDIS_PORT=6379
       - NODE_ENV=development
       - MONGO_SEED=true
     links:
@@ -74,7 +75,7 @@ services:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - MONGODB_URI=mongodb://mongodb:27017/salestracker-dev
       - NODE_ENV=development
-      - REDIS_ADDR=redis://redis
+      - REDIS_ADDR=redis
       - REDIS_PORT=6379
     links:
       - "server-elasticsearch:elasticsearch"
@@ -106,7 +107,7 @@ services:
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - MONGODB_URI=mongodb://mongodb:27017/salestracker-dev
-      - REDIS_ADDR=redis://redis
+      - REDIS_ADDR=redis
       - REDIS_PORT=6379
       - NODE_ENV=development
       - PAGING_PAGES_LIMIT=1
@@ -140,7 +141,8 @@ services:
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - MONGODB_URI=mongodb://mongodb:27017/salestracker-dev
-      - REDIS_ADDR=redis://redis:6379
+      - REDIS_ADDR=redis
+      - REDIS_PORT=6379
       - NODE_ENV=development
     links:
       - "server-elasticsearch:elasticsearch"
@@ -170,7 +172,8 @@ services:
       - backend-notifier-modules:/usr/src/app/node_modules
     environment:
       - MONGODB_URI=mongodb://mongodb:27017/salestracker-dev
-      - REDIS_ADDR=redis://redis:6379
+      - REDIS_ADDR=redis
+      - REDIS_PORT=6379
       - TELEGRAM_API_TOKEN=${TELEGRAM_API_TOKEN}
       - NODE_ENV=development
     links:
@@ -187,10 +190,10 @@ services:
   salestracker.eu-processor:
     container_name: salestracker.eu-processor
     build:
-      context: ./salestracker.eu-processor/
+      context: ./../salestracker.eu-processor/
       dockerfile: Dockerfile.development
     volumes:
-      - ./salestracker.eu-processor/:/usr/src/app/
+      - ./../salestracker.eu-processor/:/usr/src/app/
       - ./salestracker.eu-shared/config/:/usr/src/app/config/
       - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
       - ./.data/uploads/:/usr/src/app/uploads/
@@ -198,7 +201,7 @@ services:
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - MONGODB_URI=mongodb://mongodb:27017/salestracker-dev
-      - REDIS_ADDR=redis://redis
+      - REDIS_ADDR=redis
       - REDIS_PORT=6379
       - NODE_ENV=development
       - SHOULD_HARVEST_PICTURES=true
