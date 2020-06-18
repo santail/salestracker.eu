@@ -139,16 +139,11 @@ services:
       - networks-backend-mongodb
       - networks-backend-redis
 
-  backend-notifier:
-    container_name: backend-notifier
-    build:
-      context: ./salestracker.eu-notifier/
-      dockerfile: Dockerfile.production
+  salestracker.eu-notifier:
+    container_name: salestracker.eu-notifier
+    image: salestracker/salestracker.eu-processor:latest
     volumes:
-      - ./salestracker.eu-notifier/:/usr/src/app/
-      - ./salestracker.eu-shared/config/:/usr/src/app/config/
-      - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
-      - backend-notifier-modules:/usr/src/app/node_modules
+      - ./.data/uploads/:/usr/src/app/uploads/
     environment:
       - MONGODB_URI=mongodb://${APP_BACKEND_NOTIFIER_MONGO_USER}:${APP_BACKEND_NOTIFIER_MONGO_PASSWORD}@mongodb:27017/salestracker
       - TELEGRAM_API_TOKEN=${TELEGRAM_API_TOKEN}
@@ -276,4 +271,3 @@ volumes:
   web-public-modules:
   web-public-public:
   backend-janitor-modules:
-  backend-notifier-modules:

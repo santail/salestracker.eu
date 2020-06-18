@@ -160,16 +160,17 @@ services:
       - networks-backend-mongodb
       - networks-backend-redis
 
-  backend-notifier:
-    container_name: backend-notifier
+  salestracker.eu-notifier:
+    container_name: salestracker.eu-notifier
     build:
-      context: ./salestracker.eu-notifier/
-      dockerfile: Dockerfile
+      context: ./../salestracker.eu-notifier/
+      dockerfile: Dockerfile.development
     volumes:
-      - ./salestracker.eu-notifier/:/usr/src/app/
+      - ./../salestracker.eu-notifier/:/usr/src/app/
       - ./salestracker.eu-shared/config/:/usr/src/app/config/
       - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
-      - backend-notifier-modules:/usr/src/app/node_modules
+      - ./.data/uploads/:/usr/src/app/uploads/
+      - salestracker.eu-notifier-modules:/usr/src/app/node_modules
     environment:
       - MONGODB_URI=mongodb://mongodb:27017/salestracker-dev
       - REDIS_ADDR=redis
@@ -343,5 +344,5 @@ volumes:
   salestracker.eu-finder-modules:
   salestracker.eu-harvester-modules:
   backend-janitor-modules:
-  backend-notifier-modules:
+  salestracker.eu-notifier-modules:
   salestracker.eu-processor-modules:
