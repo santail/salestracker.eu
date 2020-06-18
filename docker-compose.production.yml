@@ -81,6 +81,10 @@ services:
       - networks-backend-elasticsearch
       - networks-backend-mongodb
       - networks-backend-redis
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   salestracker.eu-harvester:
     container_name: salestracker.eu-harvester
@@ -107,6 +111,10 @@ services:
       - networks-backend-elasticsearch
       - networks-backend-mongodb
       - networks-backend-redis
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   backend-janitor:
     container_name: backend-janitor
@@ -160,6 +168,10 @@ services:
     networks:
       - networks-backend-mongodb
       - networks-backend-redis
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   salestracker.eu-processor:
     container_name: salestracker.eu-processor
@@ -185,7 +197,11 @@ services:
       - networks-backend-elasticsearch
       - networks-backend-mongodb
       - networks-backend-redis
-
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+  
   server-mongodb:
     container_name: server-mongodb
     image: mongo:latest
