@@ -141,7 +141,7 @@ services:
 
   salestracker.eu-notifier:
     container_name: salestracker.eu-notifier
-    image: salestracker/salestracker.eu-processor:latest
+    image: salestracker/salestracker.eu-notifier:latest
     volumes:
       - ./.data/uploads/:/usr/src/app/uploads/
     environment:
