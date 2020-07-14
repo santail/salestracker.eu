@@ -1,18 +1,13 @@
 version: '3.7'
 services:
           
-  web-admin:
-    container_name: web-admin
-    build:
-      context: ./salestracker.eu-admin/
-      dockerfile: Dockerfile.production
+  salestracker.eu-admin:
+    container_name: salestracker.eu-admin
+    image: salestracker/salestracker.eu-admin:latest
     ports:
       - "8000:8000"
     volumes:
-      - ./salestracker.eu-admin/:/usr/src/app/
       - ./.data/uploads/:/usr/src/app/uploads/
-      - web-admin-modules:/usr/src/app/node_modules # will statically map node_modules folder to container. Should clean-up on each package.json change with docker rm -v containerId
-      - web-admin-public:/usr/src/app/public/lib # will statically map public/lib folder to container. Should clean-up on each bower.json change with docker rm -v containerId
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - MONGODB_URI=mongodb://${APP_WEB_ADMIN_MONGO_USER}:${APP_WEB_ADMIN_MONGO_PASSWORD}@mongodb:27017/salestracker
@@ -33,6 +28,10 @@ services:
       - networks-backend-elasticsearch
       - networks-backend-mongodb
       - networks-backend-redis
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   web-public:
     container_name: web-public
@@ -282,8 +281,6 @@ networks:
   networks-backend-redis:
 
 volumes:
-  web-admin-modules:
-  web-admin-public:
   web-public-modules:
   web-public-public:
   backend-janitor-modules:
