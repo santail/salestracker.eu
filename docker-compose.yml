@@ -1,24 +1,25 @@
 version: '3.7'
 services:
           
-  web-admin:
-    container_name: web-admin
+  salestracker.eu-admin:
+    container_name: salestracker.eu-admin
     build:
-      context: ./salestracker.eu-admin/
-      dockerfile: Dockerfile
+      context: ./../salestracker.eu-admin/
+      dockerfile: Dockerfile.development
     ports:
       - "8000:8000"
     volumes:
-      - ./salestracker.eu-admin/:/usr/src/app/
+      - ./../salestracker.eu-admin/:/usr/src/app/
       - ./.data/uploads/:/usr/src/app/uploads/
-      - web-admin-modules:/usr/src/app/node_modules # will statically map node_modules folder to container. Should clean-up on each package.json change with docker rm -v containerId
-      - web-admin-public:/usr/src/app/public/lib # will statically map public/lib folder to container. Should clean-up on each bower.json change with docker rm -v containerId
+      - salestracker.eu-admin-modules:/usr/src/app/node_modules # will statically map node_modules folder to container. Should clean-up on each package.json change with docker rm -v containerId
+      - salestracker.eu-admin-public:/usr/src/app/public/lib # will statically map public/lib folder to container. Should clean-up on each bower.json change with docker rm -v containerId
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - MONGODB_URI=mongodb://mongodb:27017/salestracker-dev
       - REDIS_ADDR=redis
       - REDIS_PORT=6379
       - NODE_ENV=development
+      - PORT=8000
     links:
       - "server-elasticsearch:elasticsearch"
       - "server-mongodb:mongodb"
@@ -62,14 +63,12 @@ services:
   salestracker.eu-finder:
     container_name: salestracker.eu-finder
     build:
-      context: ../salestracker.eu-finder/
+      context: ./../salestracker.eu-finder/
       dockerfile: Dockerfile.development
     ports:
       - "9229:9229"
     volumes:
-      - ../salestracker.eu-finder/:/usr/src/app/
-      - ../salestracker.eu-shared/config/:/usr/src/app/config/
-      - ../salestracker.eu-shared/lib/:/usr/src/app/lib/
+      - ./../salestracker.eu-finder/:/usr/src/app/
       - salestracker.eu-finder-modules:/usr/src/app/node_modules
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
@@ -96,12 +95,10 @@ services:
   salestracker.eu-harvester:
     container_name: salestracker.eu-harvester
     build:
-      context: ./salestracker.eu-harvester/
+      context: ./../salestracker.eu-harvester/
       dockerfile: Dockerfile.development
     volumes:
-      - ./salestracker.eu-harvester/:/usr/src/app/
-      - ./salestracker.eu-shared/config/:/usr/src/app/config/
-      - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
+      - ./../salestracker.eu-harvester/:/usr/src/app/
       - ./.data/uploads/:/usr/src/app/uploads/
       - salestracker.eu-harvester-modules:/usr/src/app/node_modules
     environment:
@@ -167,8 +164,6 @@ services:
       dockerfile: Dockerfile.development
     volumes:
       - ./../salestracker.eu-notifier/:/usr/src/app/
-      - ./salestracker.eu-shared/config/:/usr/src/app/config/
-      - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
       - ./.data/uploads/:/usr/src/app/uploads/
       - salestracker.eu-notifier-modules:/usr/src/app/node_modules
     environment:
@@ -195,8 +190,6 @@ services:
       dockerfile: Dockerfile.development
     volumes:
       - ./../salestracker.eu-processor/:/usr/src/app/
-      - ./salestracker.eu-shared/config/:/usr/src/app/config/
-      - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
       - ./.data/uploads/:/usr/src/app/uploads/
       - salestracker.eu-processor-modules:/usr/src/app/node_modules
     environment:
@@ -337,8 +330,8 @@ networks:
   networks-backend-redis:
 
 volumes:
-  web-admin-modules:
-  web-admin-public:
+  salestracker.eu-admin-modules:
+  salestracker.eu-admin-public:
   web-public-modules:
   web-public-public:
   salestracker.eu-finder-modules:
