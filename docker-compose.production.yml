@@ -153,7 +153,7 @@ services:
       - REDIS_PORT=6379
       - NODE_ENV=production
       - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
-      = TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
     links:
       - "server-mongodb:mongodb"
       - "server-redis:redis"
