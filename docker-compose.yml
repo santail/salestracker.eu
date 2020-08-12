@@ -125,16 +125,15 @@ services:
       - networks-backend-mongodb
       - networks-backend-redis
 
-  backend-janitor:
-    container_name: backend-janitor
+  salestracker.eu-janitor:
+    container_name: salestracker.eu-janitor
     build:
-      context: ./salestracker.eu-janitor/
-      dockerfile: Dockerfile
+      context: ./../salestracker.eu-janitor/
+      dockerfile: Dockerfile.development
     volumes:
-      - ./salestracker.eu-janitor/:/usr/src/app/
-      - ./salestracker.eu-shared/config/:/usr/src/app/config/
-      - ./salestracker.eu-shared/lib/:/usr/src/app/lib/
-      - backend-janitor-modules:/usr/src/app/node_modules
+      - ./../salestracker.eu-janitor/:/usr/src/app/
+      - ./.data/uploads/:/usr/src/app/uploads/
+      - salestracker.eu-janitor-modules:/usr/src/app/node_modules
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - MONGODB_URI=mongodb://mongodb:27017/salestracker-dev
@@ -336,6 +335,6 @@ volumes:
   web-public-public:
   salestracker.eu-finder-modules:
   salestracker.eu-harvester-modules:
-  backend-janitor-modules:
+  salestracker.eu-janitor-modules:
   salestracker.eu-notifier-modules:
   salestracker.eu-processor-modules:
