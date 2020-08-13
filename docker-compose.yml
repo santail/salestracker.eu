@@ -14,12 +14,12 @@ services:
       - salestracker.eu-admin-modules:/usr/src/app/node_modules # will statically map node_modules folder to container. Should clean-up on each package.json change with docker rm -v containerId
       - salestracker.eu-admin-public:/usr/src/app/public/lib # will statically map public/lib folder to container. Should clean-up on each bower.json change with docker rm -v containerId
     environment:
+      - PORT=8000
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - MONGODB_URI=mongodb://mongodb:27017/salestracker-dev
       - REDIS_ADDR=redis
       - REDIS_PORT=6379
       - NODE_ENV=development
-      - PORT=8000
     links:
       - "server-elasticsearch:elasticsearch"
       - "server-mongodb:mongodb"
@@ -35,22 +35,22 @@ services:
       - networks-backend-mongodb
       - networks-backend-redis
 
-  web-public:
-    container_name: web-public
+  salestracker.eu-public:
+    container_name: salestracker.eu-public
     build:
-      context: ./salestracker.eu-public/
-      dockerfile: Dockerfile
+      context: ./../salestracker.eu-public/
+      dockerfile: Dockerfile.development
     ports:
       - "9000:9000"
     volumes:
-      - ./salestracker.eu-public/:/usr/src/app/
+      - ./../salestracker.eu-public/:/usr/src/app/
       - ./.data/uploads/:/usr/src/app/uploads/
-      - web-public-modules:/usr/src/app/node_modules # will statically map node_modules folder to container. Should clean-up on each package.json change with docker rm -v containerId
-      - web-public-public:/usr/src/app/public/lib # will statically map public/lib folder to container. Should clean-up on each bower.json change with docker rm -v containerId
+      - salestracker.eu-public-modules:/usr/src/app/node_modules # will statically map node_modules folder to container. Should clean-up on each package.json change with docker rm -v containerId
+      - salestracker.eu-public-public:/usr/src/app/public/lib # will statically map public/lib folder to container. Should clean-up on each bower.json change with docker rm -v containerId
     environment:
+      - PORT=9000
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - MONGODB_URI=mongodb://mongodb:27017/salestracker-dev
-      - PORT=9000
       - REDIS_ADDR=redis
       - REDIS_PORT=6379
       - NODE_ENV=development
@@ -59,6 +59,15 @@ services:
       - "server-elasticsearch:elasticsearch"
       - "server-mongodb:mongodb"
       - "server-redis:redis"
+    depends_on:
+      - server-elasticsearch
+      - server-mongodb
+      - server-redis
+    restart: on-failure
+    networks:
+      - networks-backend-elasticsearch
+      - networks-backend-mongodb
+      - networks-backend-redis
 
   salestracker.eu-finder:
     container_name: salestracker.eu-finder
@@ -331,8 +340,8 @@ networks:
 volumes:
   salestracker.eu-admin-modules:
   salestracker.eu-admin-public:
-  web-public-modules:
-  web-public-public:
+  salestracker.eu-public-modules:
+  salestracker.eu-public-public:
   salestracker.eu-finder-modules:
   salestracker.eu-harvester-modules:
   salestracker.eu-janitor-modules:

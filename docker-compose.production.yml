@@ -33,18 +33,13 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  web-public:
-    container_name: web-public
-    build:
-      context: ./salestracker.eu-public/
-      dockerfile: Dockerfile.production
+  salestracker.eu-public:
+    container_name: salestracker.eu-public
+    image: salestracker/salestracker.eu-public:latest
     ports:
       - "9000:9000"
     volumes:
-      - ./salestracker.eu-public/:/usr/src/app/
       - ./.data/uploads/:/usr/src/app/uploads/
-      - web-public-modules:/usr/src/app/node_modules # will statically map node_modules folder to container. Should clean-up on each package.json change with docker rm -v containerId
-      - web-public-public:/usr/src/app/public/lib # will statically map public/lib folder to container. Should clean-up on each bower.json change with docker rm -v containerId
     environment:
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - MONGODB_URI=mongodb://${APP_WEB_PUBLIC_MONGO_USER}:${APP_WEB_PUBLIC_MONGO_PASSWORD}@mongodb:27017/salestracker
@@ -56,6 +51,19 @@ services:
       - "server-elasticsearch:elasticsearch"
       - "server-mongodb:mongodb"
       - "server-redis:redis"
+    depends_on:
+      - server-elasticsearch
+      - server-mongodb
+      - server-redis
+    restart: on-failure
+    networks:
+      - networks-backend-elasticsearch
+      - networks-backend-mongodb
+      - networks-backend-redis
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   salestracker.eu-finder:
     container_name: salestracker.eu-finder
