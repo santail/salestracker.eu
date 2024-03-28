@@ -1,0 +1,24 @@
+{
+  "name": "public-portal-api",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/public-portal-api/src",
+  "projectType": "application",
+  "targets": {
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "public-portal-api:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "public-portal-api:build:development"
+        },
+        "production": {
+          "buildTarget": "public-portal-api:build:production"
+        }
+      }
+    }
+  },
+  "tags": []
+}
