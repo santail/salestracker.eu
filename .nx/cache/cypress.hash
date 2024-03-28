@@ -1,0 +1,73 @@
+{
+  "16115305096552347757": {
+    "e2e": {
+      "command": "cypress run",
+      "options": {
+        "cwd": "apps/salestracker.eu-e2e"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "cypress"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/dist/cypress/apps/salestracker.eu-e2e/videos",
+        "{workspaceRoot}/dist/cypress/apps/salestracker.eu-e2e/screenshots"
+      ],
+      "configurations": {
+        "production": {
+          "command": "cypress run --env webServerCommand=\"nx run salestracker.eu:preview\""
+        }
+      }
+    },
+    "e2e-ci--src/e2e/app.cy.ts": {
+      "outputs": [
+        "{workspaceRoot}/dist/cypress/apps/salestracker.eu-e2e/videos",
+        "{workspaceRoot}/dist/cypress/apps/salestracker.eu-e2e/screenshots"
+      ],
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "cypress"
+          ]
+        }
+      ],
+      "cache": true,
+      "command": "cypress run --env webServerCommand=\"nx run salestracker.eu:serve-static\" --spec src/e2e/app.cy.ts",
+      "options": {
+        "cwd": "apps/salestracker.eu-e2e"
+      }
+    },
+    "e2e-ci": {
+      "executor": "nx:noop",
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "cypress"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/dist/cypress/apps/salestracker.eu-e2e/videos",
+        "{workspaceRoot}/dist/cypress/apps/salestracker.eu-e2e/screenshots"
+      ],
+      "dependsOn": [
+        {
+          "target": "e2e-ci--src/e2e/app.cy.ts",
+          "projects": "self",
+          "params": "forward"
+        }
+      ]
+    }
+  }
+}

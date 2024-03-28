@@ -1,0 +1,23 @@
+{
+  "2613939305187605801": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/salestracker.eu"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/salestracker.eu"
+      ]
+    }
+  }
+}
