@@ -2,17 +2,26 @@
   "version": "6.0",
   "nxVersion": "18.1.3",
   "deps": {
+    "@nestjs/common": "^10.0.2",
+    "@nestjs/core": "^10.0.2",
+    "@nestjs/platform-express": "^10.0.2",
+    "axios": "^1.6.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.8.0",
     "tslib": "^2.3.0",
     "@babel/core": "^7.14.5",
     "@babel/preset-react": "^7.14.5",
+    "@nestjs/schematics": "^10.0.1",
+    "@nestjs/testing": "^10.0.2",
     "@nx/cypress": "18.1.3",
     "@nx/eslint": "18.1.3",
     "@nx/eslint-plugin": "18.1.3",
     "@nx/jest": "18.1.3",
     "@nx/js": "18.1.3",
     "@nx/nest": "^18.1.3",
+    "@nx/node": "18.1.3",
     "@nx/react": "18.1.3",
     "@nx/web": "18.1.3",
     "@nx/webpack": "18.1.3",
@@ -42,6 +51,7 @@
     "eslint-plugin-react-hooks": "4.6.0",
     "jest": "^29.4.1",
     "jest-environment-jsdom": "^29.4.1",
+    "jest-environment-node": "^29.4.1",
     "nx": "18.1.3",
     "postcss": "8.4.21",
     "prettier": "^2.6.2",
@@ -53,7 +63,11 @@
     "url-loader": "^4.1.1",
     "webpack-cli": "^5.1.4"
   },
-  "pathMappings": {},
+  "pathMappings": {
+    "@salestracker.ts/parsers": [
+      "libs/parsers/src/index.ts"
+    ]
+  },
   "nxJsonPlugins": [
     {
       "name": "@nx/webpack/plugin",
@@ -86,223 +100,436 @@
   "fileMap": {
     "nonProjectFiles": [
       {
-        "file": "salestracker.eu-shared/lib/parsers/www.babycity.ee.parser.ts",
-        "hash": "9930370434659130748"
-      },
-      {
-        "file": "salestracker.eu-shared/lib/parsers/www.rimi.ee.parser.ts",
-        "hash": "3967776639236007687"
-      },
-      {
-        "file": "salestracker.eu-shared/test/parsers/www.selver.ee/siider-kopparberg-metsamarja-500-ml-purk-1",
-        "hash": "8700767832359157459"
-      },
-      {
         "file": "salestracker.eu-shared/lib/parsers/www.ecoop.ee.parser.ts",
         "hash": "13968935759036845866"
-      },
-      {
-        "file": "salestracker.eu-shared/lib/parsers/www.minuvalik.ee.parser.ts",
-        "hash": "7263112880912750878"
-      },
-      {
-        "file": ".eslintrc.json",
-        "hash": "18315524891129148814"
-      },
-      {
-        "file": "salestracker.eu-shared/lib/parsers/AbstractParser.ts",
-        "hash": "4722867138466024901"
-      },
-      {
-        "file": "config/bootstrap/mongodb/mongo-healthcheck",
-        "hash": "17645009567508826582"
-      },
-      {
-        "file": "tsconfig.base.json",
-        "hash": "16936441711144470533"
-      },
-      {
-        "file": "config/elasticsearch.yml",
-        "hash": "1551738573534847751"
-      },
-      {
-        "file": "salestracker.eu-shared/test/parsers/www.zoomaailm.ee/keraamilised-kausid-edition-komplekt-alusega-2tkx0-3l-12cm-35x22cm.data.json",
-        "hash": "8741887306269060813"
-      },
-      {
-        "file": "package-lock.json",
-        "hash": "2610643183945302493"
-      },
-      {
-        "file": "jest.config.ts",
-        "hash": "3494843969422251966"
-      },
-      {
-        "file": ".circleci/config.yml",
-        "hash": "17853243264002052895"
-      },
-      {
-        "file": "package.json",
-        "hash": "6416437469658816620"
-      },
-      {
-        "file": ".gitattributes",
-        "hash": "10565074416347251976"
-      },
-      {
-        "file": "docker-compose.production.yml",
-        "hash": "13875163464025950098"
-      },
-      {
-        "file": "salestracker.eu-shared/lib/parsers/www.euronics.ee.parser.ts",
-        "hash": "1371353631971303873"
-      },
-      {
-        "file": "salestracker.eu-seeds/data/2_wishes/data.js",
-        "hash": "12236544327571850508"
-      },
-      {
-        "file": ".editorconfig",
-        "hash": "5443105041930014821"
-      },
-      {
-        "file": "salestracker.eu-shared/lib/parsers/www.zoomaailm.ee.parser.ts",
-        "hash": "6320675490877729050"
-      },
-      {
-        "file": "README copy.md",
-        "hash": "475043767862354039"
-      },
-      {
-        "file": "salestracker.eu-shared/test/parsers/www.barbora.ee/valge-sok-mee-mandlitega-toblerone-100-g",
-        "hash": "14112017250896115082"
       },
       {
         "file": "salestracker.eu-shared/test/parsers/www.euronics.ee/sm-j330fzkdseb",
         "hash": "6611980683535234443"
       },
       {
-        "file": "docker-compose.yml",
-        "hash": "1892406293226374702"
+        "file": "salestracker.eu-shared/lib/parsers/www.babycity.ee.parser.ts",
+        "hash": "9930370434659130748"
       },
       {
-        "file": "salestracker.eu-shared/lib/parsers/www.asos.com.men.parser.ts",
-        "hash": "5493618793222598212"
+        "file": "salestracker.eu-shared/lib/parsers/AbstractParser.ts",
+        "hash": "4722867138466024901"
       },
       {
-        "file": "salestracker.eu-shared/test/parsers/www.zoomaailm.ee/keraamilised-kausid-edition-komplekt-alusega-2tkx0-3l-12cm-35x22cm",
-        "hash": "9920102873419690064"
+        "file": "nx.json",
+        "hash": "10145157841892122385"
       },
       {
-        "file": ".gitignore",
-        "hash": "16877376182141465221"
+        "file": ".eslintrc.json",
+        "hash": "4566917484430375526"
       },
       {
-        "file": "README.md",
-        "hash": "2806626510530724905"
-      },
-      {
-        "file": "salestracker.eu-shared/lib/parsers/www.yoox.com.parser.js",
-        "hash": "12138733143690224042"
-      },
-      {
-        "file": "salestracker.eu-shared/lib/services/ParserFactory.ts",
-        "hash": "10235115087437172030"
-      },
-      {
-        "file": ".nx/cache/d/server-process.json",
-        "hash": "17159656297731011092"
-      },
-      {
-        "file": "salestracker.eu-shared/test/parsers/www.selver.ee/siider-kopparberg-metsamarja-500-ml-purk-1.data.json",
-        "hash": "8019855344899696063"
-      },
-      {
-        "file": "config/bootstrap/mongodb/create_db_user.sh",
-        "hash": "3834770056326528873"
-      },
-      {
-        "file": ".vscode/extensions.json",
-        "hash": "4934098906304722861"
-      },
-      {
-        "file": "salestracker.eu-seeds/data/1_sites/data.js",
-        "hash": "6354548713535375639"
+        "file": "salestracker.eu-shared/test/parsers/www.barbora.ee/valge-sok-mee-mandlitega-toblerone-100-g",
+        "hash": "14112017250896115082"
       },
       {
         "file": "salestracker.eu-seeds/data/3_categories/data.js",
         "hash": "12616605660235098431"
       },
       {
-        "file": "jest.preset.js",
-        "hash": "9430166341120122740"
-      },
-      {
-        "file": "salestracker.eu-shared/lib/parsers/www.selver.ee.parser.ts",
-        "hash": "397936709169820863"
-      },
-      {
-        "file": "nx.json",
-        "hash": "13881198312131496207"
-      },
-      {
-        "file": "salestracker.eu-shared/test/parsers/parsers.spec.js",
-        "hash": "7750283719351799082"
-      },
-      {
-        "file": "salestracker.eu-shared/test/parsers/www.euronics.ee/sm-j330fzkdseb.data.json",
-        "hash": "15674105222798847532"
-      },
-      {
-        "file": ".prettierignore",
-        "hash": "16448050467312557263"
-      },
-      {
-        "file": "salestracker.eu-shared/lib/parsers/www.asos.com.women.parser.ts",
-        "hash": "1923907038063333121"
-      },
-      {
-        "file": "salestracker.eu-shared/lib/parsers/www.houseoffraser.co.uk.parser.js",
-        "hash": "15581527524147623871"
-      },
-      {
-        "file": "deploy_app.sh",
-        "hash": "7856294544137730452"
-      },
-      {
-        "file": "salestracker.eu-shared/lib/parsers/www.barbora.ee.parser.ts",
-        "hash": "1307477850185706092"
-      },
-      {
-        "file": "salestracker.eu-shared/lib/parsers/www.nordstrom.com.parser.js",
-        "hash": "7323987731606517820"
-      },
-      {
-        "file": "salestracker.eu-shared/lib/services/SessionFactory.ts",
-        "hash": "12945958327122341208"
-      },
-      {
-        "file": "salestracker.eu-shared/test/parsers/www.barbora.ee/valge-sok-mee-mandlitega-toblerone-100-g.data.json",
-        "hash": "15727345549006361711"
+        "file": ".editorconfig",
+        "hash": "5443105041930014821"
       },
       {
         "file": "salestracker.eu-shared/lib/services/Logger.ts",
         "hash": "11804440899399824163"
       },
       {
+        "file": "salestracker.eu-shared/test/parsers/www.euronics.ee/sm-j330fzkdseb.data.json",
+        "hash": "15674105222798847532"
+      },
+      {
+        "file": ".circleci/config.yml",
+        "hash": "17853243264002052895"
+      },
+      {
+        "file": "salestracker.eu-shared/lib/parsers/www.euronics.ee.parser.ts",
+        "hash": "1371353631971303873"
+      },
+      {
+        "file": ".vscode/extensions.json",
+        "hash": "4934098906304722861"
+      },
+      {
+        "file": "config/bootstrap/mongodb/mongo-healthcheck",
+        "hash": "17645009567508826582"
+      },
+      {
+        "file": "salestracker.eu-shared/lib/services/SessionFactory.ts",
+        "hash": "12945958327122341208"
+      },
+      {
+        "file": "README.md",
+        "hash": "2806626510530724905"
+      },
+      {
+        "file": "config/elasticsearch.yml",
+        "hash": "1551738573534847751"
+      },
+      {
+        "file": ".gitattributes",
+        "hash": "10565074416347251976"
+      },
+      {
         "file": ".env.dist",
         "hash": "7529894928134611713"
+      },
+      {
+        "file": "salestracker.eu-shared/lib/services/ParserFactory.ts",
+        "hash": "10235115087437172030"
+      },
+      {
+        "file": "salestracker.eu-shared/lib/parsers/www.houseoffraser.co.uk.parser.js",
+        "hash": "15581527524147623871"
+      },
+      {
+        "file": "salestracker.eu-seeds/data/2_wishes/data.js",
+        "hash": "12236544327571850508"
+      },
+      {
+        "file": "package-lock.json",
+        "hash": "15333209403230611918"
+      },
+      {
+        "file": "jest.config.ts",
+        "hash": "3494843969422251966"
+      },
+      {
+        "file": "salestracker.eu-shared/lib/parsers/www.zoomaailm.ee.parser.ts",
+        "hash": "6320675490877729050"
+      },
+      {
+        "file": "salestracker.eu-shared/test/parsers/parsers.spec.js",
+        "hash": "7750283719351799082"
       },
       {
         "file": ".prettierrc",
         "hash": "16267754514737964994"
       },
       {
+        "file": "tsconfig.base.json",
+        "hash": "2866398363207886943"
+      },
+      {
+        "file": "salestracker.eu-shared/lib/parsers/www.minuvalik.ee.parser.ts",
+        "hash": "7263112880912750878"
+      },
+      {
+        "file": "salestracker.eu-shared/test/parsers/www.zoomaailm.ee/keraamilised-kausid-edition-komplekt-alusega-2tkx0-3l-12cm-35x22cm.data.json",
+        "hash": "8741887306269060813"
+      },
+      {
+        "file": "docker-compose.yml",
+        "hash": "1892406293226374702"
+      },
+      {
+        "file": ".gitignore",
+        "hash": "16877376182141465221"
+      },
+      {
+        "file": "salestracker.eu-shared/lib/parsers/www.rimi.ee.parser.ts",
+        "hash": "3967776639236007687"
+      },
+      {
+        "file": "salestracker.eu-shared/lib/parsers/www.barbora.ee.parser.ts",
+        "hash": "1307477850185706092"
+      },
+      {
+        "file": "salestracker.eu-shared/test/parsers/www.zoomaailm.ee/keraamilised-kausid-edition-komplekt-alusega-2tkx0-3l-12cm-35x22cm",
+        "hash": "9920102873419690064"
+      },
+      {
+        "file": "salestracker.eu-shared/lib/parsers/www.asos.com.men.parser.ts",
+        "hash": "5493618793222598212"
+      },
+      {
+        "file": "salestracker.eu-shared/lib/parsers/www.asos.com.women.parser.ts",
+        "hash": "1923907038063333121"
+      },
+      {
+        "file": "salestracker.eu-shared/test/parsers/www.barbora.ee/valge-sok-mee-mandlitega-toblerone-100-g.data.json",
+        "hash": "15727345549006361711"
+      },
+      {
+        "file": "docker-compose.production.yml",
+        "hash": "13875163464025950098"
+      },
+      {
+        "file": "package.json",
+        "hash": "4005935992661999457"
+      },
+      {
+        "file": "jest.preset.js",
+        "hash": "9430166341120122740"
+      },
+      {
+        "file": "README copy.md",
+        "hash": "475043767862354039"
+      },
+      {
+        "file": "deploy_app.sh",
+        "hash": "7856294544137730452"
+      },
+      {
         "file": ".eslintignore",
         "hash": "7663861978715868291"
+      },
+      {
+        "file": "salestracker.eu-shared/lib/parsers/www.selver.ee.parser.ts",
+        "hash": "397936709169820863"
+      },
+      {
+        "file": "config/bootstrap/mongodb/create_db_user.sh",
+        "hash": "3834770056326528873"
+      },
+      {
+        "file": "salestracker.eu-shared/test/parsers/www.selver.ee/siider-kopparberg-metsamarja-500-ml-purk-1",
+        "hash": "8700767832359157459"
+      },
+      {
+        "file": ".prettierignore",
+        "hash": "16448050467312557263"
+      },
+      {
+        "file": "salestracker.eu-shared/lib/parsers/www.yoox.com.parser.js",
+        "hash": "12138733143690224042"
+      },
+      {
+        "file": "salestracker.eu-shared/test/parsers/www.selver.ee/siider-kopparberg-metsamarja-500-ml-purk-1.data.json",
+        "hash": "8019855344899696063"
+      },
+      {
+        "file": "salestracker.eu-shared/lib/parsers/www.nordstrom.com.parser.js",
+        "hash": "7323987731606517820"
+      },
+      {
+        "file": "salestracker.eu-seeds/data/1_sites/data.js",
+        "hash": "6354548713535375639"
       }
     ],
     "projectFileMap": {
+      "parsers": [
+        {
+          "file": "libs/parsers/.eslintrc.json",
+          "hash": "16896711999632553762"
+        },
+        {
+          "file": "libs/parsers/README.md",
+          "hash": "9828506609158611694"
+        },
+        {
+          "file": "libs/parsers/jest.config.ts",
+          "hash": "14069273932787050885"
+        },
+        {
+          "file": "libs/parsers/package.json",
+          "hash": "123167926471009141",
+          "deps": [
+            "npm:tslib"
+          ]
+        },
+        {
+          "file": "libs/parsers/project.json",
+          "hash": "2054928123601682759"
+        },
+        {
+          "file": "libs/parsers/src/index.ts",
+          "hash": "15739844980390814630"
+        },
+        {
+          "file": "libs/parsers/src/lib/parsers.spec.ts",
+          "hash": "13261330787557134256"
+        },
+        {
+          "file": "libs/parsers/src/lib/parsers.ts",
+          "hash": "3798837713490595101"
+        },
+        {
+          "file": "libs/parsers/tsconfig.json",
+          "hash": "5840880287502376438"
+        },
+        {
+          "file": "libs/parsers/tsconfig.lib.json",
+          "hash": "3632393694954060084"
+        },
+        {
+          "file": "libs/parsers/tsconfig.spec.json",
+          "hash": "11550347367511341917"
+        }
+      ],
+      "public-portal-api-e2e": [
+        {
+          "file": "apps/public-portal-api-e2e/.eslintrc.json",
+          "hash": "13800677001662881425"
+        },
+        {
+          "file": "apps/public-portal-api-e2e/jest.config.ts",
+          "hash": "4576469044039014244"
+        },
+        {
+          "file": "apps/public-portal-api-e2e/project.json",
+          "hash": "2590992564204642491"
+        },
+        {
+          "file": "apps/public-portal-api-e2e/src/public-portal-api/public-portal-api.spec.ts",
+          "hash": "110394728024017389",
+          "deps": [
+            "npm:axios"
+          ]
+        },
+        {
+          "file": "apps/public-portal-api-e2e/src/support/global-setup.ts",
+          "hash": "2568409276037275290"
+        },
+        {
+          "file": "apps/public-portal-api-e2e/src/support/global-teardown.ts",
+          "hash": "5275447082211835490"
+        },
+        {
+          "file": "apps/public-portal-api-e2e/src/support/test-setup.ts",
+          "hash": "10984585515912236441",
+          "deps": [
+            "npm:axios"
+          ]
+        },
+        {
+          "file": "apps/public-portal-api-e2e/tsconfig.json",
+          "hash": "15443990093475294480"
+        },
+        {
+          "file": "apps/public-portal-api-e2e/tsconfig.spec.json",
+          "hash": "14954872453723519891"
+        }
+      ],
+      "salestracker.eu-e2e": [
+        {
+          "file": "apps/salestracker.eu-e2e/.eslintrc.json",
+          "hash": "14060216369337943343"
+        },
+        {
+          "file": "apps/salestracker.eu-e2e/cypress.config.ts",
+          "hash": "10256340249849227462",
+          "deps": [
+            "npm:@nx/cypress",
+            "npm:cypress"
+          ]
+        },
+        {
+          "file": "apps/salestracker.eu-e2e/project.json",
+          "hash": "9530472275337095273"
+        },
+        {
+          "file": "apps/salestracker.eu-e2e/src/e2e/app.cy.ts",
+          "hash": "5720309029730762291"
+        },
+        {
+          "file": "apps/salestracker.eu-e2e/src/fixtures/example.json",
+          "hash": "11785586596216172004"
+        },
+        {
+          "file": "apps/salestracker.eu-e2e/src/support/app.po.ts",
+          "hash": "11157016311132186162"
+        },
+        {
+          "file": "apps/salestracker.eu-e2e/src/support/commands.ts",
+          "hash": "5397443931564808659"
+        },
+        {
+          "file": "apps/salestracker.eu-e2e/src/support/e2e.ts",
+          "hash": "1054106023200826784"
+        },
+        {
+          "file": "apps/salestracker.eu-e2e/tsconfig.json",
+          "hash": "10740392072068377465"
+        }
+      ],
+      "public-portal-api": [
+        {
+          "file": "apps/public-portal-api/.eslintrc.json",
+          "hash": "13800677001662881425"
+        },
+        {
+          "file": "apps/public-portal-api/jest.config.ts",
+          "hash": "5612594400093115625"
+        },
+        {
+          "file": "apps/public-portal-api/project.json",
+          "hash": "16715302115109495542"
+        },
+        {
+          "file": "apps/public-portal-api/src/app/app.controller.spec.ts",
+          "hash": "9499997688052526633",
+          "deps": [
+            "npm:@nestjs/testing"
+          ]
+        },
+        {
+          "file": "apps/public-portal-api/src/app/app.controller.ts",
+          "hash": "9005150069945785676",
+          "deps": [
+            "npm:@nestjs/common"
+          ]
+        },
+        {
+          "file": "apps/public-portal-api/src/app/app.module.ts",
+          "hash": "3163250445227373966",
+          "deps": [
+            "npm:@nestjs/common"
+          ]
+        },
+        {
+          "file": "apps/public-portal-api/src/app/app.service.spec.ts",
+          "hash": "8587461140686713758",
+          "deps": [
+            "npm:@nestjs/testing"
+          ]
+        },
+        {
+          "file": "apps/public-portal-api/src/app/app.service.ts",
+          "hash": "9135729211265004807",
+          "deps": [
+            "npm:@nestjs/common",
+            "parsers"
+          ]
+        },
+        {
+          "file": "apps/public-portal-api/src/assets/.gitkeep",
+          "hash": "3244421341483603138"
+        },
+        {
+          "file": "apps/public-portal-api/src/main.ts",
+          "hash": "11205222914964382693",
+          "deps": [
+            "npm:@nestjs/common",
+            "npm:@nestjs/core"
+          ]
+        },
+        {
+          "file": "apps/public-portal-api/tsconfig.app.json",
+          "hash": "3171572500325445971"
+        },
+        {
+          "file": "apps/public-portal-api/tsconfig.json",
+          "hash": "3490524966360018312"
+        },
+        {
+          "file": "apps/public-portal-api/tsconfig.spec.json",
+          "hash": "11550347367511341917"
+        },
+        {
+          "file": "apps/public-portal-api/webpack.config.js",
+          "hash": "4455289172662341842",
+          "deps": [
+            "npm:@nx/webpack",
+            "npm:path"
+          ]
+        }
+      ],
       "salestracker.eu": [
         {
           "file": "apps/salestracker.eu/.babelrc",
@@ -394,48 +621,6 @@
             "npm:@nx/react",
             "npm:path"
           ]
-        }
-      ],
-      "salestracker.eu-e2e": [
-        {
-          "file": "apps/salestracker.eu-e2e/.eslintrc.json",
-          "hash": "14060216369337943343"
-        },
-        {
-          "file": "apps/salestracker.eu-e2e/cypress.config.ts",
-          "hash": "10256340249849227462",
-          "deps": [
-            "npm:@nx/cypress",
-            "npm:cypress"
-          ]
-        },
-        {
-          "file": "apps/salestracker.eu-e2e/project.json",
-          "hash": "9530472275337095273"
-        },
-        {
-          "file": "apps/salestracker.eu-e2e/src/e2e/app.cy.ts",
-          "hash": "5720309029730762291"
-        },
-        {
-          "file": "apps/salestracker.eu-e2e/src/fixtures/example.json",
-          "hash": "11785586596216172004"
-        },
-        {
-          "file": "apps/salestracker.eu-e2e/src/support/app.po.ts",
-          "hash": "11157016311132186162"
-        },
-        {
-          "file": "apps/salestracker.eu-e2e/src/support/commands.ts",
-          "hash": "5397443931564808659"
-        },
-        {
-          "file": "apps/salestracker.eu-e2e/src/support/e2e.ts",
-          "hash": "1054106023200826784"
-        },
-        {
-          "file": "apps/salestracker.eu-e2e/tsconfig.json",
-          "hash": "10740392072068377465"
         }
       ]
     }

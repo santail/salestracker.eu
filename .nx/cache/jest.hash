@@ -19,5 +19,110 @@
         "{workspaceRoot}/coverage/apps/salestracker.eu"
       ]
     }
+  },
+  "740574321071999565": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "6137919573950574036": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api-e2e"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/public-portal-api-e2e"
+      ]
+    }
+  },
+  "12537856600965793813": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "libs/parsers"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/libs/parsers"
+      ]
+    }
+  },
+  "10996192884127251265": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "1279710516950961500": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
   }
 }

@@ -1,0 +1,19 @@
+{
+  "name": "parsers",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/parsers/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/parsers",
+        "main": "libs/parsers/src/index.ts",
+        "tsConfig": "libs/parsers/tsconfig.lib.json",
+        "assets": ["libs/parsers/*.md"]
+      }
+    }
+  },
+  "tags": []
+}
