@@ -2,7 +2,12 @@
   "name": "@salestracker.ts/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "portal:serve": "nx serve public-portal-frontend",
+    "portal:build": "nx build public-portal-frontend",
+    "portal:test": "nx run public-portal-frontend:test",
+    "portal:e2e": "nx run public-portal-frontend-e2e:e2e"
+  },
   "private": true,
   "dependencies": {
     "@nestjs/common": "^10.0.2",
