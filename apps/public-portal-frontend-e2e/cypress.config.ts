@@ -7,10 +7,10 @@ export default defineConfig({
     ...nxE2EPreset(__filename, {
       cypressDir: 'src',
       webServerCommands: {
-        default: 'nx run salestracker.eu:serve',
-        production: 'nx run salestracker.eu:preview',
+        default: 'nx run public-portal-frontend:serve',
+        production: 'nx run public-portal-frontend:preview',
       },
-      ciWebServerCommand: 'nx run salestracker.eu:serve-static',
+      ciWebServerCommand: 'nx run public-portal-frontend:serve-static',
     }),
     baseUrl: 'http://localhost:4200',
   },

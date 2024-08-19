@@ -1,11 +1,11 @@
 /* eslint-disable */
 export default {
-  displayName: 'salestracker.eu',
+  displayName: 'public-portal-frontend',
   preset: '../../jest.preset.js',
   transform: {
     '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': '@nx/react/plugins/jest',
     '^.+\\.[tj]sx?$': ['babel-jest', { presets: ['@nx/react/babel'] }],
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../coverage/apps/salestracker.eu',
+  coverageDirectory: '../../coverage/apps/public-portal-frontend',
 };

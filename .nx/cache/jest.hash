@@ -41,11 +41,11 @@
       ]
     }
   },
-  "2613939305187605801": {
+  "1152537973210423048": {
     "test": {
       "command": "jest",
       "options": {
-        "cwd": "apps/salestracker.eu"
+        "cwd": "apps/public-portal-frontend"
       },
       "cache": true,
       "inputs": [
@@ -58,7 +58,7 @@
         }
       ],
       "outputs": [
-        "{workspaceRoot}/coverage/apps/salestracker.eu"
+        "{workspaceRoot}/coverage/apps/public-portal-frontend"
       ]
     }
   },

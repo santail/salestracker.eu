@@ -1,6 +1,6 @@
 import { getGreeting } from '../support/app.po';
 
-describe('salestracker.eu-e2e', () => {
+describe('public-portal-frontend-e2e', () => {
   beforeEach(() => cy.visit('/'));
 
   it('should display welcome message', () => {

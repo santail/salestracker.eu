@@ -1,9 +1,9 @@
 {
-  "18445549522278656171": {
+  "5175821022877733019": {
     "e2e": {
       "command": "cypress run",
       "options": {
-        "cwd": "apps/salestracker.eu-e2e"
+        "cwd": "apps/public-portal-frontend-e2e"
       },
       "cache": true,
       "inputs": [
@@ -16,19 +16,19 @@
         }
       ],
       "outputs": [
-        "{workspaceRoot}/dist/cypress/apps/salestracker.eu-e2e/videos",
-        "{workspaceRoot}/dist/cypress/apps/salestracker.eu-e2e/screenshots"
+        "{workspaceRoot}/dist/cypress/apps/public-portal-frontend-e2e/videos",
+        "{workspaceRoot}/dist/cypress/apps/public-portal-frontend-e2e/screenshots"
       ],
       "configurations": {
         "production": {
-          "command": "cypress run --env webServerCommand=\"nx run salestracker.eu:preview\""
+          "command": "cypress run --env webServerCommand=\"nx run public-portal-frontend:preview\""
         }
       }
     },
     "e2e-ci--src/e2e/app.cy.ts": {
       "outputs": [
-        "{workspaceRoot}/dist/cypress/apps/salestracker.eu-e2e/videos",
-        "{workspaceRoot}/dist/cypress/apps/salestracker.eu-e2e/screenshots"
+        "{workspaceRoot}/dist/cypress/apps/public-portal-frontend-e2e/videos",
+        "{workspaceRoot}/dist/cypress/apps/public-portal-frontend-e2e/screenshots"
       ],
       "inputs": [
         "default",
@@ -40,9 +40,9 @@
         }
       ],
       "cache": true,
-      "command": "cypress run --env webServerCommand=\"nx run salestracker.eu:serve-static\" --spec src/e2e/app.cy.ts",
+      "command": "cypress run --env webServerCommand=\"nx run public-portal-frontend:serve-static\" --spec src/e2e/app.cy.ts",
       "options": {
-        "cwd": "apps/salestracker.eu-e2e"
+        "cwd": "apps/public-portal-frontend-e2e"
       }
     },
     "e2e-ci": {
@@ -58,8 +58,8 @@
         }
       ],
       "outputs": [
-        "{workspaceRoot}/dist/cypress/apps/salestracker.eu-e2e/videos",
-        "{workspaceRoot}/dist/cypress/apps/salestracker.eu-e2e/screenshots"
+        "{workspaceRoot}/dist/cypress/apps/public-portal-frontend-e2e/videos",
+        "{workspaceRoot}/dist/cypress/apps/public-portal-frontend-e2e/screenshots"
       ],
       "dependsOn": [
         {
