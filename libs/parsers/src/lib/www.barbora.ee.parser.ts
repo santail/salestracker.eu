@@ -6,7 +6,7 @@ import AbstractParser, { ParserConfiguration } from "./AbstractParser";
 
 class BarboraParser extends AbstractParser {
 
-  protected config: ParserConfiguration = {
+  protected override config: ParserConfiguration = {
     'site': 'https://www.barbora.ee/',
     'headers': {
       'Connection': 'keep-alive',
@@ -35,7 +35,7 @@ class BarboraParser extends AbstractParser {
       'pattern': '?page={paging_pagenumber}'
     },
     'list': ($) => {
-      return $('div.b-products-list div.b-product--wrap2 > div.b-product--wrap > div.b-product-wrap-img > a:first-child').map((index, el) => {
+      return $('div.b-products-list div.b-product--wrap2 > div.b-product--wrap > div.b-product-wrap-img > a:first-child').map((index: any, el: any) => {
         return this.compileOfferHref($(el).attr('href'));
       }).get();
     },
@@ -47,7 +47,7 @@ class BarboraParser extends AbstractParser {
         return $('div.b-product-info h1.b-product-info--title').text().trim();
       },
       'pictures': ($) => {
-        return $('div.b-product-info div.b-product-info--pictures-wrap div.b-carousel--slide > img').map((index, el) => {
+        return $('div.b-product-info div.b-product-info--pictures-wrap div.b-carousel--slide > img').map((index: any, el: any) => {
           return this.compileImageHref($(el).attr('src'));
         }).get();
       },
@@ -69,7 +69,7 @@ class BarboraParser extends AbstractParser {
         var descriptionSection = $('dl.b-product-info--info-2');
 
         if (descriptionSection.length) {
-          var vendorHeader = descriptionSection.find('dt.b-product-info--info-3-title').filter(function (index, el) {
+          var vendorHeader = descriptionSection.find('dt.b-product-info--info-3-title').filter(function (index: any, el: any) {
             return $(el).text().toLowerCase() === 'Tootja kontaktid'.toLowerCase();
           }).first();
 
@@ -84,12 +84,12 @@ class BarboraParser extends AbstractParser {
     'translations': ['title', 'description'],
     'required_properties': ['price', 'pictures', 'title']
   };
-    
-  compileImageHref = (link) => {
+
+  override compileImageHref = (link: any) => {
     return url.resolve(this.config.index_page, link);
   };
 
-  compileOfferHref = (link) => {
+  override compileOfferHref = (link: any) => {
     return url.resolve(this.config.index_page, link);
   };
 };

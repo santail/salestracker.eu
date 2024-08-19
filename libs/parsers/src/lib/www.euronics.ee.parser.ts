@@ -8,7 +8,7 @@ import AbstractParser, { ParserConfiguration } from "./AbstractParser";
 
 class EuronicsParser extends AbstractParser {
 
-  protected config: ParserConfiguration = {
+  protected override config: ParserConfiguration = {
     'has_index_page': true,
     'index_page': 'https://www.euronics.ee/tooted/status/outlet/sort/pricechangedesc',
     'site': 'https://www.euronics.ee/',
@@ -21,7 +21,7 @@ class EuronicsParser extends AbstractParser {
       'eng': {
         'exists': true,
         'findHref': ($) => {
-          return $('ul.oi-lang-switch > li > a').filter((index, el) => {
+          return $('ul.oi-lang-switch > li > a').filter((index: any, el: any) => {
             return $(el).text() === 'ENG';
           }).first().attr('href');
         }
@@ -29,7 +29,7 @@ class EuronicsParser extends AbstractParser {
       'rus': {
         'exists': true,
         'findHref': ($) => {
-          return $('ul.oi-lang-switch > li > a').filter((index, el) => {
+          return $('ul.oi-lang-switch > li > a').filter((index: any, el: any) => {
             return $(el).text() === 'RUS';
           }).first().attr('href');
         }
@@ -59,7 +59,7 @@ class EuronicsParser extends AbstractParser {
       }
     },
     'list': ($) => {
-      return $("div.oi-section-product-data ul.oi-grid-products > li.oi-item p.image > a").map((index, el) => {
+      return $("div.oi-section-product-data ul.oi-grid-products > li.oi-item p.image > a").map((index: any, el: any) => {
         return $(el).attr('href');
       }).get();
     },
@@ -83,7 +83,7 @@ class EuronicsParser extends AbstractParser {
           pictureUrls.push(this.compileImageHref(mainPictureUrl));
         }
 
-        let hrefs = $('div.oi-viewport-media > ol > li.oi-pager-item > a[data-img]').map((index, el) => {
+        let hrefs = $('div.oi-viewport-media > ol > li.oi-pager-item > a[data-img]').map((index: any, el: any) => {
           return this.compileImageHref($(el).attr('href'));
         }).get();
 
@@ -114,7 +114,7 @@ class EuronicsParser extends AbstractParser {
         return $('div.oi-product-description > div.oi-description').html();
       },
       'vendor': ($) => {
-        var header = $('div.oi-product-details > table th').filter((index, el) => {
+        var header = $('div.oi-product-details > table th').filter((index: any, el: any) => {
           return _.includes(['tootja:', 'Производитель:', 'producer:'], $(el).text());
         }).first();
 
@@ -125,19 +125,19 @@ class EuronicsParser extends AbstractParser {
     'required_properties': ['description', 'price', 'pictures', 'title']
   };
 
-  compilePageHref = (link) => {
+  override compilePageHref = (link: any) => {
     return this.config.site + link;
   };
-  
-  compilePagingPattern = () => {
+
+  override compilePagingPattern = () => {
     return this.config.site + this.config.paging!!.pattern;
   };
 
-  compileOfferHref = (link) => {
+  override compileOfferHref = (link: any) => {
     return link;
   };
 
-  compileImageHref = (link) => {
+  override compileImageHref = (link: any) => {
     return link;
   };
 };

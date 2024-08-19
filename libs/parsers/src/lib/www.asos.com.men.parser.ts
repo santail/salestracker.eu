@@ -7,7 +7,7 @@ import AbstractParser, { ParserConfiguration } from "./AbstractParser";
 
 class AsosManParser extends AbstractParser {
 
-  protected config: ParserConfiguration = {
+  protected override config: ParserConfiguration = {
     'site': 'http://www.asos.com',
     'has_index_page': true,
     'index_page': 'https://api.asos.com/product/search/v1/categories/27396?channel=desktop-web&country=EE&currency=EUR&lang=en&limit=72&offset=0&rowlength=4&store=26',
@@ -75,42 +75,42 @@ class AsosManParser extends AbstractParser {
     'required_properties': ['price', 'pictures', 'title']
   };
 
-  compilePagingParameters = (content, options) => {
+  override compilePagingParameters = (content: any, options: any) => {
     var itemCount = content.itemCount;
     var pageSize = 72;
-  
+
     var lastPage = (itemCount % pageSize > 0 ? 1 : 0) + Math.floor(itemCount / pageSize);
-  
-    if (process.env.NODE_ENV === 'development' && process.env.PAGING_PAGES_LIMIT && parseInt(process.env.PAGING_PAGES_LIMIT, 10) < lastPage) {
-      lastPage = parseInt(process.env.PAGING_PAGES_LIMIT, 10);
+
+    if (process.env['NODE_ENV'] === 'development' && process.env['PAGING_PAGES_LIMIT'] && parseInt(process.env['PAGING_PAGES_LIMIT'], 10) < lastPage) {
+      lastPage = parseInt(process.env['PAGING_PAGES_LIMIT'], 10);
     } else if (options.limit && options.limit < lastPage) {
       lastPage = options.limit;
     } else if (this.config.paging && this.config.paging.limit && this.config.paging.limit < lastPage) {
       lastPage = this.config.paging.limit;
     }
-  
+
     var pages: string[] = [];
-  
+
     for (var pageNumber = 0; pageNumber < lastPage; pageNumber++) {
       var offset = pageNumber * pageSize;
-  
+
       pages.push(this.compilePageHref(this.config.paging!!.pattern
         .replace(/{paging_pagenumber}/g, '' + pageNumber)
         .replace(/{paging_offset}/g, '' + offset)
         .replace(/{paging_pagesize}/g, '' + pageSize)
         .replace(/{search_criteria}/g, options.search)));
     }
-  
+
     return {
       'pages': pages
     };
   };
 
-  compilePageHref = (link) => {
+  override compilePageHref = (link: any) => {
     return url.resolve(this.config.index_page, link);
   };
 
-  compileOfferHref = (offer) => {
+  override compileOfferHref = (offer: any) => {
     return util.format('https://www.asos.com/%s', offer.url);
   };
 };

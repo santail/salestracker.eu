@@ -12661,6 +12661,11 @@
         "source": "parsers",
         "target": "npm:tslib",
         "type": "static"
+      },
+      {
+        "source": "parsers",
+        "target": "npm:lodash",
+        "type": "static"
       }
     ],
     "npm:@ampproject/remapping": [

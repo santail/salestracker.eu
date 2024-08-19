@@ -1,9 +1,9 @@
 'use strict';
 
 const _ = require('lodash');
-const util = require("util");
+const util = require('util');
 
-const LOG = require("../services/Logger");
+const LOG = require('../../../../salestracker.eu-shared/lib/services/Logger');
 
 interface LanguageConfiguration {
   main?: boolean;
@@ -50,7 +50,7 @@ export interface ParserConfiguration {
   hierarchy?: { [level: string]: (content: any) => string[] };
   paging?: PagingConfiguration;
   list: (content: any) => any[];
-  json?: boolean
+  json?: boolean;
   templates: OfferTemplates;
   languages: { [language: string]: LanguageConfiguration };
   headers?: { [header: string]: string };
@@ -63,14 +63,24 @@ class AbstractParser {
     has_index_page: false,
     index_page: '',
     hierarchy: {
-      groups: () => { return [] },
-      categories: () => { return [] }
+      groups: () => {
+        return [];
+      },
+      categories: () => {
+        return [];
+      }
     },
     list: () => [],
     templates: {
-      content: () => { return '' },
-      title: () => { return '' },
-      pictures: () => { return [] },
+      content: () => {
+        return '';
+      },
+      title: () => {
+        return '';
+      },
+      pictures: () => {
+        return [];
+      },
       price: () => {
         return {
           current: 0,
@@ -80,10 +90,14 @@ class AbstractParser {
             percents: 0
           },
           currency: ''
-        }
+        };
       },
-      vendor: () => { return '' },
-      description: () => { return '' }
+      vendor: () => {
+        return '';
+      },
+      description: () => {
+        return '';
+      }
     },
     languages: {},
     translations: [],
@@ -93,22 +107,22 @@ class AbstractParser {
     headers: {}
   };
 
-  getHierarchicalIndexPages = (options, content) => {
-    if (this.config.hierarchy!!.pattern) {
-      return this.config.hierarchy!!.pattern(content);
+  getHierarchicalIndexPages = (options: any, content: any) => {
+    if (this.config.hierarchy && this.config.hierarchy['pattern']) {
+      return this.config.hierarchy!!['pattern'](content);
     }
 
     return this.config.hierarchy!!['level-' + options.hierarchy](content);
   };
 
-  compilePagingParameters = (content, options) => {
+  compilePagingParameters = (content: any, options: any) => {
     let pages: string[] = [];
 
     const firstPage = this.config.paging!!.first!!(content) || 1;
     let lastPage = this.config.paging!!.last!!(content) || 1;
 
-    if (process.env.NODE_ENV === 'development' && process.env.PAGING_PAGES_LIMIT && _.toFinite(process.env.PAGING_PAGES_LIMIT) < lastPage) {
-      lastPage = _.toFinite(process.env.PAGING_PAGES_LIMIT);
+    if (process.env['NODE_ENV'] === 'development' && process.env['PAGING_PAGES_LIMIT'] && _.toFinite(process.env['PAGING_PAGES_LIMIT']) < lastPage) {
+      lastPage = _.toFinite(process.env['PAGING_PAGES_LIMIT']);
     } else if (options.limit && options.limit < lastPage) {
       lastPage = options.limit;
     } else if (this.config.paging!!.limit!! && this.config.paging!!.limit!! < lastPage) {
@@ -129,10 +143,10 @@ class AbstractParser {
 
   compilePagingPattern = (options?: any) => {
     const pattern = this.config.paging!!.pattern ? this.config.paging!!.pattern : this.config.index_page;
-    return this.compilePageHref(pattern)
+    return this.compilePageHref(pattern);
   };
 
-  compilePageHref = (link) => {
+  compilePageHref = (link: string) => {
     return this.config.index_page + link;
   };
 
@@ -142,22 +156,21 @@ class AbstractParser {
     return this.compilePagingPattern().replace(/{paging_pagenumber}/g, '' + index);
   };
 
-  getOffers = (content) => {
+  getOffers = (content: any) => {
     let dataItems: any[] = [];
 
     try {
       dataItems = this.config.list.call(this, content);
-    }
-    catch (err) {
+    } catch (err) {
       content = null;
       LOG.error(util.format('[ERROR] Offers processing not scheduled', err));
     }
 
-    if (process.env.NODE_ENV === 'development' && process.env.OFFERS_LIMIT) {
-      dataItems = dataItems.slice(0, _.toFinite(process.env.OFFERS_LIMIT));
+    if (process.env['NODE_ENV'] === 'development' && process.env['OFFERS_LIMIT']) {
+      dataItems = dataItems.slice(0, _.toFinite(process.env['OFFERS_LIMIT']));
     }
 
-    let metadata = _.map(dataItems, (item) => {
+    let metadata = _.map(dataItems, (item: any) => {
       let metadata = {
         'href': this.compileOfferHref(item)
       };
@@ -169,29 +182,29 @@ class AbstractParser {
       return metadata;
     });
 
-    return _.filter(metadata, (item) => {
+    return _.filter(metadata, (item: { href: any; }) => {
       return item.href;
     });
   };
 
-  content = (body) => {
-    if (this.config.json && typeof body === 'string') {
+  content = (body: string) => {
+    if (this.config.json) {
       body = JSON.parse(body);
     }
 
     return this.config.templates.content.call(this, body);
   };
 
-  parse = (body, callback) => {
+  parse = (body: string, callback: any) => {
     if (this.config.json && typeof body === 'string') {
       body = JSON.parse(body);
     }
 
-    let offer = (function (that, data) {
+    let offer = ((that, data: any): any => {
       let templates = _.extend({}, that.config.templates);
 
-      function _parseTemplates(body, templates) {
-        let result = {};
+      function _parseTemplates(body: string, templates: any) {
+        let result: any = {};
 
         for (let key in templates) {
 
@@ -204,7 +217,7 @@ class AbstractParser {
               result[key] = _parseTemplates(body, template);
             } else if (typeof template === 'function') {
               const value = template.call(null, body);
-              result[key] = typeof value === "string" ? value.trim().replace(/\t/g, ' ').replace(/\s\s+/g, ' ') : value;
+              result[key] = typeof value === 'string' ? value.trim().replace(/\t/g, ' ').replace(/\s\s+/g, ' ') : value;
             }
           }
         }
@@ -218,31 +231,30 @@ class AbstractParser {
         data = null;
 
         return result;
-      }
-      catch (err) {
+      } catch (err) {
         console.error('Error parsing offer\'s data', err);
 
-        return callback(new Error(util.format("Error parsing templates", err)), offer);
+        return callback(new Error(util.format('Error parsing templates', err)), this);
       }
     })(this, body);
 
     return callback(null, offer);
   };
 
-  compileOfferHref = (link, language?: string) => {
+  compileOfferHref = (link: string, language?: string) => {
     return this.config.index_page + link.replace(/&amp;/g, '&');
   };
 
-  compileImageHref = (link) => {
+  compileImageHref = (link: string) => {
     return this.config.index_page + link.replace(/&amp;/g, '&');
   };
 
-  filterOfferProperties = (data) => {
-    let offer = {};
+  filterOfferProperties = (data: any) => {
+    let offer: any = {};
 
     const filteredFields = ['language', 'href', 'content'];
 
-    _.each(_.keys(data), property => {
+    _.each(_.keys(data), (property: any) => {
       if (!_.includes(this.config.translations, property) && !_.includes(filteredFields, property)) {
         offer[property] = data[property];
       }
@@ -251,11 +263,11 @@ class AbstractParser {
     return offer;
   };
 
-  compileTranslations = (options, data) => {
-    let translations = {};
+  compileTranslations = (options: { language: string; href: string; }, data: any) => {
+    let translations: any = {};
     translations[options.language] = {};
 
-    _.each(_.keys(data), (property) => {
+    _.each(_.keys(data), (property: string) => {
       if (data.hasOwnProperty(property) && _.includes(this.config.translations, property)) {
         translations[options.language][property] = data[property];
       }
@@ -267,7 +279,7 @@ class AbstractParser {
   };
 
   getMainLanguage = () => {
-    let mainLanguage = _.find(_.keys(this.config.languages), (language) => {
+    let mainLanguage = _.find(_.keys(this.config.languages), (language: string) => {
       return this.config.languages[language].main;
     });
 
@@ -286,7 +298,7 @@ class AbstractParser {
     return undefined;
   };
 
-  compileDiscount = (current, original) => {
+  compileDiscount = (current: number | undefined, original: number | undefined) => {
     let amount = 0;
     let percents = 0;
 
@@ -297,15 +309,15 @@ class AbstractParser {
 
     return {
       amount: Number((+amount).toFixed(2)),
-      percents: Number((+percents).toFixed(2)),
+      percents: Number((+percents).toFixed(2))
     };
   };
 
-  validateOfferProperties = (offer) => {
-    offer.is_valid = !_.some(this.config.required_properties, property => {
+  validateOfferProperties = (offer: any) => {
+    offer.is_valid = !_.some(this.config.required_properties, (property: string | number) => {
       return _.isUndefined(offer[property]) || _.isNil(offer[property]) || _.isEmpty(offer[property]);
     });
-  }
+  };
 }
 
 export default AbstractParser;

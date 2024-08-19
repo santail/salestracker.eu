@@ -5,6 +5,6 @@ import {parsers} from '@salestracker.ts/parsers';
 @Injectable()
 export class AppService {
   getData(): { message: string } {
-    return { message: 'Hello API' + parsers() };
+    return { message: 'Hello API ' + parsers() };
   }
 }

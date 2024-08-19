@@ -8,7 +8,7 @@ import AbstractParser, { ParserConfiguration } from "./AbstractParser";
 
 class EcoopParser extends AbstractParser {
 
-  protected config: ParserConfiguration = {
+  protected override config: ParserConfiguration = {
     'site': 'https://ecoop.ee',
     'has_index_page': false,
     'index_page': 'https://ecoop.ee/api/v1/products?ordering=popularity&has_discount=1',
@@ -53,7 +53,7 @@ class EcoopParser extends AbstractParser {
         return data.name;
       },
       'pictures': data => {
-        return _.map(data.images, image => {
+        return _.map(data.images, (image: { productimage: any; }) => {
           return this.compileImageHref(image.productimage);
         });
       },
@@ -82,15 +82,15 @@ class EcoopParser extends AbstractParser {
     'required_properties': ['description', 'price', 'pictures', 'title']
   };
 
-  compileImageHref = (link) => {
+  override compileImageHref = (link: any) => {
     return url.resolve(this.config.index_page, link);
   };
 
-  compileOfferHref = (data, language ? : string) => {
+  override compileOfferHref = (data: any, language ? : string) => {
     return util.format('https://ecoop.ee/et/toode/%s/', data.slug_et);
   };
 
-  compilePagingPattern = () => {
+  override compilePagingPattern = () => {
     return this.config.index_page + this.config.paging!!.pattern;
   }
 }

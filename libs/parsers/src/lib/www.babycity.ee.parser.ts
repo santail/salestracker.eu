@@ -8,7 +8,7 @@ import AbstractParser, { ParserConfiguration } from "./AbstractParser";
 
 class BabycityParser extends AbstractParser {
 
-  protected config: ParserConfiguration = {
+  protected override config: ParserConfiguration = {
     'has_index_page': false,
     'index_page': 'https://www.babycity.ee/ee/shop/customList/2/',
     'site': 'https://www.babycity.ee/',
@@ -30,7 +30,7 @@ class BabycityParser extends AbstractParser {
       'pattern': 'page:{paging_pagenumber}'
     },
     'list': ($) => {
-      return $('div.category-product-list div.category-product-item > a').map((index, el) => {
+      return $('div.category-product-list div.category-product-item > a').map((index: any, el: any) => {
         return $(el).attr('href');
       }).get();
     },
@@ -42,7 +42,7 @@ class BabycityParser extends AbstractParser {
         return $('div.product div.product-title > h1').first().text().trim();
       },
       'pictures': ($) => {
-        return $('div.product-images div.product-thumbs div.product-thumb > img').map((index, el) => {
+        return $('div.product-images div.product-thumbs div.product-thumb > img').map((index: any, el: any) => {
           return this.compileImageHref($(el).attr('src').replace(/\/resized\/70x74/gi, ''));
         }).get();
       },
@@ -61,7 +61,7 @@ class BabycityParser extends AbstractParser {
         return $('div.product-description.text-content').html();
       },
       'vendor': ($) => {
-        var header = $('div.__itemDescriptionTable table.table-product-features > tbody > tr > td').filter((index, el) => {
+        var header = $('div.__itemDescriptionTable table.table-product-features > tbody > tr > td').filter((index: any, el: any) => {
           return _.includes(['Bränd'], $(el).text());
         }).first();
 
@@ -72,19 +72,19 @@ class BabycityParser extends AbstractParser {
     'required_properties': ['description', 'price', 'pictures', 'title']
   };
 
-  compilePageHref = (link) => {
+  override compilePageHref = (link: any) => {
     return this.config.index_page + link;
   };
-  
-  compilePagingPattern = () => {
+
+  override compilePagingPattern = () => {
     return this.config.index_page + this.config.paging!!.pattern;
   };
 
-  compileOfferHref = (link) => {
+  override compileOfferHref = (link: any) => {
     return link;
   };
 
-  compileImageHref = (link) => {
+  override compileImageHref = (link: any) => {
     return link;
   };
 };
