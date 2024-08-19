@@ -41,6 +41,27 @@
       ]
     }
   },
+  "7158436261362702638": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "libs/parsers"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/libs/parsers"
+      ]
+    }
+  },
   "1152537973210423048": {
     "test": {
       "command": "jest",
@@ -62,11 +83,11 @@
       ]
     }
   },
-  "7158436261362702638": {
+  "2935059156071767512": {
     "test": {
       "command": "jest",
       "options": {
-        "cwd": "libs/parsers"
+        "cwd": "apps/public-portal-frontend"
       },
       "cache": true,
       "inputs": [
@@ -79,7 +100,1246 @@
         }
       ],
       "outputs": [
-        "{workspaceRoot}/coverage/libs/parsers"
+        "{workspaceRoot}/coverage/apps/public-portal-frontend"
+      ]
+    }
+  },
+  "8576940179653273922": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-frontend"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-frontend"
+      ]
+    }
+  },
+  "7331041189682998739": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-frontend"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-frontend"
+      ]
+    }
+  },
+  "11864256701263686851": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "15763058821074299632": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "12827865451206230545": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "10420933624702006391": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "4555696892328485114": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "17623835140238709599": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "15546931404782378741": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "6493020014913035358": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "4326439701372307057": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "13075229423172461962": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "16285322440864134558": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "9526900809940169027": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "15274483129163069900": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "841423130514517268": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "2767046007214907361": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "10331386061590926338": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "5350010018203711472": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-frontend"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-frontend"
+      ]
+    }
+  },
+  "4746688268219503628": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "11731792669995365233": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "4280168658973156660": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "13638748762392588977": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "1738875162886808248": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "9075173246921555246": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "7932283316936599952": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "7021451751434469786": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "5193342739885785100": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "13392766979314166645": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "12931975725239196780": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "692989014577777939": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "16270244541409073842": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "7393059950650057574": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "3031340692263459546": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "1654467138739834219": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "4412141745828146966": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "2702400334481618954": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "2704184052874544372": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "13853130023382695877": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "12039075892315244548": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "14117391226591243634": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "17246264201524853471": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "13520256491191513007": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "16212946390767557098": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "15184143944408639460": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "3220345623330123497": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "10966270829304342353": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "4891888869647414675": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "12624389217101280247": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "11794049740012275277": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "9480594723315971790": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "11956240086356087840": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "10819803555040833857": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "3783151580644138684": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "14313523371332987284": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "18124276528493858448": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-api"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-api"
+      ]
+    }
+  },
+  "8789298032410686591": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-frontend"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-frontend"
+      ]
+    }
+  },
+  "12565672551844412146": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-frontend"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-frontend"
+      ]
+    }
+  },
+  "10167419699843552710": {
+    "test": {
+      "command": "jest",
+      "options": {
+        "cwd": "apps/public-portal-frontend"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": [
+            "jest"
+          ]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/public-portal-frontend"
       ]
     }
   }
