@@ -28,7 +28,10 @@ name: Deploy to Amazon ECS
 
 on:
   push:
-    branches: [ "master" ]
+    branches:
+      - master
+  
+  workflow_dispatch:
 
 env:
   AWS_REGION: MY_AWS_REGION                   # set this to your preferred AWS region, e.g. us-west-1
@@ -41,7 +44,9 @@ env:
                                                # containerDefinitions section of your task definition
 
 permissions:
-  contents: read
+  contents: write
+  deployments: write
+  id-token: write
 
 jobs:
   deploy:
