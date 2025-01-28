@@ -1,14 +1,14 @@
 
 # Pull the Node.js image
-FROM node:18-alpine AS builder
+FROM node:23-alpine AS builder
 
 WORKDIR /usr/src/app
 
-COPY ../../package*.json ./
+COPY ../../package.json ./
 
 RUN apk add --update python3 make g++ && rm -rf /var/cache/apk/*
 
-RUN npm install --only=development --silent
+RUN npm install --only=development --silent --force
 
 COPY ../../ .
 
