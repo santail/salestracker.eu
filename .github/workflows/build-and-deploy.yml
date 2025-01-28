@@ -32,6 +32,11 @@ on:
       - master
   
   workflow_dispatch:
+    inputs:
+      environment:
+        description: Choose an environment to deploy to
+        type: environment
+        default: stage
 
 env:
   AWS_REGION: ${{vars.AWS_REGION}}
