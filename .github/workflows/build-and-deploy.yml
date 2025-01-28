@@ -34,6 +34,7 @@ on:
   workflow_dispatch:
 
 env:
+  AWS_REGION: ${{vars.AWS_REGION}}
   ECS_TASK_DEFINITION: .aws/ecs/task-definitions/public-frontend-service.json # set this to the path to your Amazon ECS task definition
                                                # file, e.g. .aws/task-definition.json
   CONTAINER_NAME: public-frontend-task           # set this to the name of the container in the
