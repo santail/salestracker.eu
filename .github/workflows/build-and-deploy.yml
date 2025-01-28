@@ -39,7 +39,7 @@ on:
         default: stage
 
 env:
-  AWS_REGION: ${{vars.AWS_REGION}}
+  AWS_REGION: ${{ vars.AWS_REGION }}
   ECS_TASK_DEFINITION: .aws/ecs/task-definitions/public-frontend-service.json # set this to the path to your Amazon ECS task definition
                                                # file, e.g. .aws/task-definition.json
   CONTAINER_NAME: public-frontend-task           # set this to the name of the container in the
@@ -62,7 +62,6 @@ jobs:
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
-      secrets: inherit
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
