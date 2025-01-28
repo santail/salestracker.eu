@@ -46,7 +46,7 @@ env:
                                                # containerDefinitions section of your task definition
 
 permissions:
-  contents: read,write
+  contents: read
   deployments: write
   id-token: write
 
