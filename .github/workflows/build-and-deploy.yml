@@ -62,7 +62,7 @@ jobs:
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
         task-definition: .aws/ecs/task-definitions/public-portal-api-service.json 
-        container-name: public-portal-api-service
+        container-name: public-portal-api-task
         image: ${{ steps.build-image.outputs.image }}
 
     - name: Deploy Amazon ECS task definition
