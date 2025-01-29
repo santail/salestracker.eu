@@ -17,7 +17,6 @@ env:
   ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}             # set this to your Amazon ECR repository name
   ECS_SERVICE: ${{ vars.ECS_SERVICE }}                 # set this to your Amazon ECS service name
   ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}                 # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION: .aws/ecs/task-definitions/public-frontend-service.json 
   CONTAINER_NAME: public-frontend-task      
 
 permissions:
@@ -26,10 +25,9 @@ permissions:
   id-token: write
 
 jobs:
-  deploy:
-    name: Deploy
+  build:
+    name: Build
     runs-on: ubuntu-latest
-    environment: production
 
     steps:
     - name: Checkout
@@ -63,7 +61,7 @@ jobs:
       id: task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
-        task-definition: ${{ env.ECS_TASK_DEFINITION }}
+        task-definition: .aws/ecs/task-definitions/public-portal-api-service.json 
         container-name: ${{ env.CONTAINER_NAME }}
         image: ${{ steps.build-image.outputs.image }}
 

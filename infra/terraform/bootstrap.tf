@@ -1,7 +1,6 @@
 
 locals {
     base_repository_names = [
-        "ecs-bootstrap",
         "public-portal-api",
         "public-portal-frontend"
     ]

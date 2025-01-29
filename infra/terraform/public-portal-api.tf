@@ -1,9 +1,9 @@
-resource "aws_ecs_task_definition" "public-frontend-task" {
-  family                   = "public-frontend-task"
+resource "aws_ecs_task_definition" "public-portal-api-task" {
+  family                   = "public-portal-api-task"
   container_definitions    = <<DEFINITION
   [
     {
-      "name": "public-frontend-task",
+      "name": "public-portal-api-task",
       "image": "515966505393.dkr.ecr.eu-west-1.amazonaws.com/public-portal-api:latest",
       "essential": true,
       "portMappings": [
@@ -102,15 +102,15 @@ resource "aws_lb_listener" "listener" {
 }
 
 resource "aws_ecs_service" "app_service" {
-  name            = "public-frontend-service"
+  name            = "public-portal-api-service"
   cluster         = "${aws_ecs_cluster.salestracker-stage.id}"   # Reference the created Cluster
-  task_definition = "${aws_ecs_task_definition.public-frontend-task.arn}" # Reference the task that the service will spin up
+  task_definition = "${aws_ecs_task_definition.public-portal-api-task.arn}" # Reference the task that the service will spin up
   launch_type     = "FARGATE"
   desired_count   = 1 # Set up the number of containers to 3
 
   load_balancer {
     target_group_arn = "${aws_lb_target_group.target_group.arn}" # Reference the target group
-    container_name   = "${aws_ecs_task_definition.public-frontend-task.family}"
+    container_name   = "${aws_ecs_task_definition.public-portal-api-task.family}"
     container_port   = 3000 # Specify the container port
   }
 
