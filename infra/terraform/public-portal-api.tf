@@ -3,7 +3,7 @@ resource "aws_ecs_task_definition" "public-portal-api-task" {
   container_definitions    = <<DEFINITION
   [
     {
-      "name": "public-portal-api-task",
+      "name": "public-portal-api-service",
       "image": "515966505393.dkr.ecr.eu-west-1.amazonaws.com/public-portal-api:latest",
       "essential": true,
       "portMappings": [
