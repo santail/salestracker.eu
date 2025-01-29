@@ -17,7 +17,6 @@ env:
   ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}             # set this to your Amazon ECR repository name
   ECS_SERVICE: ${{ vars.ECS_SERVICE }}                 # set this to your Amazon ECS service name
   ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}                 # set this to your Amazon ECS cluster name
-  CONTAINER_NAME: public-portal-api-task      
 
 permissions:
   contents: read
@@ -27,6 +26,7 @@ permissions:
 jobs:
   build:
     name: Build
+    environment: ${{ inputs.environment || 'stage' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -62,7 +62,7 @@ jobs:
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
         task-definition: .aws/ecs/task-definitions/public-portal-api-service.json 
-        container-name: ${{ env.CONTAINER_NAME }}
+        container-name: public-portal-api-service
         image: ${{ steps.build-image.outputs.image }}
 
     - name: Deploy Amazon ECS task definition
