@@ -1,0 +1,24 @@
+{
+  "name": "admin-portal-api",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/admin-portal-api/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "admin-portal-api:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "admin-portal-api:build:development"
+        },
+        "production": {
+          "buildTarget": "admin-portal-api:build:production"
+        }
+      }
+    }
+  }
+}

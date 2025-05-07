@@ -40,3 +40,5 @@ Thumbs.db
 
 .nx
 infra/terraform/.terraform
+logs/
+*.log

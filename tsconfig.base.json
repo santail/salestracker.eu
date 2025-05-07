@@ -15,7 +15,11 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@salestracker.ts/parsers": ["libs/parsers/src/index.ts"]
+      "@salestracker/database": ["libs/database/src/index.ts"],
+      "@salestracker/entities": ["libs/database/src/lib/entities/index.ts"],
+      "@salestracker/parsers": ["libs/src/parsers/src/index.ts"],
+      "@salestracker/services": ["libs/src/services/src/index.ts"],
+      "@salestracker/shared": ["libs/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

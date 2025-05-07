@@ -7,14 +7,14 @@ module.exports = {
     path: join(__dirname, '../../dist/apps/public-portal-frontend'),
   },
   devServer: {
-    port: 4200,
+    port: 4201,
   },
   plugins: [
     new NxWebpackPlugin({
       tsConfig: './tsconfig.app.json',
       compiler: 'babel',
-      main: './src/main.tsx',
-      index: './src/index.html',
+      main: './src/index.tsx',
+      index: './public/index.html',
       baseHref: '/',
       assets: ['./src/favicon.ico', './src/assets'],
       styles: ['./src/styles.css'],

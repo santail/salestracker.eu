@@ -1,0 +1,58 @@
+{
+  "name": "scraper-service",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/scraper-service/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "development",
+      "options": {
+        "target": "node",
+        "compiler": "tsc",
+        "outputPath": "dist/apps/scraper-service",
+        "main": "apps/scraper-service/src/main.ts",
+        "tsConfig": "apps/scraper-service/tsconfig.app.json",
+        "isolatedConfig": true,
+        "webpackConfig": "apps/scraper-service/webpack.config.js"
+      },
+      "configurations": {
+        "development": {},
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "inspect": false
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "scraper-service:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "scraper-service:build:development"
+        },
+        "production": {
+          "buildTarget": "scraper-service:build:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/scraper-service/jest.config.ts"
+      }
+    }
+  },
+  "tags": [],
+  "dependencies": ["entities"]
+}
