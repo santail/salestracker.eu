@@ -1,0 +1,141 @@
+# ECR Repository for Frontend
+resource "aws_ecr_repository" "public_portal_frontend" {
+  name = "${var.project_name}-public-portal-frontend"
+}
+
+# Load Balancer for Frontend
+resource "aws_lb" "public_portal_frontend" {
+  name               = "${var.project_name}-frontend-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.frontend_alb.id]
+  subnets            = module.vpc.public_subnets
+
+  tags = var.tags
+}
+
+# Task Definition for Frontend
+resource "aws_ecs_task_definition" "public_portal_frontend" {
+  family                   = "${var.project_name}-public-portal-frontend"
+  requires_compatibilities = ["FARGATE"]
+  network_mode            = "awsvpc"
+  cpu                     = 256
+  memory                  = 512
+  execution_role_arn      = aws_iam_role.ecs_task_execution_role.arn
+
+  container_definitions = jsonencode([
+    {
+      name  = "public-portal-frontend"
+      image = "${aws_ecr_repository.public_portal_frontend.repository_url}:latest"
+      environment = [
+        {
+          name  = "REACT_APP_API_URL"
+          #value = "http://${aws_lb.public_portal_api.dns_name}"
+          value = "http://localhost:3000"
+        }
+      ]
+      portMappings = [
+        {
+          containerPort = 80
+          hostPort      = 80
+          protocol      = "tcp"
+        }
+      ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          "awslogs-group"         = "/ecs/${var.project_name}"
+          "awslogs-region"        = var.aws_region
+          "awslogs-stream-prefix" = "public-portal-frontend"
+        }
+      }
+    }
+  ])
+}
+
+# Security Group for Frontend ALB
+resource "aws_security_group" "frontend_alb" {
+  name        = "${var.project_name}-frontend-alb-sg"
+  description = "Security group for frontend ALB"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = var.tags
+}
+
+# Target Group for Frontend
+resource "aws_lb_target_group" "public_portal_frontend" {
+  name        = "${var.project_name}-frontend-tg"
+  port        = 80
+  protocol    = "HTTP"
+  target_type = "ip"
+  vpc_id      = module.vpc.vpc_id
+
+  health_check {
+    path                = "/"
+    healthy_threshold   = 2
+    unhealthy_threshold = 10
+  }
+}
+
+# Listener for Frontend ALB
+resource "aws_lb_listener" "public_portal_frontend" {
+  load_balancer_arn = aws_lb.public_portal_frontend.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.public_portal_frontend.arn
+  }
+}
+
+# ECS Service for Frontend
+resource "aws_ecs_service" "public_portal_frontend" {
+  name            = "${var.project_name}-public-portal-frontend"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.public_portal_frontend.arn
+  desired_count   = 2
+  launch_type     = "FARGATE"
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.public_portal_frontend.arn
+    container_name   = "public-portal-frontend"
+    container_port   = 80
+  }
+
+  network_configuration {
+    subnets          = module.vpc.private_subnets
+    security_groups  = [aws_security_group.ecs_tasks.id]
+    assign_public_ip = false
+  }
+
+  depends_on = [
+    aws_lb_listener.public_portal_frontend
+  ]
+}
+
+# Output for Frontend URL
+output "frontend_url" {
+  value = "http://${aws_lb.public_portal_frontend.dns_name}"
+} 
