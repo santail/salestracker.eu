@@ -1,0 +1,54 @@
+name: Infrastructure
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'infra/terraform/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'infra/terraform/**'
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+        aws-region: us-west-2
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.5.0
+
+    - name: Terraform Format
+      run: terraform fmt -check
+      working-directory: infra/terraform
+
+    - name: Terraform Init
+      run: terraform init
+      working-directory: infra/terraform
+
+    - name: Terraform Validate
+      run: terraform validate
+      working-directory: infra/terraform
+
+    - name: Terraform Plan
+      if: github.event_name == 'pull_request'
+      run: terraform plan
+      working-directory: infra/terraform
+
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: terraform apply -auto-approve
+      working-directory: infra/terraform 

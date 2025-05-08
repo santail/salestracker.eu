@@ -1,0 +1,89 @@
+name: Deploy to AWS ECS
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  AWS_REGION: eu-central-1
+  ECR_REPOSITORY_PREFIX: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+  ECS_CLUSTER: salestracker-cluster
+  ECS_SERVICE_PUBLIC_PORTAL_FRONTEND: salestracker-public-portal-frontend
+  ECS_SERVICE_PUBLIC_PORTAL_API: salestracker-public-portal-api
+  ECS_SERVICE_SCRAPER: salestracker-scraper-service
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build and push Public Portal Frontend
+      env:
+        ECR_REPOSITORY: ${{ env.ECR_REPOSITORY_PREFIX }}/salestracker-public-portal-frontend
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REPOSITORY:latest -f infra/dockerfiles/public-portal-frontend.Dockerfile .
+        docker push $ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REPOSITORY:latest
+
+    - name: Build and push Public Portal API
+      env:
+        ECR_REPOSITORY: ${{ env.ECR_REPOSITORY_PREFIX }}/salestracker-public-portal-api
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REPOSITORY:latest -f infra/dockerfiles/public-portal-api.Dockerfile .
+        docker push $ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REPOSITORY:latest
+
+    - name: Build and push Scraper Service
+      env:
+        ECR_REPOSITORY: ${{ env.ECR_REPOSITORY_PREFIX }}/salestracker-scraper-service
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REPOSITORY:latest -f infra/dockerfiles/scraper-service.Dockerfile .
+        docker push $ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REPOSITORY:latest
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Update ECS services
+      run: |
+        aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE_PUBLIC_PORTAL_FRONTEND --force-new-deployment
+        aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE_PUBLIC_PORTAL_API --force-new-deployment
+        aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE_SCRAPER --force-new-deployment
+
+    - name: Wait for services to stabilize
+      run: |
+        aws ecs wait services-stable --cluster $ECS_CLUSTER --services $ECS_SERVICE_PUBLIC_PORTAL_FRONTEND $ECS_SERVICE_PUBLIC_PORTAL_API $ECS_SERVICE_SCRAPER 
