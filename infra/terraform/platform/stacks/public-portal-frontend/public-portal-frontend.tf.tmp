@@ -18,10 +18,10 @@ resource "aws_lb" "public_portal_frontend" {
 resource "aws_ecs_task_definition" "public_portal_frontend" {
   family                   = "${var.project_name}-public-portal-frontend"
   requires_compatibilities = ["FARGATE"]
-  network_mode            = "awsvpc"
-  cpu                     = 256
-  memory                  = 512
-  execution_role_arn      = aws_iam_role.ecs_task_execution_role.arn
+  network_mode             = "awsvpc"
+  cpu                      = 256
+  memory                   = 512
+  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
 
   container_definitions = jsonencode([
     {
@@ -29,7 +29,7 @@ resource "aws_ecs_task_definition" "public_portal_frontend" {
       image = "${aws_ecr_repository.public_portal_frontend.repository_url}:latest"
       environment = [
         {
-          name  = "REACT_APP_API_URL"
+          name = "REACT_APP_API_URL"
           #value = "http://${aws_lb.public_portal_api.dns_name}"
           value = "http://localhost:3000"
         }
@@ -85,7 +85,7 @@ resource "aws_security_group" "frontend_alb" {
 
 # Target Group for Frontend
 resource "aws_lb_target_group" "public_portal_frontend" {
-  name        = "${var.project_name}-frontend-tg"
+  name        = "${var.project_name}-public_portal_frontend-tg"
   port        = 80
   protocol    = "HTTP"
   target_type = "ip"
@@ -134,8 +134,3 @@ resource "aws_ecs_service" "public_portal_frontend" {
     aws_lb_listener.public_portal_frontend
   ]
 }
-
-# Output for Frontend URL
-output "frontend_url" {
-  value = "http://${aws_lb.public_portal_frontend.dns_name}"
-} 

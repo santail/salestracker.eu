@@ -34,18 +34,6 @@ variable "public_subnet_cidrs" {
   default     = ["10.0.101.0/24", "10.0.102.0/24"]
 }
 
-variable "db_username" {
-  description = "Username for RDS database"
-  type        = string
-  default     = "postgres"
-}
-
-variable "db_password" {
-  description = "Password for RDS database"
-  type        = string
-  sensitive   = true
-}
-
 variable "tags" {
   description = "Tags to apply to all resources"
   type        = map(string)

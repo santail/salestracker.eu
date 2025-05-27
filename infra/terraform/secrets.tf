@@ -1,20 +1,23 @@
 # Database credentials secret
-resource "aws_secretsmanager_secret" "db_credentials" {
-  name = "${var.project_name}/db-credentials"
-  description = "Database credentials for ${var.project_name}"
+resource "aws_secretsmanager_secret" "db-configuration" {
+  name                    = "${var.project_name}/db-configuration"
+  description             = "Database configuration for ${var.project_name}"
+  recovery_window_in_days = 0
 }
 
-resource "aws_secretsmanager_secret_version" "db_credentials" {
-  secret_id = aws_secretsmanager_secret.db_credentials.id
+resource "aws_secretsmanager_secret_version" "db-configuration" {
+  secret_id = aws_secretsmanager_secret.db-configuration.id
   secret_string = jsonencode({
-    username = var.db_username
-    password = var.db_password
+    username = "postgres"
+    password = "${random_password.database_password[0].result}"
     dbname   = "salestracker"
   })
 }
 
-# API keys and other sensitive configuration
-resource "aws_secretsmanager_secret" "app_config" {
-  name = "${var.project_name}/app-config"
-  description = "Application configuration for ${var.project_name}"
+resource "random_password" "database_password" {
+  count = 1
+
+  length           = 16
+  special          = true
+  override_special = "_"
 }
