@@ -1,349 +1,78 @@
-version: '3.7'
+version: '3.8'
+
 services:
-          
-  salestracker.eu-admin:
-    container_name: salestracker.eu-admin
+  scraper-service:
     build:
-      context: ./../salestracker.eu-admin/
-      dockerfile: Dockerfile.development
+      context: .
+      dockerfile: infra/dockerfiles/scraper-service.Dockerfile
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/salestracker
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - PROXY_API_URL=${PROXY_API_URL}
+    depends_on:
+      - postgres
+      - rabbitmq
+      - elasticsearch
+
+  public-portal-api:
+    build:
+      context: .
+      dockerfile: infra/dockerfiles/public-portal-api.Dockerfile
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/salestracker
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
     ports:
-      - "8000:8000"
-    volumes:
-      - ./../salestracker.eu-admin/:/usr/src/app/
-      - ./.data/uploads/:/usr/src/app/uploads/
-      - salestracker.eu-admin-modules:/usr/src/app/node_modules # will statically map node_modules folder to container. Should clean-up on each package.json change with docker rm -v containerId
-      - salestracker.eu-admin-public:/usr/src/app/public/lib # will statically map public/lib folder to container. Should clean-up on each bower.json change with docker rm -v containerId
-    environment:
-      - PORT=8000
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
-      - MONGODB_URI=mongodb://mongodb:27017/salestracker-dev
-      - REDIS_ADDR=redis
-      - REDIS_PORT=6379
-      - NODE_ENV=development
-    links:
-      - "server-elasticsearch:elasticsearch"
-      - "server-mongodb:mongodb"
-      - "server-redis:redis"
+      - "3000:3000"
     depends_on:
-      - server-elasticsearch
-      - server-mongodb
-      - server-redis
-      - tools-seeds
-    restart: on-failure
-    networks:
-      - networks-backend-elasticsearch
-      - networks-backend-mongodb
-      - networks-backend-redis
+      - postgres
+      - rabbitmq
+      - elasticsearch
 
-  salestracker.eu-public:
-    container_name: salestracker.eu-public
+  public-portal-frontend:
     build:
-      context: ./../salestracker.eu-public/
-      dockerfile: Dockerfile.development
+      context: .
+      dockerfile: infra/dockerfiles/public-portal-frontend.Dockerfile
+    environment:
+      - REACT_APP_API_URL=http://localhost:3000
     ports:
-      - "9000:9000"
-    volumes:
-      - ./../salestracker.eu-public/:/usr/src/app/
-      - ./.data/uploads/:/usr/src/app/uploads/
-      - salestracker.eu-public-modules:/usr/src/app/node_modules # will statically map node_modules folder to container. Should clean-up on each package.json change with docker rm -v containerId
-      - salestracker.eu-public-public:/usr/src/app/public/lib # will statically map public/lib folder to container. Should clean-up on each bower.json change with docker rm -v containerId
-    environment:
-      - PORT=9000
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
-      - MONGODB_URI=mongodb://mongodb:27017/salestracker-dev
-      - REDIS_ADDR=redis
-      - REDIS_PORT=6379
-      - NODE_ENV=development
-      - MONGO_SEED=true
-    links:
-      - "server-elasticsearch:elasticsearch"
-      - "server-mongodb:mongodb"
-      - "server-redis:redis"
+      - "80:80"
     depends_on:
-      - server-elasticsearch
-      - server-mongodb
-      - server-redis
-    restart: on-failure
-    networks:
-      - networks-backend-elasticsearch
-      - networks-backend-mongodb
-      - networks-backend-redis
+      - public-portal-api
 
-  salestracker.eu-finder:
-    container_name: salestracker.eu-finder
-    build:
-      context: ./../salestracker.eu-finder/
-      dockerfile: Dockerfile.development
+  postgres:
+    image: postgres:14-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=salestracker
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     ports:
-      - "9229:9229"
-    volumes:
-      - ./../salestracker.eu-finder/:/usr/src/app/
-      - salestracker.eu-finder-modules:/usr/src/app/node_modules
-    environment:
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
-      - MONGODB_URI=mongodb://mongodb:27017/salestracker-dev
-      - NODE_ENV=development
-      - REDIS_ADDR=redis
-      - REDIS_PORT=6379
-    links:
-      - "server-elasticsearch:elasticsearch"
-      - "server-mongodb:mongodb"
-      - "server-redis:redis"
-    depends_on:
-      - server-elasticsearch
-      - server-mongodb
-      - server-redis
-      - tools-seeds
-      - salestracker.eu-processor
-    restart: on-failure
-    networks:
-      - networks-backend-elasticsearch
-      - networks-backend-mongodb
-      - networks-backend-redis
+      - "5432:5432"
 
-  salestracker.eu-harvester:
-    container_name: salestracker.eu-harvester
-    build:
-      context: ./../salestracker.eu-harvester/
-      dockerfile: Dockerfile.development
-    volumes:
-      - ./../salestracker.eu-harvester/:/usr/src/app/
-      - ./.data/uploads/:/usr/src/app/uploads/
-      - salestracker.eu-harvester-modules:/usr/src/app/node_modules
-    environment:
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
-      - MONGODB_URI=mongodb://mongodb:27017/salestracker-dev
-      - REDIS_ADDR=redis
-      - REDIS_PORT=6379
-      - NODE_ENV=development
-      - PAGING_PAGES_LIMIT=1
-      - OFFERS_LIMIT=1
-    links:
-      - "server-elasticsearch:elasticsearch"
-      - "server-mongodb:mongodb"
-      - "server-redis:redis"
-    depends_on:
-      - server-elasticsearch
-      - server-mongodb
-      - server-redis
-      - tools-seeds
-      - salestracker.eu-processor
-    restart: on-failure    
-    networks:
-      - networks-backend-elasticsearch
-      - networks-backend-mongodb
-      - networks-backend-redis
-
-  salestracker.eu-janitor:
-    container_name: salestracker.eu-janitor
-    build:
-      context: ./../salestracker.eu-janitor/
-      dockerfile: Dockerfile.development
-    volumes:
-      - ./../salestracker.eu-janitor/:/usr/src/app/
-      - ./.data/uploads/:/usr/src/app/uploads/
-      - salestracker.eu-janitor-modules:/usr/src/app/node_modules
-    environment:
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
-      - MONGODB_URI=mongodb://mongodb:27017/salestracker-dev
-      - REDIS_ADDR=redis
-      - REDIS_PORT=6379
-      - NODE_ENV=development
-    links:
-      - "server-elasticsearch:elasticsearch"
-      - "server-mongodb:mongodb"
-      - "server-redis:redis"
-    depends_on:
-      - server-elasticsearch
-      - server-mongodb
-      - server-redis
-      - tools-seeds
-      - salestracker.eu-processor
-    restart: on-failure    
-    networks:
-      - networks-backend-elasticsearch
-      - networks-backend-mongodb
-      - networks-backend-redis
-
-  salestracker.eu-notifier:
-    container_name: salestracker.eu-notifier
-    build:
-      context: ./../salestracker.eu-notifier/
-      dockerfile: Dockerfile.development
-    volumes:
-      - ./../salestracker.eu-notifier/:/usr/src/app/
-      - ./.data/uploads/:/usr/src/app/uploads/
-      - salestracker.eu-notifier-modules:/usr/src/app/node_modules
-    environment:
-      - MONGODB_URI=mongodb://mongodb:27017/salestracker-dev
-      - REDIS_ADDR=redis
-      - REDIS_PORT=6379
-      - TELEGRAM_API_TOKEN=${TELEGRAM_API_TOKEN}
-      - NODE_ENV=development
-    links:
-      - "server-mongodb:mongodb"
-      - "server-redis:redis"
-    depends_on:
-      - server-mongodb
-      - server-redis
-    restart: on-failure    
-    networks:
-      - networks-backend-mongodb
-      - networks-backend-redis
-
-  salestracker.eu-processor:
-    container_name: salestracker.eu-processor
-    build:
-      context: ./../salestracker.eu-processor/
-      dockerfile: Dockerfile.development
-    volumes:
-      - ./../salestracker.eu-processor/:/usr/src/app/
-      - ./.data/uploads/:/usr/src/app/uploads/
-      - salestracker.eu-processor-modules:/usr/src/app/node_modules
-    environment:
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
-      - MONGODB_URI=mongodb://mongodb:27017/salestracker-dev
-      - REDIS_ADDR=redis
-      - REDIS_PORT=6379
-      - NODE_ENV=development
-      - SHOULD_HARVEST_PICTURES=true
-    links:
-      - "server-elasticsearch:elasticsearch"
-      - "server-mongodb:mongodb"
-      - "server-redis:redis"
-    depends_on:
-      - server-elasticsearch
-      - server-mongodb
-      - server-redis
-      - tools-seeds
-    restart: on-failure
-    networks:
-      - networks-backend-elasticsearch
-      - networks-backend-mongodb
-      - networks-backend-redis
-
-  server-mongodb:
-    container_name: server-mongodb
-    image: mongo:latest
-    restart: on-failure
-    networks:
-      - networks-backend-mongodb
-    healthcheck:
-      test:
-        - CMD
-        - mongo
-        - --eval
-        - "db.adminCommand('ping')"
-    volumes:
-      - "./.data/mongodb:/data/db"
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
     ports:
-      - "27017:27017"
-
-  server-redis:
-    container_name: server-redis
-    image: redis
-    restart: on-failure
-    networks:
-      - networks-backend-redis
+      - "5672:5672"
+      - "15672:15672"
     volumes:
-      - ./.data/redis:/data
-    ports:
-      - "6379:6379"
+      - rabbitmq_data:/var/lib/rabbitmq
 
-  server-elasticsearch:
-    image: elasticsearch:6.4.2
-    restart: on-failure
-    container_name: server-elasticsearch
-    command: elasticsearch -Ecluster.name=salestracker -Ebootstrap.memory_lock=true -Ehttp.port=9200 -Ehttp.cors.allow-origin="http://localhost:1358" -Ehttp.cors.enabled=true -Ehttp.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization -Ehttp.cors.allow-credentials=true
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
     environment:
+      - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
     ports:
       - "9200:9200"
-      - "9300:9300"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    networks:
-      - networks-backend-elasticsearch
-    volumes:
-      - ./.data/elasticsearch:/usr/share/elasticsearch/data
-    healthcheck:
-        test: curl -s https://localhost:9200 >/dev/null; if [[ $$? == 52 ]]; then echo 0; else echo 1; fi
-        interval: 30s
-        timeout: 10s
-        retries: 5
-        start_period: 60s
-
-  tools-mongodb-commander:
-    image: mongo-express
-    restart: on-failure
-    container_name: tools-mongodb-commander
-    environment:
-      ME_CONFIG_MONGODB_SERVER: mongodb
-      ME_CONFIG_MONGODB_URI: mongodb://admin:pass@mongodb:27017/salestracker-dev
-      VCAP_APP_PORT: 8082
-    links:
-      - "server-mongodb:mongodb"
-    depends_on:
-      - server-mongodb
-    ports:
-      - "8082:8082"
-    networks:
-      - networks-backend-mongodb
-
-  tools-kue-ui:
-    image: christophwitzko/kue-ui
-    restart: on-failure
-    hostname: kui-ui
-    container_name: tools-kui-ui
-    links:
-      - "server-redis:redis"
-    depends_on:
-      - server-redis
-    environment:
-      KUE_PREFIX: q
-    ports:
-      - "5000:5000"
-    networks:
-      - networks-backend-redis
-
-  tools-mailcatcher:
-    image: schickling/mailcatcher:latest
-    container_name: tools-mailcatcher
-    hostname: mailcatcher
-    ports:
-      - "1080:1080"
-      - "1025:1025"
-
-  tools-seeds:
-    container_name: tools-seeds
-    build:
-      context: ./salestracker.eu-seeds/
-      dockerfile: Dockerfile
-    environment:
-      DB_URI: mongodb://mongodb:27017/salestracker-dev
-      DROP_DATABASE: "true"
-      REPLACE_ID: "true"
-    links:
-      - "server-mongodb:mongodb"
-    networks:
-      - networks-backend-mongodb
-    depends_on:
-      - server-mongodb
-
-networks:
-  networks-backend-elasticsearch:
-  networks-backend-mongodb:
-  networks-backend-redis:
 
 volumes:
-  salestracker.eu-admin-modules:
-  salestracker.eu-admin-public:
-  salestracker.eu-public-modules:
-  salestracker.eu-public-public:
-  salestracker.eu-finder-modules:
-  salestracker.eu-harvester-modules:
-  salestracker.eu-janitor-modules:
-  salestracker.eu-notifier-modules:
-  salestracker.eu-processor-modules:
+  postgres_data:
+  rabbitmq_data:
+  elasticsearch_data:
