@@ -55,7 +55,7 @@
     "puppeteer": "^24.8.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
-    "typeorm": "^0.3.0",
+    "typeorm": "^0.3.27",
     "vite": "^6.3.5"
   },
   "devDependencies": {
